@@ -1,0 +1,19 @@
+{
+  "name": "@anzenjs/joi",
+  "version": "0.0.1",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "scripts": {
+    "clean": "rimraf ./dist",
+    "prebuild": "yarn clean",
+    "build": "tsc --outDir dist",
+    "test": "mocha -r @ts-tools/node/r \"test/**/*.spec.ts?(x)\" --watch-extensions ts,tsx --colors"
+  },
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "joi": "^14.3.1"
+  }
+}

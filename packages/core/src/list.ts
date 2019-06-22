@@ -29,7 +29,7 @@ export function List<S extends SchemaLike>(
     type: SchemaType.List,
     childSchema: resolveSchema(childSchema),
     get _(): any {
-      throw new Error('')
+      return undefined
     },
   }
   return Object.assign((target: any, key: any) => {

@@ -12,7 +12,9 @@ import { SchemaResolver } from './decoder'
 
 export * from './decoder'
 
-export const defaultJoi = Joi.defaults(schema => {
+export * from './decorators'
+
+export const commonJoi = Joi.defaults(schema => {
   if (schema.schemaType === 'array') {
     schema = (schema as ArraySchema).single()
   }

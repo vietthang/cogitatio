@@ -2,11 +2,13 @@ import {
   Constructor,
   PrimitiveConstructor,
   reflectClass,
+  resolveSchema,
   Schema,
   SchemaType,
 } from '@anzenjs/core'
 import { IDecoder } from '@anzenjs/extra'
 import Joi, { Schema as JoiSchema } from 'joi'
+import { getPropertyTransformers } from './transformer'
 
 type Transformer<T, U> = (value: T) => U
 
@@ -33,7 +35,7 @@ export interface IJoiDecoderOptions {
 }
 
 export class JoiDecoder implements IDecoder<unknown> {
-  private readonly resolveSchema = cache(
+  private readonly resolveJoiSchema = cache(
     (schema: Schema): JoiSchema => {
       if (this.options.schemaResolvers) {
         for (const resolver of this.options.schemaResolvers) {
@@ -50,19 +52,25 @@ export class JoiDecoder implements IDecoder<unknown> {
         case SchemaType.Enum:
           return this.options.joi.only(Object.values(schema.enumValues))
         case SchemaType.Optional:
-          return this.resolveSchema(schema.childSchema).optional()
+          return this.resolveJoiSchema(schema.childSchema).optional()
         case SchemaType.Nullable:
-          return this.resolveSchema(schema.childSchema).allow(null)
+          return this.resolveJoiSchema(schema.childSchema).allow(null)
         case SchemaType.List:
           return this.options.joi
             .array()
-            .items(this.resolveSchema(schema.childSchema))
+            .items(this.resolveJoiSchema(schema.childSchema))
+        case SchemaType.Dictionary:
+          return this.options.joi
+            .object()
+            .pattern(/.*/, this.resolveJoiSchema(schema.childSchema))
+
         case SchemaType.Tuple:
           return this.options.joi
             .array()
+            .length(schema.childSchemas.length)
             .ordered(
               schema.childSchemas.map(childSchema =>
-                this.resolveSchema(childSchema),
+                this.resolveJoiSchema(childSchema),
               ),
             )
         case SchemaType.Object:
@@ -84,9 +92,16 @@ export class JoiDecoder implements IDecoder<unknown> {
       return this.options.joi.object(
         keys.reduce(
           (prev, key) => {
+            let joiSchema = this.resolveJoiSchema(
+              resolveSchema(descriptor[key]),
+            )
+            const transformers = getPropertyTransformers(ctor, key)
+            for (const transformer of transformers) {
+              joiSchema = transformer(joiSchema)
+            }
             return {
               ...prev,
-              [key]: this.resolveSchema(descriptor[key]),
+              [key]: joiSchema,
             }
           },
           {} as any,
@@ -109,7 +124,7 @@ export class JoiDecoder implements IDecoder<unknown> {
         case Date:
           return this.options.joi.date()
         case ArrayBuffer:
-          return this.options.joi.binary()
+          throw new Error('ArrayBuffer is not supported by joi yet')
         case Buffer:
           return this.options.joi.binary()
         default:
@@ -132,7 +147,10 @@ export class JoiDecoder implements IDecoder<unknown> {
 
   public decode(schema: Schema) {
     return (value: unknown): any => {
-      const result = this.resolveSchema(schema).validate(value)
+      const result = this.resolveJoiSchema(schema).validate(
+        value,
+        this.options.validationOptions,
+      )
       if (result.error) {
         throw result.error
       }

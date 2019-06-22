@@ -32,7 +32,7 @@ export function Tuple<SS extends [SchemaLike, ...SchemaLike[]]>(
     type: SchemaType.Tuple,
     childSchemas: childSchemas.map(resolveSchema),
     get _(): any {
-      throw new Error('')
+      return undefined
     },
   }
   return Object.assign((target: any, key: any) => {

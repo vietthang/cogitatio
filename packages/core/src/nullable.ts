@@ -31,7 +31,7 @@ export function Nullable<S extends SchemaLike>(
     type: SchemaType.Nullable,
     childSchema: resolveSchema(childSchema),
     get _(): any {
-      throw new Error('')
+      return undefined
     },
   }
   return Object.assign((target: any, key: any) => {

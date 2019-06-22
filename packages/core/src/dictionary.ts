@@ -35,7 +35,7 @@ export function Dictionary<S extends SchemaLike>(
     type: SchemaType.Dictionary,
     childSchema: resolveSchema(childSchema),
     get _(): any {
-      throw new Error('')
+      return undefined
     },
   }
   return Object.assign((target: any, key: any) => {

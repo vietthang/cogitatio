@@ -1,5 +1,3 @@
-import 'node'
-
 import { IBaseSchema, SchemaType } from './common'
 
 export type PrimitiveConstructor =

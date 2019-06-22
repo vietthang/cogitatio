@@ -7,13 +7,15 @@
     "clean": "rimraf ./dist",
     "prebuild": "yarn clean",
     "build": "tsc --outDir dist",
-    "test": "mocha -r @ts-tools/node/r \"test/**/*.spec.ts?(x)\" --watch-extensions ts,tsx --colors"
+    "test": "jest"
   },
   "license": "MIT",
   "publishConfig": {
     "access": "public"
   },
   "dependencies": {
-    "joi": "^14.3.1"
+    "joi": "^14.3.1",
+    "@anzenjs/core": "0.0.2",
+    "@anzenjs/extra": "0.0.2"
   }
 }

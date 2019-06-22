@@ -30,7 +30,7 @@ export function Enum<T extends {} = {}>(
     type: SchemaType.Enum,
     enumValues: values,
     get _(): any {
-      throw new Error('')
+      return undefined
     },
   }
   return Object.assign((target: any, key: any) => {

@@ -49,7 +49,7 @@ export function Property<T extends {}>(
 export function Property<S extends IBrandSchema>(schema: S): BrandDecorator<S>
 
 export function Property(schema: SchemaLike): any {
-  return <T>(target: Constructor<T>, key: keyof T) => {
-    decorateClass(target, key, schema)
+  return <T extends object>(target: T, key: keyof T) => {
+    decorateClass<T, keyof T>(target.constructor as any, key, schema)
   }
 }

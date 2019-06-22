@@ -1,45 +1,45 @@
 import { Brand, ResolveBrand } from '@anzenjs/core'
 
-const emailSymbol = Symbol('email')
+export const emailSymbol = Symbol('email')
 
-export const emailSchema = Brand(String, emailSymbol)
+export const Email = Brand(String, emailSymbol)
 
-export type Email = ResolveBrand<typeof emailSchema>
+export type Email = ResolveBrand<typeof Email>
 
-const uriSymbol = Symbol('uri')
+export const uriSymbol = Symbol('uri')
 
 export const uriSchema = Brand(String, uriSymbol)
 
 export type Uri = ResolveBrand<typeof uriSchema>
 
-const integerSymbol = Symbol('integer')
+export const integerSymbol = Symbol('integer')
 
-export const integerSchema = Brand(Number, integerSymbol)
+export const Integer = Brand(Number, integerSymbol)
 
-export type Integer = ResolveBrand<typeof integerSchema>
+export type Integer = ResolveBrand<typeof Integer>
 
-const portSymbol = Symbol('port')
+export const portSymbol = Symbol('port')
 
-export const portSchema = Brand(integerSchema, portSymbol)
+export const Port = Brand(Integer, portSymbol)
 
-export type Port = ResolveBrand<typeof portSchema>
+export type Port = ResolveBrand<typeof Port>
 
-const ipSymbol = Symbol('ip')
+export const ipSymbol = Symbol('ip')
 
-export const ipSchema = Brand(String, ipSymbol)
+export const Ip = Brand(String, ipSymbol)
 
-export type Ip = ResolveBrand<typeof ipSchema>
+export type Ip = ResolveBrand<typeof Ip>
 
-const hostnameSymbol = Symbol('hostname')
+export const hostnameSymbol = Symbol('hostname')
 
-export const hostnameSchema = Brand(String, hostnameSymbol)
+export const Hostname = Brand(String, hostnameSymbol)
 
-export type Hostname = ResolveBrand<typeof hostnameSchema>
+export type Hostname = ResolveBrand<typeof Hostname>
 
-const uuidSymbol = Symbol('uuid')
+export const uuidSymbol = Symbol('uuid')
 
-export const uuidSchema = Brand(String, uuidSymbol)
+export const Uuid = Brand(String, uuidSymbol)
 
-export type Uuid = ResolveBrand<typeof uuidSchema>
+export type Uuid = ResolveBrand<typeof Uuid>
 
 export { IEncoder, IDecoder, ICodec } from './codec'

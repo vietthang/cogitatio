@@ -1,12 +1,12 @@
 {
   "name": "@anzenjs/joi",
   "version": "0.0.2",
-  "main": "dist/src/index.js",
-  "types": "dist/src/index.d.ts",
+  "main": "cjs/src/index.js",
+  "types": "cjs/src/index.d.ts",
   "scripts": {
-    "clean": "rimraf ./dist",
+    "clean": "rimraf ./cjs",
     "prebuild": "yarn clean",
-    "build": "tsc --outDir dist",
+    "build": "ts-build . --cjs",
     "test": "jest"
   },
   "license": "MIT",

@@ -1,13 +1,12 @@
 {
   "name": "@anzenjs/extra",
   "version": "0.0.2",
-  "main": "dist/src/index.js",
-  "types": "dist/src/index.d.ts",
+  "main": "cjs/src/index.js",
+  "types": "cjs/src/index.d.ts",
   "scripts": {
     "clean": "rimraf ./dist",
     "prebuild": "yarn clean",
-    "build": "tsc --outDir dist",
-    "test": "mocha -r @ts-tools/node/r \"test/**/*.spec.ts?(x)\" --watch-extensions ts,tsx --colors"
+    "build": "ts-build . --cjs"
   },
   "license": "MIT",
   "publishConfig": {

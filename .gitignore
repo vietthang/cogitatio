@@ -101,3 +101,5 @@ typings/
 
 # DynamoDB Local files
 .dynamodb/
+
+cjs

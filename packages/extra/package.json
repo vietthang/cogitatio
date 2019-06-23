@@ -1,6 +1,6 @@
 {
   "name": "@anzenjs/extra",
-  "version": "0.0.4-alpha.1",
+  "version": "0.0.4-alpha.3",
   "main": "cjs/src/index.js",
   "types": "cjs/src/index.d.ts",
   "scripts": {

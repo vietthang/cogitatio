@@ -1,6 +1,6 @@
 {
   "name": "@anzenjs/core",
-  "version": "0.0.3",
+  "version": "0.0.4-0.0.4-alpha.2.0",
   "main": "cjs/src/index.js",
   "types": "cjs/src/index.d.ts",
   "scripts": {

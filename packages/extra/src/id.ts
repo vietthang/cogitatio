@@ -1,4 +1,4 @@
-import { Brand, Constructor } from '@anzenjs/core'
+import { Brand, Constructor, IBrandSchema } from '@anzenjs/core'
 
 type Transformer<T, U> = (value: T) => U
 
@@ -18,8 +18,12 @@ function cache<T extends object, U>(
 
 export const idSymbol = Symbol()
 
-export const Id = cache(<T>(ctor: Constructor<T>) => {
-  return Brand(String, idSymbol, ctor)
-})
+export const Id = cache(
+  <T>(
+    ctor: Constructor<T>,
+  ): IBrandSchema<string, typeof idSymbol, Constructor<T>> => {
+    return Brand(String, idSymbol, ctor)
+  },
+)
 
 export type Id<T> = string & { [idSymbol]: Constructor<T> }

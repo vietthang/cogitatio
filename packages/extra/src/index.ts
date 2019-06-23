@@ -1,44 +1,66 @@
-import { Brand, ResolveBrand } from '@anzenjs/core'
+import { Brand, IBrandSchema, ResolveBrand } from '@anzenjs/core'
 
 export const emailSymbol = Symbol('email')
 
-export const Email = Brand(String, emailSymbol)
+export const Email: IBrandSchema<string, typeof emailSymbol, true> = Brand(
+  String,
+  emailSymbol,
+)
 
 export type Email = ResolveBrand<typeof Email>
 
 export const uriSymbol = Symbol('uri')
 
-export const Uri = Brand(String, uriSymbol)
+export const Uri: IBrandSchema<string, typeof uriSymbol, true> = Brand(
+  String,
+  uriSymbol,
+)
 
 export type Uri = ResolveBrand<typeof Uri>
 
 export const integerSymbol = Symbol('integer')
 
-export const Integer = Brand(Number, integerSymbol)
+export const Integer: IBrandSchema<number, typeof integerSymbol, true> = Brand(
+  Number,
+  integerSymbol,
+)
 
 export type Integer = ResolveBrand<typeof Integer>
 
 export const portSymbol = Symbol('port')
 
-export const Port = Brand(Integer, portSymbol)
+export const Port: IBrandSchema<Integer, typeof portSymbol, true> = Brand(
+  Integer,
+  portSymbol,
+)
 
 export type Port = ResolveBrand<typeof Port>
 
 export const ipSymbol = Symbol('ip')
 
-export const Ip = Brand(String, ipSymbol)
+export const Ip: IBrandSchema<string, typeof ipSymbol, true> = Brand(
+  String,
+  ipSymbol,
+)
 
 export type Ip = ResolveBrand<typeof Ip>
 
 export const hostnameSymbol = Symbol('hostname')
 
-export const Hostname = Brand(String, hostnameSymbol)
+export const Hostname: IBrandSchema<
+  string,
+  typeof hostnameSymbol,
+  true
+> = Brand(String, hostnameSymbol)
 
 export type Hostname = ResolveBrand<typeof Hostname>
 
 export const uuidSymbol = Symbol('uuid')
 
-export const Uuid = Brand(String, uuidSymbol)
+export const Uuid: IBrandSchema<string, typeof uuidSymbol, true> = Brand(
+  String,
+  uuidSymbol,
+)
 
 export type Uuid = ResolveBrand<typeof Uuid>
 

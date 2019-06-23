@@ -50,16 +50,21 @@ export class JoiDecoder implements IDecoder<unknown> {
       switch (schema.type) {
         case SchemaType.Primitive:
           return this.resolvePrimitveSchema(schema.native)
+
         case SchemaType.Enum:
           return this.options.joi.only(Object.values(schema.enumValues))
+
         case SchemaType.Optional:
           return this.resolveJoiSchema(schema.childSchema).optional()
+
         case SchemaType.Nullable:
           return this.resolveJoiSchema(schema.childSchema).allow(null)
+
         case SchemaType.List:
           return this.options.joi
             .array()
             .items(this.resolveJoiSchema(schema.childSchema))
+
         case SchemaType.Dictionary:
           return this.options.joi
             .object()
@@ -76,6 +81,10 @@ export class JoiDecoder implements IDecoder<unknown> {
             )
         case SchemaType.Object:
           return this.resolveObjectSchema(schema.resolver())
+
+        case SchemaType.Brand:
+          return this.resolveJoiSchema(schema.childSchema)
+
         default:
           throw new Error('unsupported')
       }

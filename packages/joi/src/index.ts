@@ -1,12 +1,4 @@
-import {
-  emailSchema,
-  hostnameSchema,
-  integerSchema,
-  ipSchema,
-  portSchema,
-  uriSchema,
-  uuidSchema,
-} from '@anzenjs/extra'
+import { Email, Hostname, Integer, Ip, Port, Uri, Uuid } from '@anzenjs/extra'
 import Joi, { ArraySchema } from 'joi'
 import { SchemaResolver } from './decoder'
 
@@ -24,19 +16,19 @@ export const commonJoi = Joi.defaults(schema => {
 export const wellKnownBrandResolvers: SchemaResolver[] = [
   schema => {
     switch (schema) {
-      case emailSchema:
+      case Email:
         return Joi.string().email()
-      case uriSchema:
+      case Uri:
         return Joi.string().uri()
-      case integerSchema:
+      case Integer:
         return Joi.number().integer()
-      case portSchema:
+      case Port:
         return Joi.number().port()
-      case ipSchema:
+      case Ip:
         return Joi.string().ip()
-      case hostnameSchema:
+      case Hostname:
         return Joi.string().hostname()
-      case uuidSchema:
+      case Uuid:
         return Joi.string().guid()
       default:
         return undefined

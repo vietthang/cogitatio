@@ -4,6 +4,7 @@ import {
   reflectClass,
   resolveSchema,
   Schema,
+  SchemaLike,
   SchemaType,
 } from '@anzenjs/core'
 import { IDecoder } from '@anzenjs/extra'
@@ -145,9 +146,9 @@ export class JoiDecoder implements IDecoder<unknown> {
     },
   ) {}
 
-  public decode(schema: Schema) {
+  public decode(schema: SchemaLike) {
     return (value: unknown): any => {
-      const result = this.resolveJoiSchema(schema).validate(
+      const result = this.resolveJoiSchema(resolveSchema(schema)).validate(
         value,
         this.options.validationOptions,
       )

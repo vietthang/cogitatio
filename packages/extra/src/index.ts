@@ -8,9 +8,9 @@ export type Email = ResolveBrand<typeof Email>
 
 export const uriSymbol = Symbol('uri')
 
-export const uriSchema = Brand(String, uriSymbol)
+export const Uri = Brand(String, uriSymbol)
 
-export type Uri = ResolveBrand<typeof uriSchema>
+export type Uri = ResolveBrand<typeof Uri>
 
 export const integerSymbol = Symbol('integer')
 
@@ -43,3 +43,5 @@ export const Uuid = Brand(String, uuidSymbol)
 export type Uuid = ResolveBrand<typeof Uuid>
 
 export { IEncoder, IDecoder, ICodec } from './codec'
+
+export { Id } from './id'

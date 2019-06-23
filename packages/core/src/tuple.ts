@@ -1,5 +1,4 @@
 import { IBaseSchema, SchemaType } from './common'
-import { Property } from './property'
 import { Resolve, resolveSchema, Schema, SchemaLike } from './schema'
 
 export interface ITupleSchema<
@@ -26,16 +25,9 @@ export type TupleDecorator<S extends ITupleSchema> = <
 
 export function Tuple<SS extends [SchemaLike, ...SchemaLike[]]>(
   ...childSchemas: SS
-): ITupleSchema<{ [key in keyof SS]: Resolve<SS[key]> }> &
-  TupleDecorator<ITupleSchema<{ [key in keyof SS]: Resolve<SS[key]> }>> {
-  const schema: ITupleSchema<{ [key in keyof SS]: Resolve<SS[key]> }> = {
+): ITupleSchema<{ [key in keyof SS]: Resolve<SS[key]> }> {
+  return {
     type: SchemaType.Tuple,
     childSchemas: childSchemas.map(resolveSchema),
-    get _(): any {
-      return undefined
-    },
-  }
-  return Object.assign((target: any, key: any) => {
-    Property(schema)(target, key)
-  }, schema)
+  } as ITupleSchema<{ [key in keyof SS]: Resolve<SS[key]> }>
 }

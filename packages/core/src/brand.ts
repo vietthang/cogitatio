@@ -1,5 +1,4 @@
 import { IBaseSchema, SchemaType } from './common'
-import { Property } from './property'
 import { Resolve, resolveSchema, Schema, SchemaLike } from './schema'
 
 export interface IBrandSchema<
@@ -40,18 +39,11 @@ export function Brand<
   childSchema: S,
   brand: B,
   value: V = true as V,
-): IBrandSchema<Resolve<S>, B, V> &
-  BrandDecorator<IBrandSchema<Resolve<S>, B, V>> {
-  const schema: IBrandSchema<Resolve<S>, B, V> = {
+): IBrandSchema<Resolve<S>, B, V> {
+  return {
     type: SchemaType.Brand,
     childSchema: resolveSchema(childSchema),
     brand,
     value,
-    get _(): any {
-      return undefined
-    },
-  }
-  return Object.assign((target: any, key: any) => {
-    Property(schema)(target, key)
-  }, schema)
+  } as IBrandSchema<Resolve<S>, B, V>
 }

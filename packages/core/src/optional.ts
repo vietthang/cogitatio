@@ -1,5 +1,4 @@
 import { IBaseSchema, SchemaType } from './common'
-import { Property } from './property'
 import { Resolve, resolveSchema, Schema, SchemaLike } from './schema'
 
 export interface IOptionalSchema<T extends unknown = unknown>
@@ -25,16 +24,9 @@ export type OptionalDecorator<S extends IOptionalSchema> = <
 
 export function Optional<S extends SchemaLike>(
   childSchema: S,
-): IOptionalSchema<Resolve<S>> &
-  OptionalDecorator<IOptionalSchema<Resolve<S>>> {
-  const schema: IOptionalSchema<Resolve<S>> = {
+): IOptionalSchema<Resolve<S>> {
+  return {
     type: SchemaType.Optional,
     childSchema: resolveSchema(childSchema),
-    get _(): any {
-      return undefined
-    },
-  }
-  return Object.assign((target: any, key: any) => {
-    Property(schema)(target, key)
-  }, schema)
+  } as IOptionalSchema<Resolve<S>>
 }

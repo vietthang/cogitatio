@@ -1,5 +1,4 @@
 import { IBaseSchema, SchemaType } from './common'
-import { Property } from './property'
 import { Resolve, resolveSchema, Schema, SchemaLike } from './schema'
 
 export interface Dictionary<T extends unknown> {
@@ -29,16 +28,9 @@ export type DictionaryDecorator<S extends IDictionarySchema> = <
 
 export function Dictionary<S extends SchemaLike>(
   childSchema: S,
-): IDictionarySchema<Resolve<S>> &
-  DictionaryDecorator<IDictionarySchema<Resolve<S>>> {
-  const schema: IDictionarySchema<Resolve<S>> = {
+): IDictionarySchema<Resolve<S>> {
+  return {
     type: SchemaType.Dictionary,
     childSchema: resolveSchema(childSchema),
-    get _(): any {
-      return undefined
-    },
-  }
-  return Object.assign((target: any, key: any) => {
-    Property(schema)(target, key)
-  }, schema)
+  } as IDictionarySchema<Resolve<S>>
 }

@@ -1,5 +1,4 @@
 import { IBaseSchema, SchemaType } from './common'
-import { Property } from './property'
 import { Resolve, resolveSchema, Schema, SchemaLike } from './schema'
 
 export interface IListSchema<T extends unknown = unknown> extends IBaseSchema {
@@ -24,15 +23,12 @@ export type ListDecorator<S extends IListSchema> = <
 
 export function List<S extends SchemaLike>(
   childSchema: S,
-): IListSchema<Resolve<S>> & ListDecorator<IListSchema<Resolve<S>>> {
-  const schema: IListSchema<Resolve<S>> = {
+): IListSchema<Resolve<S>> {
+  return {
     type: SchemaType.List,
     childSchema: resolveSchema(childSchema),
     get _(): any {
       return undefined
     },
-  }
-  return Object.assign((target: any, key: any) => {
-    Property(schema)(target, key)
-  }, schema)
+  } as IListSchema<Resolve<S>>
 }

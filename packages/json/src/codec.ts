@@ -4,7 +4,9 @@ import {
   Primitive,
   reflectClass,
   Resolve,
+  resolveSchema,
   Schema,
+  SchemaLike,
   SchemaType,
 } from '@anzenjs/core'
 import { ICodec } from '@anzenjs/extra'
@@ -12,7 +14,9 @@ import { decode, encode } from 'base64-arraybuffer'
 import { JsonValue } from './types'
 
 export class JsonCodec implements ICodec<JsonValue, JsonValue> {
-  public encode(schema: Schema) {
+  public encode(schemaLike: SchemaLike) {
+    const schema = resolveSchema(schemaLike)
+
     return (value: Resolve<Schema>): JsonValue => {
       switch (schema.type) {
         case SchemaType.Primitive:
@@ -48,7 +52,9 @@ export class JsonCodec implements ICodec<JsonValue, JsonValue> {
     }
   }
 
-  public decode(schema: Schema) {
+  public decode(schemaLike: SchemaLike) {
+    const schema = resolveSchema(schemaLike)
+
     return (value: JsonValue): any => {
       switch (schema.type) {
         case SchemaType.Primitive:

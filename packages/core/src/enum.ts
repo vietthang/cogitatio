@@ -1,5 +1,4 @@
 import { IBaseSchema, SchemaType } from './common'
-import { Property } from './property'
 
 export interface IEnumSchema<T extends {} = {}> extends IBaseSchema {
   type: SchemaType.Enum
@@ -23,17 +22,9 @@ export type EnumDecorator<S extends IEnumSchema> = <
   key: Key,
 ) => void
 
-export function Enum<T extends {} = {}>(
-  values: T,
-): IEnumSchema<T> & EnumDecorator<IEnumSchema<T>> {
-  const schema: IEnumSchema<T> = {
+export function Enum<T extends {} = {}>(values: T): IEnumSchema<T> {
+  return {
     type: SchemaType.Enum,
     enumValues: values,
-    get _(): any {
-      return undefined
-    },
-  }
-  return Object.assign((target: any, key: any) => {
-    Property(schema)(target, key)
-  }, schema)
+  } as IEnumSchema<T>
 }

@@ -1,5 +1,4 @@
 import { IBaseSchema, SchemaType } from './common'
-import { Property } from './property'
 import { Resolve, resolveSchema, Schema, SchemaLike } from './schema'
 
 export interface INullableSchema<T extends unknown = unknown>
@@ -25,16 +24,9 @@ export type NullableDecorator<S extends INullableSchema> = <
 
 export function Nullable<S extends SchemaLike>(
   childSchema: S,
-): INullableSchema<Resolve<S>> &
-  NullableDecorator<INullableSchema<Resolve<S>>> {
-  const schema: INullableSchema<Resolve<S>> = {
+): INullableSchema<Resolve<S>> {
+  return {
     type: SchemaType.Nullable,
     childSchema: resolveSchema(childSchema),
-    get _(): any {
-      return undefined
-    },
-  }
-  return Object.assign((target: any, key: any) => {
-    Property(schema)(target, key)
-  }, schema)
+  } as INullableSchema<Resolve<S>>
 }

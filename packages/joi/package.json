@@ -1,6 +1,6 @@
 {
   "name": "@anzenjs/joi",
-  "version": "0.0.4-alpha.0",
+  "version": "0.0.4-alpha.1",
   "main": "cjs/src/index.js",
   "types": "cjs/src/index.d.ts",
   "scripts": {
@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@anzenjs/core": "^0.0.3",
-    "@anzenjs/extra": "^0.0.4-alpha.0",
+    "@anzenjs/extra": "^0.0.4-alpha.1",
     "joi": "^14.3.1"
   }
 }

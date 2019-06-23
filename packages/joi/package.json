@@ -1,6 +1,6 @@
 {
   "name": "@anzenjs/joi",
-  "version": "0.0.4-alpha.3",
+  "version": "0.0.4-alpha.4",
   "main": "cjs/src/index.js",
   "types": "cjs/src/index.d.ts",
   "scripts": {

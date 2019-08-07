@@ -8,8 +8,8 @@ import {
   Schema,
   SchemaLike,
   SchemaType,
-} from '@anzenjs/core'
-import { ICodec } from '@anzenjs/extra'
+} from '@cogitatio/core'
+import { ICodec } from '@cogitatio/extra'
 import { decode, encode } from 'base64-arraybuffer'
 import { JsonValue } from './types'
 

@@ -1,5 +1,5 @@
 {
-  "name": "@anzenjs/extra",
+  "name": "@cogitatio/extra",
   "version": "0.0.4-alpha.3",
   "main": "cjs/src/index.js",
   "types": "cjs/src/index.d.ts",

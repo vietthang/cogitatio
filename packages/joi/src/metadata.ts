@@ -1,4 +1,4 @@
-import { Schema as JoiSchema } from 'joi'
+import { Schema as JoiSchema } from '@hapi/joi'
 
 const reflectMap = new WeakMap<any, any>()
 

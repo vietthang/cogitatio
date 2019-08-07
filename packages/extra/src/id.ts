@@ -1,4 +1,4 @@
-import { Brand, Constructor, IBrandSchema } from '@anzenjs/core'
+import { Brand, Constructor, IBrandSchema } from '@cogitatio/core'
 
 type Transformer<T, U> = (value: T) => U
 

@@ -1,4 +1,4 @@
-import { Brand, IBrandSchema, ResolveBrand } from '@anzenjs/core'
+import { Brand, IBrandSchema, ResolveBrand } from '@cogitatio/core'
 
 export const emailSymbol = Symbol('email')
 

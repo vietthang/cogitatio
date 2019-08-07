@@ -7,7 +7,7 @@ import {
   IpOptions,
   StringRegexOptions,
   UriOptions,
-} from 'joi'
+} from '@hapi/joi'
 import { PropertyConfig } from './transformer'
 
 export function Integer() {

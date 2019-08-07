@@ -1,4 +1,4 @@
-import { Resolve, SchemaLike } from '@anzenjs/core'
+import { Resolve, SchemaLike } from '@cogitatio/core'
 
 export interface IEncoder<O extends unknown> {
   encode<S extends SchemaLike>(schema: S): (value: Resolve<S>) => O

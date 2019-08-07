@@ -6,9 +6,9 @@ import {
   Schema,
   SchemaLike,
   SchemaType,
-} from '@anzenjs/core'
-import { IDecoder } from '@anzenjs/extra'
-import Joi, { Schema as JoiSchema } from 'joi'
+} from '@cogitatio/core'
+import { IDecoder } from '@cogitatio/extra'
+import Joi, { Schema as JoiSchema } from '@hapi/joi'
 import { getPropertyTransformers } from './transformer'
 
 type Transformer<T, U> = (value: T) => U
@@ -134,7 +134,7 @@ export class JoiDecoder implements IDecoder<unknown> {
         case Date:
           return this.options.joi.date()
         case ArrayBuffer:
-          throw new Error('ArrayBuffer is not supported by joi yet')
+          return this.options.joi.binary()
         case Buffer:
           return this.options.joi.binary()
         default:

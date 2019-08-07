@@ -1,5 +1,5 @@
 {
-  "name": "@anzenjs/json",
+  "name": "@cogitatio/json",
   "version": "0.0.4-0.0.4-alpha.2.0",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",

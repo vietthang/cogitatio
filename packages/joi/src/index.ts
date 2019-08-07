@@ -1,9 +1,8 @@
-import { Email, Hostname, Integer, Ip, Port, Uri, Uuid } from '@anzenjs/extra'
-import Joi, { ArraySchema } from 'joi'
+import { Email, Hostname, Integer, Ip, Port, Uri, Uuid } from '@cogitatio/extra'
+import Joi, { ArraySchema } from '@hapi/joi'
 import { SchemaResolver } from './decoder'
 
 export * from './decoder'
-
 export * from './decorators'
 
 export const commonJoi = Joi.defaults(schema => {

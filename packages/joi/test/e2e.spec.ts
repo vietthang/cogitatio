@@ -9,7 +9,7 @@ import {
   Property,
   resolveSchema,
   Tuple,
-} from '@anzenjs/core'
+} from '@cogitatio/core'
 import assert from 'assert'
 import { JoiDecoder } from '../src'
 
@@ -27,10 +27,10 @@ describe('validate primitive', () => {
     })
 
     it('should success with boolean value', () => {
-      assert.equal(true, validate('true'))
-      assert.equal(false, validate('false'))
-      assert.equal(true, validate(true))
-      assert.equal(false, validate(false))
+      assert.strictEqual(true, validate('true'))
+      assert.strictEqual(false, validate('false'))
+      assert.strictEqual(true, validate(true))
+      assert.strictEqual(false, validate(false))
     })
   })
 
@@ -44,10 +44,10 @@ describe('validate primitive', () => {
     })
 
     it('should success with number value', () => {
-      assert.equal(1, validate('1'))
-      assert.equal(1.1, validate('1.1'))
-      assert.equal(1.1, validate(1.1))
-      assert.equal(1, validate(1))
+      assert.strictEqual(1, validate('1'))
+      assert.strictEqual(1.1, validate('1.1'))
+      assert.strictEqual(1.1, validate(1.1))
+      assert.strictEqual(1, validate(1))
     })
   })
 
@@ -62,7 +62,7 @@ describe('validate primitive', () => {
     })
 
     it('should success with string value', () => {
-      assert.equal('foo', validate('foo'))
+      assert.strictEqual('foo', validate('foo'))
     })
   })
 
@@ -129,9 +129,9 @@ describe('validate enum', () => {
   })
 
   it('should success with enum & string value', () => {
-    assert.equal(Color.Red, validate(Color.Red))
-    assert.equal(Color.Red, validate('Red'))
-    assert.equal(Color.Green, validate(Color.Green))
+    assert.strictEqual(Color.Red, validate(Color.Red))
+    assert.strictEqual(Color.Red, validate('Red'))
+    assert.strictEqual(Color.Green, validate(Color.Green))
   })
 })
 
@@ -148,8 +148,8 @@ describe('validate optional', () => {
   })
 
   it('should success with string or undefined value', () => {
-    assert.equal('foo', validate('foo'))
-    assert.equal(undefined, validate(undefined))
+    assert.strictEqual('foo', validate('foo'))
+    assert.strictEqual(undefined, validate(undefined))
   })
 })
 
@@ -166,8 +166,8 @@ describe('validate nullable', () => {
   })
 
   it('should success with string or null value', () => {
-    assert.equal('foo', validate('foo'))
-    assert.equal(null, validate(null))
+    assert.strictEqual('foo', validate('foo'))
+    assert.strictEqual(null, validate(null))
   })
 })
 

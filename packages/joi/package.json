@@ -2,7 +2,7 @@
   "name": "@cogitatio/joi",
   "version": "0.0.4-alpha.5",
   "main": "dist/index.js",
-  "types": "dist/packages/src/index.d.ts",
+  "types": "dist/packages/joi/src/index.d.ts",
   "scripts": {
     "clean": "rimraf ./cjs",
     "prebuild": "yarn clean",

@@ -3,7 +3,7 @@ const ts = require('typescript')
 const path = require('path')
 
 const compilerOptions = ts.readJsonConfigFile(
-  path.resolve(__dirname, './tsconfig.json'),
+  path.resolve(__dirname, './tsconfig.build.json'),
   ts.sys.readFile,
 )
 

@@ -1,15 +1,28 @@
+const { pathsToModuleNameMapper } = require('ts-jest/utils')
+const ts = require('typescript')
+const path = require('path')
+
+const compilerOptions = ts.readJsonConfigFile(
+  path.resolve(__dirname, './tsconfig.build.json'),
+  ts.sys.readFile,
+)
+
+const params = ts.parseJsonSourceFileConfigFileContent(
+  compilerOptions,
+  ts.sys,
+  __dirname,
+)
+
 module.exports = {
-  moduleFileExtensions: ['js', 'jsx', 'ts', 'tsx'],
-  rootDir: '.',
-  testRegex: '.spec.ts$',
-  transform: {
-    '^.+\\.(t|j)s$': 'ts-jest',
-  },
-  coverageDirectory: './coverage',
-  collectCoverageFrom: [
-    '**/*.{ts,tsx}',
-    '!**/node_modules/**',
-    '!**/vendor/**',
-  ],
-  testEnvironment: 'node',
+  preset: 'ts-jest',
+  moduleNameMapper: pathsToModuleNameMapper(
+    Object.keys(params.options.paths).reduce((prev, key) => {
+      return {
+        ...prev,
+        [key]: params.options.paths[key].map(value =>
+          path.resolve(__dirname, '..', '..', value),
+        ),
+      }
+    }, {}),
+  ),
 }

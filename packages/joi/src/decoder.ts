@@ -31,7 +31,6 @@ export type SchemaResolver = (schema: Schema) => JoiSchema | undefined
 
 export interface IJoiDecoderOptions {
   joi: typeof Joi
-  validationOptions: Joi.ValidationOptions
   schemaResolvers?: SchemaResolver[]
 }
 
@@ -146,12 +145,6 @@ export class JoiDecoder implements IDecoder<unknown> {
   constructor(
     private readonly options: IJoiDecoderOptions = {
       joi: Joi,
-      validationOptions: {
-        allowUnknown: true,
-        stripUnknown: true,
-        convert: true,
-        presence: 'required',
-      },
     },
   ) {}
 
@@ -159,7 +152,12 @@ export class JoiDecoder implements IDecoder<unknown> {
     return (value: unknown): any => {
       const result = this.resolveJoiSchema(resolveSchema(schema)).validate(
         value,
-        this.options.validationOptions,
+        {
+          allowUnknown: true,
+          stripUnknown: true,
+          convert: true,
+          presence: 'required',
+        },
       )
       if (result.error) {
         throw result.error

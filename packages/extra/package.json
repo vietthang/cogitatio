@@ -1,12 +1,12 @@
 {
   "name": "@cogitatio/extra",
   "version": "0.0.4-alpha.3",
-  "main": "cjs/src/index.js",
-  "types": "cjs/src/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/packages/src/index.d.ts",
   "scripts": {
     "clean": "rimraf ./dist",
     "prebuild": "yarn clean",
-    "build": "ts-build . --cjs"
+    "build": "tsdx build --tsconfig tsconfig.build.json --entry src/index.ts"
   },
   "license": "MIT",
   "publishConfig": {

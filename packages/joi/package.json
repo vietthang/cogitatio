@@ -17,5 +17,9 @@
     "@cogitatio/core": "^0.0.4-alpha.6",
     "@cogitatio/extra": "^0.0.4-alpha.6",
     "@hapi/joi": "^15.1.0"
-  }
+  },
+  "files": [
+    "/src",
+    "/dist"
+  ]
 }

@@ -1,5 +1,5 @@
 import { Email, Hostname, Integer, Ip, Port, Uri, Uuid } from '@cogitatio/extra'
-import Joi, { ArraySchema } from '@hapi/joi'
+import * as Joi from '@hapi/joi'
 import { SchemaResolver } from './decoder'
 
 export * from './decoder'
@@ -7,7 +7,7 @@ export * from './decorators'
 
 export const commonJoi = Joi.defaults(schema => {
   if (schema.schemaType === 'array') {
-    schema = (schema as ArraySchema).single()
+    schema = (schema as Joi.ArraySchema).single()
   }
   return schema.empty(Joi.only(null, ''))
 })

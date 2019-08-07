@@ -13,8 +13,6 @@
     "prettify": "yarn prettier \"packages/**/*.{js,ts,tsx}\" --write"
   },
   "devDependencies": {
-    "@ts-tools/build": "^0.1.14",
-    "@ts-tools/node": "^0.9.8",
     "@types/base64-arraybuffer": "^0.1.0",
     "@types/hapi__joi": "^15.0.2",
     "@types/jest": "^24.0.15",

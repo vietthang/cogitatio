@@ -9,7 +9,7 @@ import {
   resolveSchema,
   SchemaLike,
   Tuple,
-  Variant,
+  Property,
 } from '@cogitatio/core'
 import {
   Default,
@@ -206,13 +206,13 @@ describe('resolveJoiSchema', () => {
       name: 'class',
       resolve: () => {
         class A {
-          @Variant(String)
+          @Property(String)
           public str!: string
 
-          @Variant(Number)
+          @Property(Number)
           public num!: number
 
-          @Variant(Integer, Default(1 as Integer), Min(10))
+          @Property(Integer, Default(1 as Integer), Min(10))
           public complex!: Integer & MinRefinement<10>
         }
         return A

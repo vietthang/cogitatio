@@ -4,7 +4,7 @@ import { Refine } from './brand'
 import { SchemaType } from './common'
 import { List } from './list'
 import { IObjectSchema, Record } from './object'
-import { Variant } from './property'
+import { Property } from './property'
 import { resolveSchema } from './schema'
 import { Tuple } from './tuple'
 
@@ -62,10 +62,10 @@ describe('test resolveSchema', () => {
 
   it('should handle decorated class fine', () => {
     class A {
-      @Variant(String)
+      @Property(String)
       public str!: string
 
-      @Variant(Number)
+      @Property(Number)
       public num!: number
     }
     const schema = resolveSchema(A)

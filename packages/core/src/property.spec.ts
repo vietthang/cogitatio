@@ -2,24 +2,24 @@ import 'jest'
 
 import { Refine } from './brand'
 import { SchemaType } from './common'
-import { Variant } from './property'
+import { Property } from './property'
 
-describe('test @Variant', () => {
+describe('test @Property', () => {
   it('should resolve primitive constructor correctly', () => {
-    expect(Variant(String).schema()).toStrictEqual({
+    expect(Property(String).schema()).toStrictEqual({
       type: SchemaType.Primitive,
       native: String,
     })
   })
 
   it('should handle transformers correctly', () => {
-    expect(Variant(String, s => s).schema()).toStrictEqual({
+    expect(Property(String, s => s).schema()).toStrictEqual({
       type: SchemaType.Primitive,
       native: String,
     })
 
     expect(
-      Variant(String, s => Refine(s, { foo: true } as const)).schema(),
+      Property(String, s => Refine(s, { foo: true } as const)).schema(),
     ).toStrictEqual({
       type: SchemaType.Brand,
       brand: {

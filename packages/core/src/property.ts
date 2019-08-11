@@ -16,20 +16,20 @@ export interface SafeDecorator<S extends SchemaLike> {
 
 export type Transformer<I, O> = (i: I) => O
 
-export function Variant<S extends SchemaLike>(schema: S): SafeDecorator<S>
+export function Property<S extends SchemaLike>(schema: S): SafeDecorator<S>
 
-export function Variant<S extends SchemaLike, S0 extends SchemaLike>(
+export function Property<S extends SchemaLike, S0 extends SchemaLike>(
   schema: S,
   t0: Transformer<S, S0>,
 ): SafeDecorator<S0>
 
-export function Variant<
+export function Property<
   S extends SchemaLike,
   S0 extends SchemaLike,
   S1 extends SchemaLike
 >(schema: S, t0: Transformer<S, S0>, t1: Transformer<S0, S1>): SafeDecorator<S1>
 
-export function Variant<
+export function Property<
   S extends SchemaLike,
   S0 extends SchemaLike,
   S1 extends SchemaLike,
@@ -41,7 +41,7 @@ export function Variant<
   t2: Transformer<S1, S2>,
 ): SafeDecorator<S2>
 
-export function Variant<
+export function Property<
   S extends SchemaLike,
   S0 extends SchemaLike,
   S1 extends SchemaLike,
@@ -55,7 +55,7 @@ export function Variant<
   t3: Transformer<S2, S3>,
 ): SafeDecorator<S3>
 
-export function Variant<
+export function Property<
   S extends SchemaLike,
   S0 extends SchemaLike,
   S1 extends SchemaLike,
@@ -71,7 +71,7 @@ export function Variant<
   t4: Transformer<S3, S4>,
 ): SafeDecorator<S4>
 
-export function Variant<
+export function Property<
   S extends SchemaLike,
   S0 extends SchemaLike,
   S1 extends SchemaLike,
@@ -89,7 +89,7 @@ export function Variant<
   t5: Transformer<S4, S5>,
 ): SafeDecorator<S5>
 
-export function Variant(
+export function Property(
   schema: SchemaLike,
   ...transformers: Array<Transformer<SchemaLike, SchemaLike>>
 ): SafeDecorator<any> {

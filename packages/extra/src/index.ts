@@ -1,4 +1,33 @@
-import { IRefineSchema, Refine, Resolve, SchemaLike } from '@cogitatio/core'
+import {
+  Constructor,
+  IDictionarySchema,
+  IEnumSchema,
+  IListSchema,
+  INullableSchema,
+  IObjectSchema,
+  IOptionalSchema,
+  IPrimitiveSchema,
+  IRefineSchema,
+  ITaggedUnionSchema,
+  ITupleSchema,
+  PrimitiveConstructor,
+  Refine,
+  Resolve,
+} from '@cogitatio/core'
+
+export type Schema =
+  | IPrimitiveSchema
+  | IEnumSchema
+  | IOptionalSchema
+  | INullableSchema
+  | IListSchema
+  | IDictionarySchema
+  | ITupleSchema
+  | IObjectSchema
+  | IRefineSchema
+  | ITaggedUnionSchema
+
+export type SchemaLike = Schema | PrimitiveConstructor | Constructor
 
 export interface EmailRefinement {
   email: true

@@ -11,7 +11,7 @@ import {
 } from '@cogitatio/core'
 import { ICodec } from '@cogitatio/extra'
 import { decode, encode } from 'base64-arraybuffer'
-import { JsonObject, JsonValue } from './types'
+import { JsonValue } from './types'
 
 export class JsonCodec implements ICodec<JsonValue, JsonValue> {
   public encode(schemaLike: SchemaLike) {
@@ -106,7 +106,7 @@ export class JsonCodec implements ICodec<JsonValue, JsonValue> {
     }
     return Object.fromEntries(
       Object.entries(schema.fields()).map(([key, schema]) => {
-        return [key, this.encode(schema)(value)]
+        return [key, this.encode(schema as any)(value)]
       }),
     )
   }
@@ -117,7 +117,7 @@ export class JsonCodec implements ICodec<JsonValue, JsonValue> {
     }
     return Object.fromEntries(
       Object.entries(schema.fields()).map(([key, schema]) => {
-        return [key, this.decode(schema)(value)]
+        return [key, this.decode(schema as any)(value)]
       }),
     )
   }

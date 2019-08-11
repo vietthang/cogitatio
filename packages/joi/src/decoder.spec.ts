@@ -5,11 +5,11 @@ import {
   List,
   Nullable,
   Optional,
+  Property,
   Record,
   resolveSchema,
   SchemaLike,
   Tuple,
-  Property,
 } from '@cogitatio/core'
 import {
   Default,

@@ -1,4 +1,4 @@
-import { Brand, Constructor, IBrandSchema } from '@cogitatio/core'
+import { Constructor, IRefineSchema, Refine } from '@cogitatio/core'
 
 type Transformer<T, U> = (value: T) => U
 
@@ -16,14 +16,16 @@ function cache<T extends object, U>(
   }
 }
 
-export const idSymbol = Symbol()
+export interface IdRefinement<T extends object> {
+  id: Constructor<T>
+}
 
 export const Id = cache(
-  <T>(
+  <T extends object>(
     ctor: Constructor<T>,
-  ): IBrandSchema<string, typeof idSymbol, Constructor<T>> => {
-    return Brand(String, idSymbol, ctor)
+  ): IRefineSchema<string, IdRefinement<T>> => {
+    return Refine(String, { id: ctor })
   },
 )
 
-export type Id<T> = string & { [idSymbol]: Constructor<T> }
+export type Id<T extends object> = string & IdRefinement<T>

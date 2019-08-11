@@ -1,7 +1,6 @@
 import {
-  Constructor,
+  IRefineSchema,
   PrimitiveConstructor,
-  reflectClass,
   resolveSchema,
   Schema,
   SchemaLike,
@@ -9,7 +8,6 @@ import {
 } from '@cogitatio/core'
 import { IDecoder } from '@cogitatio/extra'
 import Joi, { Schema as JoiSchema } from '@hapi/joi'
-import { getPropertyTransformers } from './transformer'
 
 type Transformer<T, U> = (value: T) => U
 
@@ -27,25 +25,42 @@ function cache<T extends object, U>(
   }
 }
 
+function isJoiStringSchema(schema: Joi.Schema): schema is Joi.StringSchema {
+  return schema.schemaType === 'string'
+}
+
+function isJoiNumberSchema(schema: Joi.Schema): schema is Joi.NumberSchema {
+  return schema.schemaType === 'number'
+}
+
+function isJoiObjectSchema(schema: Joi.Schema): schema is Joi.ObjectSchema {
+  return schema.schemaType === 'object'
+}
+
+function isJoiArraySchema(schema: Joi.Schema): schema is Joi.ArraySchema {
+  return schema.schemaType === 'array'
+}
+
+function guardResolve<T extends Joi.AnySchema, U>(
+  schema: Joi.Schema,
+  guard: (s: Joi.Schema) => s is T,
+  resolve: (s: T) => U,
+) {
+  if (!guard(schema)) {
+    throw new Error('invalid')
+  }
+  return resolve(schema)
+}
+
 export type SchemaResolver = (schema: Schema) => JoiSchema | undefined
 
 export interface IJoiDecoderOptions {
   joi: typeof Joi
-  schemaResolvers?: SchemaResolver[]
 }
 
 export class JoiDecoder implements IDecoder<unknown> {
-  private readonly resolveJoiSchema = cache(
+  public readonly resolveJoiSchema = cache(
     (schema: Schema): JoiSchema => {
-      if (this.options.schemaResolvers) {
-        for (const resolver of this.options.schemaResolvers) {
-          const maybeJoiSchema = resolver(schema)
-          if (maybeJoiSchema) {
-            return maybeJoiSchema
-          }
-        }
-      }
-
       switch (schema.type) {
         case SchemaType.Primitive:
           return this.resolvePrimitveSchema(schema.native)
@@ -79,10 +94,10 @@ export class JoiDecoder implements IDecoder<unknown> {
               ),
             )
         case SchemaType.Object:
-          return this.resolveObjectSchema(schema.resolver())
+          return this.resolveObjectSchema(schema.fields())
 
         case SchemaType.Brand:
-          return this.resolveJoiSchema(schema.childSchema)
+          return this.resolveBrandSchema(schema)
 
         default:
           throw new Error('unsupported')
@@ -90,24 +105,108 @@ export class JoiDecoder implements IDecoder<unknown> {
     },
   )
 
+  private readonly resolveBrandSchema = cache(
+    (schema: IRefineSchema): JoiSchema => {
+      return Object.entries(schema.brand as {}).reduce(
+        (joiSchema, [key, value]) => {
+          switch (key) {
+            case 'email':
+              return value
+                ? guardResolve(joiSchema, isJoiStringSchema, s => s.email())
+                : joiSchema
+
+            case 'uri':
+              return value
+                ? guardResolve(joiSchema, isJoiStringSchema, s => s.uri())
+                : joiSchema
+
+            case 'integer':
+              return value
+                ? guardResolve(joiSchema, isJoiNumberSchema, s => s.integer())
+                : joiSchema
+
+            case 'port':
+              return value
+                ? guardResolve(joiSchema, isJoiNumberSchema, s => s.port())
+                : joiSchema
+
+            case 'ip':
+              return value
+                ? guardResolve(joiSchema, isJoiStringSchema, s => s.ip())
+                : joiSchema
+
+            case 'hostname':
+              return value
+                ? guardResolve(joiSchema, isJoiStringSchema, s => s.hostname())
+                : joiSchema
+
+            case 'uuid':
+              return value
+                ? guardResolve(joiSchema, isJoiStringSchema, s => s.uuid())
+                : joiSchema
+
+            case 'min':
+              return guardResolve(joiSchema, isJoiNumberSchema, s =>
+                s.min(value as number),
+              )
+
+            case 'max':
+              return guardResolve(joiSchema, isJoiNumberSchema, s =>
+                s.max(value as number),
+              )
+
+            case 'minLength':
+              return guardResolve(joiSchema, isJoiStringSchema, s =>
+                s.min(value as number),
+              )
+
+            case 'maxLength':
+              return guardResolve(joiSchema, isJoiStringSchema, s =>
+                s.max(value as number),
+              )
+
+            case 'minItems':
+              return guardResolve(joiSchema, isJoiArraySchema, s =>
+                s.min(value as number),
+              )
+
+            case 'maxItems':
+              return guardResolve(joiSchema, isJoiArraySchema, s =>
+                s.max(value as number),
+              )
+
+            case 'uniqueItems':
+              return guardResolve(joiSchema, isJoiArraySchema, s => s.unique())
+
+            case 'default':
+              return joiSchema
+                .optional()
+                .allow(value)
+                .default(value)
+
+            case 'id':
+              return joiSchema
+
+            default:
+              throw new Error('unhandled refinement')
+          }
+        },
+        this.resolveJoiSchema(schema.childSchema),
+      )
+    },
+  )
+
   private readonly resolveObjectSchema = cache(
-    (ctor: Constructor): JoiSchema => {
-      const descriptor: any = reflectClass(ctor)
-      if (!descriptor) {
-        throw new Error(`missing schema for ${ctor}`)
-      }
+    (descriptor: any): JoiSchema => {
+      // tslint:disable-next-line
       const keys = Object.keys(descriptor)
 
       return this.options.joi.object(
         keys.reduce(
           (prev, key) => {
-            let joiSchema = this.resolveJoiSchema(
+            const joiSchema = this.resolveJoiSchema(
               resolveSchema(descriptor[key]),
             )
-            const transformers = getPropertyTransformers(ctor, key)
-            for (const transformer of transformers) {
-              joiSchema = transformer(joiSchema)
-            }
             return {
               ...prev,
               [key]: joiSchema,

@@ -28,10 +28,28 @@ export function isPrimitiveConstructor(
 
 export interface IPrimitiveSchema<
   C extends PrimitiveConstructor = PrimitiveConstructor
-> extends IBaseSchema {
+> extends IBaseSchema<ResolvePrimitiveFromConstructor<C>> {
   type: SchemaType.Primitive
   native: C
 }
+
+export type ResolvePrimitiveFromConstructor<
+  C extends PrimitiveConstructor
+> = C extends typeof Boolean
+  ? boolean
+  : C extends typeof Number
+  ? number
+  : C extends typeof String
+  ? string
+  : C extends typeof BigInt
+  ? bigint
+  : C extends typeof Date
+  ? Date
+  : C extends typeof ArrayBuffer
+  ? ArrayBuffer
+  : C extends typeof Buffer
+  ? Buffer
+  : never
 
 export type ResolvePrimitive<
   S extends IPrimitiveSchema

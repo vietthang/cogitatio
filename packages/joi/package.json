@@ -21,5 +21,6 @@
   "files": [
     "/src",
     "/dist"
-  ]
+  ],
+  "devDependencies": {}
 }

@@ -1,19 +1,18 @@
 import { Constructor } from './object'
-import { SchemaLike } from './schema'
+import { Schema } from './schema'
 
 const reflectMap = new WeakMap<Constructor, any>()
 
-export function reflectClass<T>(
-  ctor: Constructor<T>,
-): { [key in keyof T]: SchemaLike } | undefined {
+export function reflectClass(
+  ctor: Constructor,
+): { [key: string]: () => Schema } {
   return reflectMap.get(ctor)
 }
 
-export function decorateClass<T, Key extends keyof T>(
-  ctor: Constructor<T>,
-  key: Key,
-  schema: SchemaLike,
-) {
+export function decorateClass<
+  T extends object = object,
+  Key extends keyof T = keyof T
+>(ctor: Constructor<T>, key: Key, schema: () => Schema) {
   reflectMap.set(ctor, {
     ...(reflectClass(ctor) || {}),
     [key]: schema,

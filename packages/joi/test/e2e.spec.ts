@@ -6,9 +6,9 @@ import {
   List,
   Nullable,
   Optional,
-  Property,
   resolveSchema,
   Tuple,
+  Variant,
 } from '@cogitatio/core'
 import assert from 'assert'
 import { JoiDecoder } from '../src'
@@ -231,10 +231,10 @@ describe('validate tuple', () => {
 
 describe('validate object', () => {
   class A {
-    @Property(String)
+    @Variant(String)
     public readonly foo!: string
 
-    @Property(Number)
+    @Variant(Number)
     public readonly bar!: number
   }
 

@@ -10,6 +10,7 @@ export enum SchemaType {
   Brand,
 }
 
-export interface IBaseSchema {
-  type: SchemaType
+export interface IBaseSchema<T> {
+  readonly type: SchemaType
+  readonly _: T
 }

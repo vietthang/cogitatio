@@ -11,7 +11,7 @@ import {
 } from '@cogitatio/core'
 import { ICodec } from '@cogitatio/extra'
 import { decode, encode } from 'base64-arraybuffer'
-import { JsonValue } from './types'
+import { JsonObject, JsonValue } from './types'
 
 export class JsonCodec implements ICodec<JsonValue, JsonValue> {
   public encode(schemaLike: SchemaLike) {
@@ -104,37 +104,21 @@ export class JsonCodec implements ICodec<JsonValue, JsonValue> {
     if (typeof value !== 'object' || value === null) {
       throw new Error('invalid value type')
     }
-    const objectDescriptor: any = reflectClass(schema.resolver())
-    if (!objectDescriptor) {
-      throw new Error('not decorated')
-    }
-    return Object.keys(objectDescriptor).reduce(
-      (prev, key) => {
-        return {
-          ...prev,
-          [key]: this.encode(objectDescriptor[key])((value as any)[key]),
-        }
-      },
-      {} as any,
+    return Object.fromEntries(
+      Object.entries(schema.fields()).map(([key, schema]) => {
+        return [key, this.encode(schema)(value)]
+      }),
     )
   }
 
-  private decodeObject(schema: IObjectSchema, value: unknown): JsonValue {
-    if (typeof value !== 'object' || value === null) {
+  private decodeObject(schema: IObjectSchema, value: JsonValue): unknown {
+    if (typeof value !== 'object' || value === null || Array.isArray(value)) {
       throw new Error('invalid value type')
     }
-    const objectDescriptor: any = reflectClass(schema.resolver())
-    if (!objectDescriptor) {
-      throw new Error('not decorated')
-    }
-    return Object.keys(objectDescriptor).reduce(
-      (prev, key) => {
-        return {
-          ...prev,
-          [key]: this.decode(objectDescriptor[key])((value as any)[key]),
-        }
-      },
-      {} as any,
+    return Object.fromEntries(
+      Object.entries(schema.fields()).map(([key, schema]) => {
+        return [key, this.decode(schema)(value)]
+      }),
     )
   }
 

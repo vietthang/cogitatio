@@ -1,68 +1,170 @@
-import { Brand, IBrandSchema, ResolveBrand } from '@cogitatio/core'
+import { IRefineSchema, Refine, Resolve, SchemaLike } from '@cogitatio/core'
 
-export const emailSymbol = Symbol('email')
+export interface EmailRefinement {
+  email: true
+}
 
-export const Email: IBrandSchema<string, typeof emailSymbol, true> = Brand(
-  String,
-  emailSymbol,
-)
+export const Email: IRefineSchema<string, EmailRefinement> = Refine(String, {
+  email: true,
+})
 
-export type Email = ResolveBrand<typeof Email>
+export type Email = Resolve<typeof Email>
 
-export const uriSymbol = Symbol('uri')
+export interface UriRefinement {
+  uri: true
+}
 
-export const Uri: IBrandSchema<string, typeof uriSymbol, true> = Brand(
-  String,
-  uriSymbol,
-)
+export const Uri: IRefineSchema<string, UriRefinement> = Refine(String, {
+  uri: true,
+})
 
-export type Uri = ResolveBrand<typeof Uri>
+export type Uri = Resolve<typeof Uri>
 
-export const integerSymbol = Symbol('integer')
+export interface IntegerRefinement {
+  integer: true
+}
 
-export const Integer: IBrandSchema<number, typeof integerSymbol, true> = Brand(
+export const Integer: IRefineSchema<number, IntegerRefinement> = Refine(
   Number,
-  integerSymbol,
+  {
+    integer: true,
+  },
 )
 
-export type Integer = ResolveBrand<typeof Integer>
+export type Integer = Resolve<typeof Integer>
 
-export const portSymbol = Symbol('port')
+export interface PortRefinement {
+  port: true
+}
 
-export const Port: IBrandSchema<Integer, typeof portSymbol, true> = Brand(
-  Integer,
-  portSymbol,
-)
+export const Port: IRefineSchema<Integer, PortRefinement> = Refine(Integer, {
+  port: true,
+})
 
-export type Port = ResolveBrand<typeof Port>
+export type Port = Resolve<typeof Port>
 
-export const ipSymbol = Symbol('ip')
+export interface IpRefinement {
+  ip: true
+}
 
-export const Ip: IBrandSchema<string, typeof ipSymbol, true> = Brand(
+export const Ip: IRefineSchema<string, IpRefinement> = Refine(String, {
+  ip: true,
+})
+
+export type Ip = Resolve<typeof Ip>
+
+export interface HostnameRefinement {
+  hostname: true
+}
+
+export const Hostname: IRefineSchema<string, HostnameRefinement> = Refine(
   String,
-  ipSymbol,
+  { hostname: true },
 )
 
-export type Ip = ResolveBrand<typeof Ip>
+export type Hostname = Resolve<typeof Hostname>
 
-export const hostnameSymbol = Symbol('hostname')
+export interface UuidRefinement {
+  uuid: true
+}
 
-export const Hostname: IBrandSchema<
-  string,
-  typeof hostnameSymbol,
-  true
-> = Brand(String, hostnameSymbol)
+export const Uuid: IRefineSchema<string, UuidRefinement> = Refine(String, {
+  uuid: true,
+})
 
-export type Hostname = ResolveBrand<typeof Hostname>
+export type Uuid = Resolve<typeof Uuid>
 
-export const uuidSymbol = Symbol('uuid')
+export interface MinRefinement<T extends number> {
+  min: T
+}
 
-export const Uuid: IBrandSchema<string, typeof uuidSymbol, true> = Brand(
-  String,
-  uuidSymbol,
-)
+export const Min = <T extends number>(min: T) => <
+  S extends SchemaLike & (Resolve<S> extends number ? unknown : never)
+>(
+  schema: S,
+): IRefineSchema<Resolve<S>, MinRefinement<T>> => {
+  return Refine(schema, { min })
+}
 
-export type Uuid = ResolveBrand<typeof Uuid>
+export interface MaxRefinement<T extends number> {
+  max: T
+}
+
+export const Max = <T extends number>(max: T) => <
+  S extends SchemaLike & (Resolve<S> extends number ? unknown : never)
+>(
+  schema: S,
+): IRefineSchema<Resolve<S>, MaxRefinement<T>> => {
+  return Refine(schema, { max })
+}
+
+export interface MinLengthRefinement<T extends number> {
+  minLength: T
+}
+
+export const MinLength = <T extends number>(minLength: T) => <
+  S extends SchemaLike & (Resolve<S> extends string ? unknown : never)
+>(
+  schema: S,
+): IRefineSchema<Resolve<S>, MinLengthRefinement<T>> => {
+  return Refine(schema, { minLength })
+}
+
+export interface MaxLengthRefinement<T extends number> {
+  maxLength: T
+}
+
+export const MaxLength = <T extends number>(maxLength: T) => <
+  S extends SchemaLike & (Resolve<S> extends string ? unknown : never)
+>(
+  schema: S,
+): IRefineSchema<Resolve<S>, MaxLengthRefinement<T>> => {
+  return Refine(schema, { maxLength })
+}
+
+export interface MinItemsRefinement<T extends number> {
+  minItems: T
+}
+
+export const MinItems = <T extends number>(minItems: T) => <
+  S extends SchemaLike & (Resolve<S> extends unknown[] ? unknown : never)
+>(
+  schema: S,
+): IRefineSchema<Resolve<S>, MinItemsRefinement<T>> => {
+  return Refine(schema, { minItems })
+}
+
+export interface MaxItemsRefinement<T extends number> {
+  maxItems: T
+}
+
+export const MaxItems = <T extends number>(maxItems: T) => <
+  S extends SchemaLike & (Resolve<S> extends unknown[] ? unknown : never)
+>(
+  schema: S,
+): IRefineSchema<Resolve<S>, MaxItemsRefinement<T>> => {
+  return Refine(schema, { maxItems })
+}
+
+export interface UniqueItemsRefinement {
+  uniqueItems: true
+}
+
+export const UniqueItems = () => <
+  S extends SchemaLike & (Resolve<S> extends unknown[] ? unknown : never)
+>(
+  schema: S,
+): IRefineSchema<Resolve<S>, UniqueItemsRefinement> => {
+  return Refine(schema, { uniqueItems: true })
+}
+
+export const Default = <T extends unknown>(defaultValue: T) => <
+  S extends SchemaLike & (T extends Resolve<S> ? unknown : never)
+>(
+  schema: S,
+): IRefineSchema<Resolve<S>, unknown> => {
+  return Refine(schema, { default: defaultValue })
+}
 
 export { IEncoder, IDecoder, ICodec } from './codec'
 

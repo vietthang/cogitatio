@@ -1,18 +1,19 @@
-import { IBrandSchema, ResolveBrand } from './brand'
+import { IRefineSchema } from './brand'
 import { SchemaType } from './common'
-import { IDictionarySchema, ResolveDictionary } from './dictionary'
-import { IEnumSchema, ResolveEnum } from './enum'
-import { IListSchema, ResolveList } from './list'
-import { INullableSchema, ResolveNullable } from './nullable'
-import { Constructor, IObjectSchema, ResolveObject } from './object'
-import { IOptionalSchema, ResolveOptional } from './optional'
+import { IDictionarySchema } from './dictionary'
+import { IEnumSchema } from './enum'
+import { IListSchema } from './list'
+import { reflectClass } from './metadata'
+import { INullableSchema } from './nullable'
+import { Constructor, IObjectSchema } from './object'
+import { IOptionalSchema } from './optional'
 import {
   IPrimitiveSchema,
   isPrimitiveConstructor,
   PrimitiveConstructor,
-  ResolvePrimitive,
+  ResolvePrimitiveFromConstructor,
 } from './primitive'
-import { ITupleSchema, ResolveTuple } from './tuple'
+import { ITupleSchema } from './tuple'
 
 export type Schema =
   | IPrimitiveSchema
@@ -23,38 +24,80 @@ export type Schema =
   | IDictionarySchema
   | ITupleSchema
   | IObjectSchema
-  | IBrandSchema
+  | IRefineSchema
 
-export type SchemaLike = Schema | PrimitiveConstructor | Constructor
+export type SchemaLike =
+  | Schema
+  | PrimitiveConstructor
+  | Constructor
+  | ({ [key: string]: SchemaLike })
+  | ({
+      [key: number]: SchemaLike
+      length: number
+      [Symbol.iterator](): IterableIterator<SchemaLike>
+    })
+
+export type Thunk<T> = T | (() => T)
+
+// tslint:disable-next-line
+type keyofObject = keyof Object
 
 export type Resolve<S> = S extends PrimitiveConstructor
-  ? ResolvePrimitive<IPrimitiveSchema<S>>
+  ? ResolvePrimitiveFromConstructor<S>
   : S extends Constructor<infer T>
-  ? ResolveObject<IObjectSchema<T>>
-  : S extends IPrimitiveSchema
-  ? ResolvePrimitive<S>
-  : S extends IEnumSchema
-  ? ResolveEnum<S>
-  : S extends IOptionalSchema
-  ? ResolveOptional<S>
-  : S extends INullableSchema
-  ? ResolveNullable<S>
-  : S extends IListSchema
-  ? ResolveList<S>
-  : S extends IDictionarySchema
-  ? ResolveDictionary<S>
-  : S extends ITupleSchema
-  ? ResolveTuple<S>
-  : S extends IObjectSchema
-  ? ResolveObject<S>
-  : S extends IBrandSchema
-  ? ResolveBrand<S>
+  ? T
+  : S extends { [key: string]: SchemaLike }
+  ? { [key in Exclude<keyof S, keyofObject>]: Resolve<S[key]> }
+  : S extends ({
+      [key: number]: SchemaLike
+      length: number
+      [Symbol.iterator](): IterableIterator<SchemaLike>
+    })
+  ? { [key in keyof S]: Resolve<S[key]> }
+  : S extends Schema
+  ? S['_']
   : never
 
-export function resolveSchema(schemaLike: SchemaLike): Schema {
-  return isPrimitiveConstructor(schemaLike)
-    ? { type: SchemaType.Primitive, native: schemaLike }
-    : typeof schemaLike === 'function'
-    ? { type: SchemaType.Object, resolver: () => schemaLike }
-    : schemaLike
+export function resolveSchema(schema: SchemaLike): Schema {
+  if (isPrimitiveConstructor(schema)) {
+    return { type: SchemaType.Primitive, native: schema } as IPrimitiveSchema
+  }
+
+  if (typeof schema === 'function') {
+    return {
+      type: SchemaType.Object,
+      fields: () =>
+        Object.fromEntries(
+          Object.entries(reflectClass(schema)).map(([key, resolver]) => [
+            key,
+            resolver(),
+          ]),
+        ),
+    } as IObjectSchema
+  }
+
+  if (Array.isArray(schema)) {
+    if (schema.length !== 1) {
+      throw new Error('only 1-element array is supported')
+    }
+    return {
+      type: SchemaType.List,
+      childSchema: resolveSchema(schema[0]),
+    } as IListSchema
+  }
+
+  if (Object.values(SchemaType).includes((schema as Schema).type)) {
+    return schema as Schema
+  }
+
+  return {
+    type: SchemaType.Object,
+    fields: () =>
+      Object.fromEntries(
+        Object.entries(schema).map(([key, value]) => [
+          key,
+          resolveSchema(value),
+        ]),
+      ),
+  } as IObjectSchema
 }

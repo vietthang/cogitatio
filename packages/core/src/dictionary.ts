@@ -6,25 +6,10 @@ export interface Dictionary<T extends unknown> {
 }
 
 export interface IDictionarySchema<T extends unknown = unknown>
-  extends IBaseSchema {
+  extends IBaseSchema<Dictionary<T>> {
   type: SchemaType.Dictionary
   childSchema: Schema
-  _: T
 }
-
-export type ResolveDictionary<
-  S extends IDictionarySchema
-> = S extends IDictionarySchema<infer T> ? Dictionary<T> : never
-
-export type DictionaryDecorator<S extends IDictionarySchema> = <
-  T extends ResolveDictionary<S> extends T[Key]
-    ? (T[Key] extends ResolveDictionary<S> ? {} : never)
-    : never,
-  Key extends keyof T
->(
-  target: T,
-  key: Key,
-) => void
 
 export function Dictionary<S extends SchemaLike>(
   childSchema: S,

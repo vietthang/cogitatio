@@ -1,10 +1,9 @@
 import { IBaseSchema, SchemaType } from './common'
 import { Resolve, resolveSchema, SchemaLike } from './schema'
 
-export type Constructor<T extends object = object> = new (...args: any[]) => T
+export type Constructor<T extends {} = {}> = new (...args: any[]) => T
 
-export interface IObjectSchema<T extends object = object>
-  extends IBaseSchema<T> {
+export interface IObjectSchema<T extends {} = {}> extends IBaseSchema<T> {
   type: SchemaType.Object
   fields: () => { [key in keyof T]: IBaseSchema<T[key]> }
 }

@@ -9,10 +9,11 @@ export function reflectClass(
   return reflectMap.get(ctor)
 }
 
-export function decorateClass<
-  T extends object = object,
-  Key extends keyof T = keyof T
->(ctor: Constructor<T>, key: Key, schema: () => Schema) {
+export function decorateClass<T extends {} = {}, Key extends keyof T = keyof T>(
+  ctor: Constructor<T>,
+  key: Key,
+  schema: () => Schema,
+) {
   reflectMap.set(ctor, {
     ...(reflectClass(ctor) || {}),
     [key]: schema,

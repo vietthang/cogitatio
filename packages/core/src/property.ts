@@ -97,7 +97,7 @@ export function Property(
     resolveSchema(transformers.reduce((s, t) => t(s), schema))
 
   return Object.assign(
-    <T extends object>(target: T, key: keyof T) => {
+    <T extends {}>(target: T, key: keyof T) => {
       decorateClass<T, keyof T>(target.constructor as any, key, resolver)
     },
     { schema: resolver },

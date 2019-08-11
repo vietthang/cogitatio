@@ -1,6 +1,7 @@
 import {
   IRefineSchema,
   PrimitiveConstructor,
+  Resolve,
   resolveSchema,
   Schema,
   SchemaLike,
@@ -8,6 +9,8 @@ import {
 } from '@cogitatio/core'
 import { IDecoder } from '@cogitatio/extra'
 import Joi, { Schema as JoiSchema } from '@hapi/joi'
+import { join } from 'path'
+import { ITaggedUnionSchema } from '../../core/src/taggedUnion'
 
 type Transformer<T, U> = (value: T) => U
 
@@ -66,7 +69,9 @@ export class JoiDecoder implements IDecoder<unknown> {
           return this.resolvePrimitveSchema(schema.native)
 
         case SchemaType.Enum:
-          return this.options.joi.only(Object.values(schema.enumValues))
+          return (this.options.joi.only as any)(
+            ...Object.values(schema.enumValues),
+          )
 
         case SchemaType.Optional:
           return this.resolveJoiSchema(schema.childSchema).optional()
@@ -89,7 +94,7 @@ export class JoiDecoder implements IDecoder<unknown> {
             .array()
             .length(schema.childSchemas.length)
             .ordered(
-              schema.childSchemas.map(childSchema =>
+              ...schema.childSchemas.map(childSchema =>
                 this.resolveJoiSchema(childSchema),
               ),
             )
@@ -98,6 +103,9 @@ export class JoiDecoder implements IDecoder<unknown> {
 
         case SchemaType.Brand:
           return this.resolveBrandSchema(schema)
+
+        case SchemaType.TaggedUnion:
+          return this.resolveTaggedUnionSchema(schema)
 
         default:
           throw new Error('unsupported')
@@ -241,14 +249,31 @@ export class JoiDecoder implements IDecoder<unknown> {
     },
   )
 
+  private readonly resolveTaggedUnionSchema = cache(
+    (schema: ITaggedUnionSchema): JoiSchema => {
+      const { joi } = this.options
+
+      return joi.alternatives(
+        ...Object.entries(schema.schemaMap).map(([key, childSchema]) => {
+          return joi.object({
+            [schema.discriminator]: joi.only(key),
+            [key]: this.resolveJoiSchema(
+              resolveSchema(childSchema as SchemaLike),
+            ),
+          })
+        }),
+      )
+    },
+  )
+
   constructor(
     private readonly options: IJoiDecoderOptions = {
       joi: Joi,
     },
   ) {}
 
-  public decode(schema: SchemaLike) {
-    return (value: unknown): any => {
+  public decode<S extends SchemaLike>(schema: S) {
+    return (value: unknown): Resolve<S> => {
       const result = this.resolveJoiSchema(resolveSchema(schema)).validate(
         value,
         {
@@ -261,7 +286,7 @@ export class JoiDecoder implements IDecoder<unknown> {
       if (result.error) {
         throw result.error
       }
-      return result.value
+      return result.value as any
     }
   }
 }

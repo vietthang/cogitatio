@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "types": "dist/packages/core/src/index.d.ts",
   "scripts": {
-    "clean": "rimraf ./cjs",
+    "clean": "rimraf ./dist",
     "prebuild": "yarn clean",
     "build": "tsdx build --tsconfig tsconfig.build.json --entry src/index.ts",
     "test": "jest"

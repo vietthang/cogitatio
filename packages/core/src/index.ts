@@ -20,6 +20,8 @@ export * from './object'
 
 export * from './brand'
 
+export * from './taggedUnion'
+
 export * from './schema'
 
 export * from './metadata'

@@ -13,6 +13,7 @@ import {
   PrimitiveConstructor,
   ResolvePrimitiveFromConstructor,
 } from './primitive'
+import { ITaggedUnionSchema } from './taggedUnion'
 import { ITupleSchema } from './tuple'
 
 export type Schema =
@@ -25,35 +26,16 @@ export type Schema =
   | ITupleSchema
   | IObjectSchema
   | IRefineSchema
+  | ITaggedUnionSchema
 
-export type SchemaLike =
-  | Schema
-  | PrimitiveConstructor
-  | Constructor
-  | ({ [key: string]: SchemaLike })
-  | ({
-      [key: number]: SchemaLike
-      length: number
-      [Symbol.iterator](): IterableIterator<SchemaLike>
-    })
+export type SchemaLike = Schema | PrimitiveConstructor | Constructor
 
 export type Thunk<T> = T | (() => T)
-
-// tslint:disable-next-line
-type keyofObject = keyof Object
 
 export type Resolve<S> = S extends PrimitiveConstructor
   ? ResolvePrimitiveFromConstructor<S>
   : S extends Constructor<infer T>
   ? T
-  : S extends { [key: string]: SchemaLike }
-  ? { [key in Exclude<keyof S, keyofObject>]: Resolve<S[key]> }
-  : S extends ({
-      [key: number]: SchemaLike
-      length: number
-      [Symbol.iterator](): IterableIterator<SchemaLike>
-    })
-  ? { [key in keyof S]: Resolve<S[key]> }
   : S extends Schema
   ? S['_']
   : never
@@ -76,28 +58,5 @@ export function resolveSchema(schema: SchemaLike): Schema {
     } as IObjectSchema
   }
 
-  if (Array.isArray(schema)) {
-    if (schema.length !== 1) {
-      throw new Error('only 1-element array is supported')
-    }
-    return {
-      type: SchemaType.List,
-      childSchema: resolveSchema(schema[0]),
-    } as IListSchema
-  }
-
-  if (Object.values(SchemaType).includes((schema as Schema).type)) {
-    return schema as Schema
-  }
-
-  return {
-    type: SchemaType.Object,
-    fields: () =>
-      Object.fromEntries(
-        Object.entries(schema).map(([key, value]) => [
-          key,
-          resolveSchema(value),
-        ]),
-      ),
-  } as IObjectSchema
+  return schema
 }

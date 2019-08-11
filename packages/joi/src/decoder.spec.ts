@@ -2,8 +2,10 @@ import 'jest'
 
 import {
   Enum,
+  List,
   Nullable,
   Optional,
+  Record,
   resolveSchema,
   SchemaLike,
   Tuple,
@@ -67,7 +69,7 @@ describe('resolveJoiSchema', () => {
     },
     {
       name: 'string[]',
-      resolve: () => [String],
+      resolve: () => List(String),
       expected: Joi.array().items(Joi.string()),
     },
     {
@@ -89,7 +91,7 @@ describe('resolveJoiSchema', () => {
     },
     {
       name: 'object',
-      resolve: () => ({ foo: String, bar: Optional(Number) }),
+      resolve: () => Record({ foo: String, bar: Optional(Number) }),
       expected: Joi.object({
         foo: Joi.string(),
         bar: Joi.number().optional(),
@@ -173,14 +175,14 @@ describe('resolveJoiSchema', () => {
     },
     {
       name: 'minItems string[]',
-      resolve: () => MinItems(1)([String]),
+      resolve: () => MinItems(1)(List(String)),
       expected: Joi.array()
         .items(Joi.string())
         .min(1),
     },
     {
       name: 'maxItems string[]',
-      resolve: () => MaxItems(1)([String]),
+      resolve: () => MaxItems(1)(List(String)),
       expected: Joi.array()
         .items(Joi.string())
         .max(1),
@@ -195,7 +197,7 @@ describe('resolveJoiSchema', () => {
     },
     {
       name: 'uniqueItems',
-      resolve: () => UniqueItems()([String]),
+      resolve: () => UniqueItems()(List(String)),
       expected: Joi.array()
         .items(Joi.string())
         .unique(),

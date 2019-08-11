@@ -7,9 +7,11 @@ import {
   Nullable,
   Optional,
   resolveSchema,
+  TaggedUnion,
   Tuple,
   Variant,
 } from '@cogitatio/core'
+import { IDecoder } from '@cogitatio/extra'
 import assert from 'assert'
 import { JoiDecoder } from '../src'
 
@@ -239,7 +241,7 @@ describe('validate object', () => {
   }
 
   const decoder = new JoiDecoder()
-  const validate = decoder.decode(resolveSchema(A))
+  const validate = decoder.decode(A)
 
   it('should failed with invalid tuple value', () => {
     assert.throws(() => validate(0))
@@ -259,5 +261,34 @@ describe('validate object', () => {
       },
       validate({ foo: 'foo', bar: 10 }),
     )
+  })
+})
+
+describe('validate TaggedUnion', () => {
+  const decoder: IDecoder<unknown> = new JoiDecoder()
+
+  const unionSchema = TaggedUnion('kind', {
+    foo: String,
+    bar: Number,
+  })
+  const validate = decoder.decode(unionSchema)
+
+  assert.throws(() => validate({}))
+  assert.throws(() => validate({ foo: 'string', bar: 0 }))
+  assert.throws(() => validate({ kind: 'foo', bar: 0 }))
+  assert.throws(() => validate({ kind: 'foo', foo: 0 }))
+  assert.throws(() => validate({ kind: 'bar', bar: 'bar' }))
+
+  expect(validate({ kind: 'foo', foo: 'str' })).toStrictEqual({
+    kind: 'foo',
+    foo: 'str',
+  })
+  expect(validate({ kind: 'bar', bar: 0 })).toStrictEqual({
+    kind: 'bar',
+    bar: 0,
+  })
+  expect(validate({ kind: 'bar', bar: '0' })).toStrictEqual({
+    kind: 'bar',
+    bar: 0,
   })
 })

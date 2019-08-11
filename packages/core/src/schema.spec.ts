@@ -3,7 +3,7 @@ import 'jest'
 import { Refine } from './brand'
 import { SchemaType } from './common'
 import { List } from './list'
-import { IObjectSchema } from './object'
+import { IObjectSchema, Record } from './object'
 import { Variant } from './property'
 import { resolveSchema } from './schema'
 import { Tuple } from './tuple'
@@ -41,14 +41,14 @@ describe('test resolveSchema', () => {
   })
 
   it('should handle array fine', () => {
-    expect(resolveSchema([String])).toStrictEqual({
+    expect(resolveSchema(List(String))).toStrictEqual({
       type: SchemaType.List,
       childSchema: {
         type: SchemaType.Primitive,
         native: String,
       },
     })
-    expect(resolveSchema([[String]])).toStrictEqual({
+    expect(resolveSchema(List(List(String)))).toStrictEqual({
       type: SchemaType.List,
       childSchema: {
         type: SchemaType.List,
@@ -83,7 +83,7 @@ describe('test resolveSchema', () => {
   })
 
   it('should handle raw object dictionary fine', () => {
-    const schema = resolveSchema({ num: Number, str: String })
+    const schema = resolveSchema(Record({ num: Number, str: String }))
     expect(schema.type).toStrictEqual(SchemaType.Object)
     expect((schema as IObjectSchema).fields()).toStrictEqual({
       str: {

@@ -8,6 +8,7 @@ export enum SchemaType {
   Tuple,
   Object,
   Brand,
+  TaggedUnion,
 }
 
 export interface IBaseSchema<T> {

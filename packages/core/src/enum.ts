@@ -1,11 +1,11 @@
 import { IBaseSchema, SchemaType } from './common'
 
-export interface IEnumSchema<T extends {} = {}> extends IBaseSchema<T> {
+export interface IEnumSchema<T> extends IBaseSchema<T[keyof T]> {
   type: SchemaType.Enum
   enumValues: T
 }
 
-export function Enum<T extends {} = {}>(values: T): IEnumSchema<T> {
+export function Enum<T>(values: T): IEnumSchema<T> {
   return {
     type: SchemaType.Enum,
     enumValues: values,

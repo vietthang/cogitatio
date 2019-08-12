@@ -1,6 +1,6 @@
 {
   "name": "@cogitatio/core",
-  "version": "0.0.4-alpha.14",
+  "version": "0.0.4-alpha.15",
   "main": "dist/index.js",
   "types": "dist/packages/core/src/index.d.ts",
   "scripts": {

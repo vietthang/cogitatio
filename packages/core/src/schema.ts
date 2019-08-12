@@ -18,7 +18,7 @@ import { ITupleSchema } from './tuple'
 
 export type Schema =
   | IPrimitiveSchema
-  | IEnumSchema<{}>
+  | IEnumSchema
   | IOptionalSchema
   | INullableSchema
   | IListSchema

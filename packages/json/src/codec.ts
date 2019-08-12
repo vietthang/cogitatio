@@ -40,7 +40,7 @@ export class JsonCodec implements ICodec<JsonValue, JsonValue> {
 
         case SchemaType.Tuple:
           return schema.childSchemas.map((childSchema, index) =>
-            this.encode(childSchema)((value as any)[index]),
+            this.encode(childSchema)(value[index]),
           )
 
         case SchemaType.Object:

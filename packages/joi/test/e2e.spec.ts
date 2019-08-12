@@ -243,7 +243,7 @@ describe('validate object', () => {
   const decoder = new JoiDecoder()
   const validate = decoder.decode(A)
 
-  it('should failed with invalid tuple value', () => {
+  it('should failed with invalid object value', () => {
     assert.throws(() => validate(0))
     assert.throws(() => validate({}))
     assert.throws(() => validate(false))
@@ -253,7 +253,7 @@ describe('validate object', () => {
     assert.throws(() => validate([]))
   })
 
-  it('should success with correct tuple value', () => {
+  it('should success with correct object value', () => {
     assert.deepStrictEqual(
       {
         foo: 'foo',

@@ -187,9 +187,7 @@ export const UniqueItems = () => <
   return Refine(schema, { uniqueItems: true })
 }
 
-export const Default = <T extends unknown>(defaultValue: T) => <
-  S extends SchemaLike & (T extends Resolve<S> ? unknown : never)
->(
+export const Default = (defaultValue: unknown) => <S extends SchemaLike>(
   schema: S,
 ): IRefineSchema<Resolve<S>, unknown> => {
   return Refine(schema, { default: defaultValue })

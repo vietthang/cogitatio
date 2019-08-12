@@ -192,7 +192,6 @@ describe('resolveJoiSchema', () => {
       resolve: () => Default('1')(String),
       expected: Joi.string()
         .optional()
-        .allow('1')
         .default('1'),
     },
     {
@@ -212,7 +211,7 @@ describe('resolveJoiSchema', () => {
           @Property(Number)
           public num!: number
 
-          @Property(Integer, Default(1 as Integer), Min(10))
+          @Property(Integer, Default(1), Min(10))
           public complex!: Integer & MinRefinement<10>
         }
         return A
@@ -224,8 +223,7 @@ describe('resolveJoiSchema', () => {
           .integer()
           .min(10)
           .optional()
-          .default(1)
-          .allow(1),
+          .default(1),
       }),
     },
     {

@@ -187,10 +187,7 @@ export class JoiDecoder implements IDecoder<unknown> {
               return guardResolve(joiSchema, isJoiArraySchema, s => s.unique())
 
             case 'default':
-              return joiSchema
-                .optional()
-                .allow(value)
-                .default(value)
+              return joiSchema.optional().default(value)
 
             case 'id':
               return joiSchema

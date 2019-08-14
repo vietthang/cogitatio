@@ -13,21 +13,8 @@ import {
   PrimitiveConstructor,
   Refine,
   Resolve,
+  SchemaLike,
 } from '@cogitatio/core'
-
-export type Schema =
-  | IPrimitiveSchema
-  | IEnumSchema
-  | IOptionalSchema
-  | INullableSchema
-  | IListSchema
-  | IDictionarySchema
-  | ITupleSchema
-  | IObjectSchema
-  | IRefineSchema
-  | ITaggedUnionSchema
-
-export type SchemaLike = Schema | PrimitiveConstructor | Constructor
 
 export interface EmailRefinement {
   email: true

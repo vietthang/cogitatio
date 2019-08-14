@@ -2,7 +2,6 @@ import {
   IObjectSchema,
   IPrimitiveSchema,
   Primitive,
-  reflectClass,
   Resolve,
   resolveSchema,
   Schema,

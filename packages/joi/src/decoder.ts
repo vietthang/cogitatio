@@ -8,8 +8,7 @@ import {
   SchemaType,
 } from '@cogitatio/core'
 import { IDecoder } from '@cogitatio/extra'
-import Joi, { Schema as JoiSchema } from '@hapi/joi'
-import { join } from 'path'
+import * as Joi from '@hapi/joi'
 import { ITaggedUnionSchema } from '../../core/src/taggedUnion'
 
 type Transformer<T, U> = (value: T) => U
@@ -55,7 +54,7 @@ function guardResolve<T extends Joi.AnySchema, U>(
   return resolve(schema)
 }
 
-export type SchemaResolver = (schema: Schema) => JoiSchema | undefined
+export type SchemaResolver = (schema: Schema) => Joi.Schema | undefined
 
 export interface IJoiDecoderOptions {
   joi: typeof Joi
@@ -63,7 +62,7 @@ export interface IJoiDecoderOptions {
 
 export class JoiDecoder implements IDecoder<unknown> {
   public readonly resolveJoiSchema = cache(
-    (schema: Schema): JoiSchema => {
+    (schema: Schema): Joi.Schema => {
       switch (schema.type) {
         case SchemaType.Primitive:
           return this.resolvePrimitveSchema(schema.native)
@@ -114,7 +113,7 @@ export class JoiDecoder implements IDecoder<unknown> {
   )
 
   private readonly resolveBrandSchema = cache(
-    (schema: IRefineSchema): JoiSchema => {
+    (schema: IRefineSchema): Joi.Schema => {
       return Object.entries(schema.brand as {}).reduce(
         (joiSchema, [key, value]) => {
           switch (key) {
@@ -202,7 +201,7 @@ export class JoiDecoder implements IDecoder<unknown> {
   )
 
   private readonly resolveObjectSchema = cache(
-    (descriptor: any): JoiSchema => {
+    (descriptor: any): Joi.Schema => {
       // tslint:disable-next-line
       const keys = Object.keys(descriptor)
 
@@ -224,7 +223,7 @@ export class JoiDecoder implements IDecoder<unknown> {
   )
 
   private readonly resolvePrimitveSchema = cache(
-    (native: PrimitiveConstructor): JoiSchema => {
+    (native: PrimitiveConstructor): Joi.Schema => {
       switch (native) {
         case Boolean:
           return this.options.joi.bool()
@@ -247,7 +246,7 @@ export class JoiDecoder implements IDecoder<unknown> {
   )
 
   private readonly resolveTaggedUnionSchema = cache(
-    (schema: ITaggedUnionSchema): JoiSchema => {
+    (schema: ITaggedUnionSchema): Joi.Schema => {
       const { joi } = this.options
 
       return joi.alternatives(

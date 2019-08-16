@@ -68,9 +68,9 @@ export class JoiDecoder implements IDecoder<unknown> {
           return this.resolvePrimitveSchema(schema.native)
 
         case SchemaType.Enum:
-          return (this.options.joi.only as any)(
-            ...Object.values(schema.enumValues),
-          )
+          return this.options.joi
+            .any()
+            .only(...Object.values(schema.enumValues))
 
         case SchemaType.Optional:
           return this.resolveJoiSchema(schema.childSchema).optional()
@@ -252,7 +252,7 @@ export class JoiDecoder implements IDecoder<unknown> {
       return joi.alternatives(
         ...Object.entries(schema.schemaMap).map(([key, childSchema]) => {
           return joi.object({
-            [schema.discriminator]: joi.only(key),
+            [schema.discriminator]: joi.any().only(key),
             [key]: this.resolveJoiSchema(
               resolveSchema(childSchema as SchemaLike),
             ),

@@ -1,6 +1,6 @@
 {
   "name": "@cogitatio/ajv",
-  "version": "0.0.4-alpha.17",
+  "version": "0.0.4-alpha.18",
   "main": "dist/index.js",
   "types": "dist/packages/ajv/src/index.d.ts",
   "scripts": {

@@ -1,0 +1,28 @@
+{
+  "name": "@cogitatio/ajv",
+  "version": "0.0.4-alpha.17",
+  "main": "dist/index.js",
+  "types": "dist/packages/ajv/src/index.d.ts",
+  "scripts": {
+    "clean": "rimraf ./dist",
+    "prebuild": "yarn clean",
+    "build": "tsdx build --tsconfig tsconfig.build.json --entry src/index.ts",
+    "test": "jest"
+  },
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@cogitatio/core": "^0.0.4-alpha.15",
+    "@cogitatio/extra": "^0.0.4-alpha.17",
+    "ajv": "^6.10.2"
+  },
+  "files": [
+    "/src",
+    "/dist"
+  ],
+  "devDependencies": {
+    "@types/json-schema": "^7.0.3"
+  }
+}

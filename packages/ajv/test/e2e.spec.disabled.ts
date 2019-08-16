@@ -149,22 +149,17 @@ const testCases: Array<{
   },
 ]
 
-process.on('unhandledRejection', (...args: any[]) => {
-  // Will print "unhandledRejection err is not defined"
-  console.log('unhandledRejection', JSON.stringify(args))
-})
-
 describe('e2e', () => {
   const decoder = new AjvDecoder()
 
   testCases.forEach(({ name, schema, cases }) => {
     describe(name, () => {
       for (const { input, expected, throws } of cases) {
-        it(`${input} => ${throws ? 'throws' : expected}`, async () => {
+        it(`${input} => ${throws ? 'throws' : expected}`, () => {
           if (throws) {
-            await expect(decoder.decode(schema, input)).rejects
+            return expect(decoder.decode(schema, input)).rejects
           } else {
-            await expect(decoder.decode(schema, input)).resolves.toStrictEqual(
+            return expect(decoder.decode(schema, input)).resolves.toStrictEqual(
               expected,
             )
           }

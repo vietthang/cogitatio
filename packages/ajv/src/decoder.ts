@@ -186,7 +186,7 @@ export class AjvDecoder {
                 default: value,
               }
 
-            case 'id':
+            case 'id64':
               return jsonSchema
 
             default:

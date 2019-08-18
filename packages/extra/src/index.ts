@@ -182,4 +182,4 @@ export const Default = (defaultValue: unknown) => <S extends SchemaLike>(
 
 export { IEncoder, IDecoder, ICodec } from './codec'
 
-export { Id } from './id'
+export { Id64 } from './id'

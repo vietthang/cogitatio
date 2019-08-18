@@ -64,6 +64,9 @@ export class JoiDecoder implements IDecoder<unknown> {
   public readonly resolveJoiSchema = cache(
     (schema: Schema): Joi.Schema => {
       switch (schema.type) {
+        case SchemaType.Any:
+          return this.options.joi.any()
+
         case SchemaType.Primitive:
           return this.resolvePrimitveSchema(schema.native)
 
@@ -188,8 +191,10 @@ export class JoiDecoder implements IDecoder<unknown> {
             case 'default':
               return joiSchema.optional().default(value)
 
-            case 'id':
-              return joiSchema
+            case 'id64':
+              return guardResolve(joiSchema, isJoiStringSchema, s =>
+                s.regex(/^\d+$/),
+              )
 
             default:
               throw new Error('unhandled refinement')
@@ -202,21 +207,14 @@ export class JoiDecoder implements IDecoder<unknown> {
 
   private readonly resolveObjectSchema = cache(
     (descriptor: any): Joi.Schema => {
-      // tslint:disable-next-line
-      const keys = Object.keys(descriptor)
-
       return this.options.joi.object(
-        keys.reduce(
-          (prev, key) => {
-            const joiSchema = this.resolveJoiSchema(
-              resolveSchema(descriptor[key]),
-            )
-            return {
-              ...prev,
-              [key]: joiSchema,
-            }
-          },
-          {} as any,
+        Object.fromEntries(
+          Object.entries(descriptor).map(([key, value]) => {
+            return [
+              key,
+              this.resolveJoiSchema(resolveSchema(value as SchemaLike)),
+            ]
+          }),
         ),
       )
     },

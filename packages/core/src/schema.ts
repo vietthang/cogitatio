@@ -1,3 +1,4 @@
+import { IAnySchema } from './any'
 import { IRefineSchema } from './brand'
 import { SchemaType } from './common'
 import { IDictionarySchema } from './dictionary'
@@ -27,6 +28,7 @@ export type Schema =
   | IObjectSchema
   | IRefineSchema
   | ITaggedUnionSchema
+  | IAnySchema
 
 export type SchemaLike = Schema | PrimitiveConstructor | Constructor
 

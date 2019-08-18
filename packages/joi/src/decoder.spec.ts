@@ -15,7 +15,7 @@ import {
   Default,
   Email,
   Hostname,
-  Id,
+  Id64,
   Integer,
   Ip,
   Max,
@@ -241,9 +241,9 @@ describe('resolveJoiSchema', () => {
       name: 'id',
       resolve: () => {
         class A {}
-        return Id(A)
+        return Id64<A>()
       },
-      expected: Joi.string(),
+      expected: Joi.string().regex(/^\d+$/),
     },
   ]
 

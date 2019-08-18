@@ -1,4 +1,5 @@
 export enum SchemaType {
+  Any,
   Primitive,
   Enum,
   Optional,

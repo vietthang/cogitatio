@@ -22,6 +22,8 @@ export * from './brand'
 
 export * from './taggedUnion'
 
+export * from './any'
+
 export * from './schema'
 
 export * from './metadata'

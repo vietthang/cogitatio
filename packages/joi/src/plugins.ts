@@ -27,6 +27,7 @@ export const bigIntPlugin: JoiDecoderPlugin = {
         base: '!!"{{value}}" is not a bigint',
       },
       coerce(value, state, prefs) {
+        // tslint:disable-next-line
         if (typeof value === 'bigint') {
           return value
         }

@@ -60,20 +60,39 @@ export interface IJoiDecoderOptions {
   joi: typeof Joi
 }
 
+export interface JoiDecoderPlugin {
+  transformJoi?: (j: Joi.Root) => Joi.Root
+  resolveSchema?: (
+    joi: Joi.Root,
+    schema: Schema,
+    resolveJoiSchema: (s: Schema) => Joi.Schema,
+  ) => Joi.Schema | undefined
+}
+
 export class JoiDecoder implements IDecoder<unknown> {
   public readonly resolveJoiSchema = cache(
     (schema: Schema): Joi.Schema => {
+      for (const plugin of this.plugins) {
+        if (plugin.resolveSchema) {
+          const joiSchema = plugin.resolveSchema(
+            this.joi,
+            schema,
+            this.resolveJoiSchema,
+          )
+          if (joiSchema) {
+            return joiSchema
+          }
+        }
+      }
       switch (schema.type) {
         case SchemaType.Any:
-          return this.options.joi.any()
+          return this.joi.any()
 
         case SchemaType.Primitive:
           return this.resolvePrimitveSchema(schema.native)
 
         case SchemaType.Enum:
-          return this.options.joi
-            .any()
-            .only(...Object.values(schema.enumValues))
+          return this.joi.any().only(...Object.values(schema.enumValues))
 
         case SchemaType.Optional:
           return this.resolveJoiSchema(schema.childSchema).optional()
@@ -82,17 +101,17 @@ export class JoiDecoder implements IDecoder<unknown> {
           return this.resolveJoiSchema(schema.childSchema).allow(null)
 
         case SchemaType.List:
-          return this.options.joi
+          return this.joi
             .array()
             .items(this.resolveJoiSchema(schema.childSchema))
 
         case SchemaType.Dictionary:
-          return this.options.joi
+          return this.joi
             .object()
             .pattern(/.*/, this.resolveJoiSchema(schema.childSchema))
 
         case SchemaType.Tuple:
-          return this.options.joi
+          return this.joi
             .array()
             .length(schema.childSchemas.length)
             .ordered(
@@ -207,7 +226,7 @@ export class JoiDecoder implements IDecoder<unknown> {
 
   private readonly resolveObjectSchema = cache(
     (descriptor: any): Joi.Schema => {
-      return this.options.joi.object(
+      return this.joi.object(
         Object.fromEntries(
           Object.entries(descriptor).map(([key, value]) => {
             return [
@@ -224,19 +243,21 @@ export class JoiDecoder implements IDecoder<unknown> {
     (native: PrimitiveConstructor): Joi.Schema => {
       switch (native) {
         case Boolean:
-          return this.options.joi.bool()
+          return this.joi.bool()
         case Number:
-          return this.options.joi.number()
+          return this.joi.number()
         case String:
-          return this.options.joi.string()
+          return this.joi.string()
         case BigInt:
           throw new Error('bigint is not supported by joi yet')
         case Date:
-          return this.options.joi.date()
+          return this.joi.date()
         case ArrayBuffer:
-          return this.options.joi.binary()
+          return this.joi.binary()
         case Buffer:
-          return this.options.joi.binary()
+          return this.joi.binary()
+        case RegExp:
+          return this.joi.object().type(RegExp)
         default:
           throw new Error('invalid primitive type')
       }
@@ -245,12 +266,10 @@ export class JoiDecoder implements IDecoder<unknown> {
 
   private readonly resolveTaggedUnionSchema = cache(
     (schema: ITaggedUnionSchema): Joi.Schema => {
-      const { joi } = this.options
-
-      return joi.alternatives(
+      return this.joi.alternatives(
         ...Object.entries(schema.schemaMap).map(([key, childSchema]) => {
-          return joi.object({
-            [schema.discriminator]: joi.any().only(key),
+          return this.joi.object({
+            [schema.discriminator]: this.joi.any().only(key),
             [key]: this.resolveJoiSchema(
               resolveSchema(childSchema as SchemaLike),
             ),
@@ -260,27 +279,27 @@ export class JoiDecoder implements IDecoder<unknown> {
     },
   )
 
-  constructor(
-    private readonly options: IJoiDecoderOptions = {
-      joi: Joi,
-    },
-  ) {}
+  private readonly joi: Joi.Root
 
-  public decode<S extends SchemaLike>(schema: S) {
-    return (value: unknown): Resolve<S> => {
-      const result = this.resolveJoiSchema(resolveSchema(schema)).validate(
-        value,
-        {
-          allowUnknown: true,
-          stripUnknown: true,
-          convert: true,
-          presence: 'required',
-        },
-      )
-      if (result.error) {
-        throw result.error
-      }
-      return result.value as any
+  constructor(private readonly plugins: JoiDecoderPlugin[] = []) {
+    this.joi = plugins.reduce((joi, plugin) => {
+      return plugin.transformJoi ? plugin.transformJoi(joi) : joi
+    }, Joi)
+  }
+
+  public decode<S extends SchemaLike>(schema: S, value: unknown): Resolve<S> {
+    const result = this.resolveJoiSchema(resolveSchema(schema)).validate(
+      value,
+      {
+        allowUnknown: true,
+        stripUnknown: true,
+        convert: true,
+        presence: 'required',
+      },
+    )
+    if (result.error) {
+      throw result.error
     }
+    return result.value as any
   }
 }

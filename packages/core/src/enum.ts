@@ -6,7 +6,9 @@ export interface IEnumSchema<T extends any = any>
   enumValues: T
 }
 
-export function Enum<T extends any = any>(values: T): IEnumSchema<T> {
+export function Enum<T extends { [key in keyof T]: string | number } = any>(
+  values: T,
+): IEnumSchema<T> {
   return {
     type: SchemaType.Enum,
     enumValues: values,

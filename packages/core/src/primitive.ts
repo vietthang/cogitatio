@@ -8,6 +8,7 @@ export type PrimitiveConstructor =
   | typeof Date
   | typeof ArrayBuffer
   | typeof Buffer
+  | typeof RegExp
 
 export function isPrimitiveConstructor(
   value: any,
@@ -20,6 +21,7 @@ export function isPrimitiveConstructor(
     case Date:
     case ArrayBuffer:
     case Buffer:
+    case RegExp:
       return true
     default:
       return false
@@ -49,6 +51,8 @@ export type ResolvePrimitiveFromConstructor<
   ? ArrayBuffer
   : C extends typeof Buffer
   ? Buffer
+  : C extends typeof RegExp
+  ? RegExp
   : never
 
 export type ResolvePrimitive<
@@ -68,6 +72,8 @@ export type ResolvePrimitive<
       ? ArrayBuffer
       : C extends typeof Buffer
       ? Buffer
+      : C extends typeof RegExp
+      ? RegExp
       : never)
   : never
 
@@ -79,6 +85,7 @@ export type Primitive =
   | Date
   | ArrayBuffer
   | Buffer
+  | RegExp
 
 export type ReverseResolvePrimitive<T extends Primitive> = T extends boolean
   ? typeof Boolean
@@ -94,6 +101,8 @@ export type ReverseResolvePrimitive<T extends Primitive> = T extends boolean
   ? typeof ArrayBuffer
   : T extends Buffer
   ? typeof Buffer
+  : T extends RegExp
+  ? typeof RegExp
   : never
 
 export type PrimitiveDecorator<S extends IPrimitiveSchema> = <

@@ -183,3 +183,5 @@ export const Default = (defaultValue: unknown) => <S extends SchemaLike>(
 export { IEncoder, IDecoder, ICodec } from './codec'
 
 export { Id64 } from './id'
+
+export * from './phone'

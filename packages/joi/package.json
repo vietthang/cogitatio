@@ -18,8 +18,15 @@
     "@cogitatio/extra": "^0.0.4-alpha.19",
     "@hapi/joi": "^15.1.0"
   },
+  "peerDependencies": {
+    "joi-phone-number": "^3.0.2"
+  },
   "files": [
     "/src",
     "/dist"
-  ]
+  ],
+  "devDependencies": {
+    "joi-phone-number": "^3.0.2",
+    "lerna": "^3.16.4"
+  }
 }

@@ -19,7 +19,7 @@ describe('validate primitive', () => {
   const decoder = new JoiDecoder()
 
   describe('boolean', () => {
-    const validate = decoder.decode(resolveSchema(Boolean))
+    const validate = (i: unknown) => decoder.decode(resolveSchema(Boolean), i)
 
     it('should failed with non-boolean value', () => {
       assert.throws(() => validate(0))
@@ -37,7 +37,7 @@ describe('validate primitive', () => {
   })
 
   describe('number', () => {
-    const validate = decoder.decode(resolveSchema(Number))
+    const validate = (i: unknown) => decoder.decode(resolveSchema(Number), i)
 
     it('should failed with non-number value', () => {
       assert.throws(() => validate({}))
@@ -54,7 +54,7 @@ describe('validate primitive', () => {
   })
 
   describe('string', () => {
-    const validate = decoder.decode(resolveSchema(String))
+    const validate = (i: unknown) => decoder.decode(resolveSchema(String), i)
 
     it('should failed with non-string value', () => {
       assert.throws(() => validate(0))
@@ -69,7 +69,7 @@ describe('validate primitive', () => {
   })
 
   describe('bigint', () => {
-    const validate = decoder.decode(resolveSchema(String))
+    const validate = (i: unknown) => decoder.decode(resolveSchema(BigInt), i)
 
     it('should failed with any value', () => {
       assert.throws(() => validate(0))
@@ -80,7 +80,7 @@ describe('validate primitive', () => {
   })
 
   describe('date', () => {
-    const validate = decoder.decode(resolveSchema(Date))
+    const validate = (i: unknown) => decoder.decode(resolveSchema(Date), i)
 
     it('should failed with invalid date value', () => {
       assert.throws(() => validate({}))
@@ -98,7 +98,7 @@ describe('validate primitive', () => {
   })
 
   describe('binary', () => {
-    const validate = decoder.decode(resolveSchema(Buffer))
+    const validate = (i: unknown) => decoder.decode(resolveSchema(Buffer), i)
 
     it('should failed with invalid array buffer value', () => {
       assert.throws(() => validate({}))
@@ -112,6 +112,22 @@ describe('validate primitive', () => {
       assert.deepStrictEqual(buffer, validate(buffer))
     })
   })
+
+  describe('regex', () => {
+    const validate = (i: unknown) => decoder.decode(resolveSchema(RegExp), i)
+
+    it('should failed with invalid array buffer value', () => {
+      assert.throws(() => validate({}))
+      assert.throws(() => validate(false))
+      assert.throws(() => validate(100n))
+    })
+
+    it('should success with buffer value', () => {
+      const regex = /a/
+
+      assert.deepStrictEqual(regex, validate(regex))
+    })
+  })
 })
 
 describe('validate enum', () => {
@@ -122,7 +138,7 @@ describe('validate enum', () => {
   }
 
   const decoder = new JoiDecoder()
-  const validate = decoder.decode(Enum(Color))
+  const validate = (i: unknown) => decoder.decode(Enum(Color), i)
 
   it('should failed with invalid enum value', () => {
     assert.throws(() => validate('red'))
@@ -139,7 +155,7 @@ describe('validate enum', () => {
 
 describe('validate optional', () => {
   const decoder = new JoiDecoder()
-  const validate = decoder.decode(Optional(String))
+  const validate = (i: unknown) => decoder.decode(Optional(String), i)
 
   it('should failed with non-string or undefined value', () => {
     assert.throws(() => validate(0))
@@ -157,7 +173,7 @@ describe('validate optional', () => {
 
 describe('validate nullable', () => {
   const decoder = new JoiDecoder()
-  const validate = decoder.decode(Nullable(String))
+  const validate = (i: unknown) => decoder.decode(Nullable(String), i)
 
   it('should failed with non-string or null value', () => {
     assert.throws(() => validate(0))
@@ -175,7 +191,7 @@ describe('validate nullable', () => {
 
 describe('validate list', () => {
   const decoder = new JoiDecoder()
-  const validate = decoder.decode(List(String))
+  const validate = (i: unknown) => decoder.decode(List(String), i)
 
   it('should failed with non string array value', () => {
     assert.throws(() => validate(0))
@@ -194,7 +210,7 @@ describe('validate list', () => {
 
 describe('validate dictionary', () => {
   const decoder = new JoiDecoder()
-  const validate = decoder.decode(Dictionary(String))
+  const validate = (i: unknown) => decoder.decode(Dictionary(String), i)
 
   it('should failed with non string dictionaary value', () => {
     assert.throws(() => validate(0))
@@ -214,7 +230,7 @@ describe('validate dictionary', () => {
 
 describe('validate tuple', () => {
   const decoder = new JoiDecoder()
-  const validate = decoder.decode(Tuple(String, Number))
+  const validate = (i: unknown) => decoder.decode(Tuple(String, Number), i)
 
   it('should failed with invalid tuple value', () => {
     assert.throws(() => validate(0))
@@ -241,7 +257,7 @@ describe('validate object', () => {
   }
 
   const decoder = new JoiDecoder()
-  const validate = decoder.decode(A)
+  const validate = (i: unknown) => decoder.decode(A, i)
 
   it('should failed with invalid object value', () => {
     assert.throws(() => validate(0))
@@ -271,7 +287,7 @@ describe('validate TaggedUnion', () => {
     foo: String,
     bar: Number,
   })
-  const validate = decoder.decode(unionSchema)
+  const validate = (i: unknown) => decoder.decode(unionSchema, i)
 
   assert.throws(() => validate({}))
   assert.throws(() => validate({ foo: 'string', bar: 0 }))

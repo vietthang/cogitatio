@@ -54,6 +54,6 @@ export function Phone(defaultCountry: string = 'US', format?: PhoneFormat) {
 }
 
 export type Phone<
-  C extends string,
-  F extends PhoneFormat | undefined
+  C extends string = 'US',
+  F extends PhoneFormat | undefined = undefined
 > = string & PhoneRefinement<C, F>

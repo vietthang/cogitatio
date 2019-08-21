@@ -1,0 +1,24 @@
+{
+  "name": "@cogitatio/jwt",
+  "version": "0.0.4-alpha.16",
+  "main": "dist/index.js",
+  "types": "dist/packages/jwt/src/index.d.ts",
+  "scripts": {
+    "clean": "rimraf ./dist",
+    "prebuild": "yarn clean",
+    "build": "tsdx build --tsconfig tsconfig.build.json --entry src/index.ts"
+  },
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@cogitatio/core": "^0.0.4-alpha.19",
+    "@cogitatio/extra": "^0.0.4-alpha.19",
+    "jsonwebtoken": "^8.5.1"
+  },
+  "files": [
+    "/src",
+    "/dist"
+  ]
+}

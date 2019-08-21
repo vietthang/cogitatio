@@ -13,89 +13,90 @@ import { decode, encode } from 'base64-arraybuffer'
 import { JsonValue } from './types'
 
 export class JsonCodec implements ICodec<JsonValue, JsonValue> {
-  public encode(schemaLike: SchemaLike) {
+  public encode<S extends SchemaLike>(
+    schemaLike: S,
+    value: Resolve<S>,
+  ): JsonValue {
     const schema = resolveSchema(schemaLike)
 
-    return (value: Resolve<Schema>): JsonValue => {
-      switch (schema.type) {
-        case SchemaType.Primitive:
-          return this.encodePrimitive(schema, value)
+    switch (schema.type) {
+      case SchemaType.Primitive:
+        return this.encodePrimitive(schema, value)
 
-        case SchemaType.Enum:
-          return value as string | number
+      case SchemaType.Enum:
+        return value as string | number
 
-        case SchemaType.Optional:
-          return value === undefined
-            ? undefined
-            : this.encode(schema.childSchema)(value)
+      case SchemaType.Optional:
+        // tslint:disable-next-line
+        return value === undefined
+          ? undefined
+          : this.encode(schema.childSchema, value)
 
-        case SchemaType.Nullable:
-          return value === null ? null : this.encode(schema.childSchema)(value)
+      case SchemaType.Nullable:
+        // tslint:disable-next-line
+        return value === null ? null : this.encode(schema.childSchema, value)
 
-        case SchemaType.List:
-          return (value as any[]).map(value =>
-            this.encode(schema.childSchema)(value),
-          )
+      case SchemaType.List:
+        return (value as any[]).map(value =>
+          this.encode(schema.childSchema, value),
+        )
 
-        case SchemaType.Tuple:
-          return schema.childSchemas.map((childSchema, index) =>
-            this.encode(childSchema)(value[index]),
-          )
+      case SchemaType.Tuple:
+        return schema.childSchemas.map((childSchema, index) =>
+          this.encode(childSchema, value[index]),
+        )
 
-        case SchemaType.Object:
-          return this.encodeObject(schema, value)
+      case SchemaType.Object:
+        return this.encodeObject(schema, value)
 
-        default:
-          throw new Error('unsupported schema type')
-      }
+      default:
+        throw new Error('unsupported schema type')
     }
   }
 
-  public decode(schemaLike: SchemaLike) {
+  public decode<S extends SchemaLike>(schemaLike: S, value: JsonValue): any {
     const schema = resolveSchema(schemaLike)
 
-    return (value: JsonValue): any => {
-      switch (schema.type) {
-        case SchemaType.Primitive:
-          return this.decodePrimitive(schema, value)
+    switch (schema.type) {
+      case SchemaType.Primitive:
+        return this.decodePrimitive(schema, value)
 
-        case SchemaType.Enum:
-          if (Object.values(schema.enumValues).includes(value as any)) {
-            return value
-          }
-          throw new Error('invalid enum value')
+      case SchemaType.Enum:
+        if (Object.values(schema.enumValues).includes(value as any)) {
+          return value
+        }
+        throw new Error('invalid enum value')
 
-        case SchemaType.Optional:
-          return value === undefined
-            ? undefined
-            : this.decode(schema.childSchema)(value)
+      case SchemaType.Optional:
+        return value === undefined
+          ? undefined
+          : this.decode(schema.childSchema, value)
 
-        case SchemaType.Nullable:
-          return value === null ? null : this.decode(schema.childSchema)(value)
+      case SchemaType.Nullable:
+        return value === null ? null : this.decode(schema.childSchema, value)
 
-        case SchemaType.List:
-          if (Array.isArray(value)) {
-            return value.map(value => this.decode(schema.childSchema)(value))
-          }
-          throw new Error('invalid value')
+      case SchemaType.List:
+        if (Array.isArray(value)) {
+          return value.map(value => this.decode(schema.childSchema, value))
+        }
+        throw new Error('invalid value')
 
-        case SchemaType.Tuple:
-          if (
-            Array.isArray(value) &&
-            value.length === schema.childSchemas.length
-          ) {
-            return value.map((value, index) =>
-              this.decode(schema.childSchemas[index])(value),
-            )
-          }
-          throw new Error('invalid value')
+      case SchemaType.Tuple:
+        if (
+          Array.isArray(value) &&
+          value.length === schema.childSchemas.length
+        ) {
+          return value.map((value, index) =>
+            this.decode(schema.childSchemas[index], value),
+          )
+        }
+        throw new Error('invalid value')
 
-        case SchemaType.Object:
-          return this.decodeObject(schema, value)
+      case SchemaType.Object:
+        return this.decodeObject(schema, value)
 
-        default:
-          throw new Error('unsupported schema type')
-      }
+      default:
+        throw new Error('unsupported schema type')
     }
   }
 
@@ -105,7 +106,7 @@ export class JsonCodec implements ICodec<JsonValue, JsonValue> {
     }
     return Object.fromEntries(
       Object.entries(schema.fields()).map(([key, schema]) => {
-        return [key, this.encode(schema as any)(value)]
+        return [key, this.encode(schema as any, value)]
       }),
     )
   }
@@ -116,7 +117,7 @@ export class JsonCodec implements ICodec<JsonValue, JsonValue> {
     }
     return Object.fromEntries(
       Object.entries(schema.fields()).map(([key, schema]) => {
-        return [key, this.decode(schema as any)(value)]
+        return [key, this.decode(schema as any, value)]
       }),
     )
   }

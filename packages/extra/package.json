@@ -1,6 +1,6 @@
 {
   "name": "@cogitatio/extra",
-  "version": "0.0.4-alpha.19",
+  "version": "0.0.4-alpha.20",
   "main": "dist/index.js",
   "types": "dist/packages/extra/src/index.d.ts",
   "scripts": {

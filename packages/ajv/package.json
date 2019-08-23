@@ -1,6 +1,6 @@
 {
   "name": "@cogitatio/ajv",
-  "version": "0.0.4-alpha.20",
+  "version": "0.0.4-alpha.21",
   "main": "dist/index.js",
   "types": "dist/packages/ajv/src/index.d.ts",
   "scripts": {
@@ -14,8 +14,8 @@
     "access": "public"
   },
   "dependencies": {
-    "@cogitatio/core": "^0.0.4-alpha.20",
-    "@cogitatio/extra": "^0.0.4-alpha.20",
+    "@cogitatio/core": "^0.0.4-alpha.21",
+    "@cogitatio/extra": "^0.0.4-alpha.21",
     "ajv": "^6.10.2"
   },
   "files": [

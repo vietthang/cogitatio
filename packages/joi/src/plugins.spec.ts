@@ -1,7 +1,7 @@
 import 'jest'
 
 import { List, Optional } from '@cogitatio/core'
-import { Phone, PhoneFormat } from '@cogitatio/extra'
+import { PhoneFormat, PhoneNumber } from '@cogitatio/extra'
 import { JoiDecoder } from './decoder'
 import {
   bigIntPlugin,
@@ -80,7 +80,7 @@ describe('test regexPlugin', () => {
 })
 
 describe('test phoneNumber', () => {
-  const schema = Phone('VN', PhoneFormat.e164)
+  const schema = PhoneNumber('VN', PhoneFormat.e164)
 
   it('without plugin', () => {
     const decoder = new JoiDecoder()

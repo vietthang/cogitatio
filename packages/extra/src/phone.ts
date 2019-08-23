@@ -33,18 +33,24 @@ export interface PhoneRefinement<
   }
 }
 
-export function Phone(): IRefineSchema<string, PhoneRefinement<'US', undefined>>
+export function PhoneNumber(): IRefineSchema<
+  string,
+  PhoneRefinement<'US', undefined>
+>
 
-export function Phone<C extends string>(
+export function PhoneNumber<C extends string>(
   defaultCountry: C,
 ): IRefineSchema<string, PhoneRefinement<C, undefined>>
 
-export function Phone<C extends string, F extends PhoneFormat>(
+export function PhoneNumber<C extends string, F extends PhoneFormat>(
   defaultCountry: C,
   format: F,
 ): IRefineSchema<string, PhoneRefinement<C, F>>
 
-export function Phone(defaultCountry: string = 'US', format?: PhoneFormat) {
+export function PhoneNumber(
+  defaultCountry: string = 'US',
+  format?: PhoneFormat,
+) {
   return Refine(String, {
     phone: {
       defaultCountry,
@@ -53,7 +59,7 @@ export function Phone(defaultCountry: string = 'US', format?: PhoneFormat) {
   })
 }
 
-export type Phone<
+export type PhoneNumber<
   C extends string = 'US',
   F extends PhoneFormat | undefined = undefined
 > = string & PhoneRefinement<C, F>

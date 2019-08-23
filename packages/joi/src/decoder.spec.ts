@@ -24,7 +24,6 @@ import {
   Min,
   MinItems,
   MinLength,
-  MinRefinement,
   Port,
   UniqueItems,
   Uri,
@@ -212,7 +211,7 @@ describe('resolveJoiSchema', () => {
           public num!: number
 
           @Property(Integer, Default(1), Min(10))
-          public complex!: Integer & MinRefinement<10>
+          public complex!: Integer & Min<10>
         }
         return A
       },

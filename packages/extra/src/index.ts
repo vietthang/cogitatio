@@ -16,31 +16,19 @@ import {
   SchemaLike,
 } from '@cogitatio/core'
 
-export interface EmailRefinement {
-  email: true
-}
-
-export const Email: IRefineSchema<string, EmailRefinement> = Refine(String, {
+export const Email: IRefineSchema<string, { email: true }> = Refine(String, {
   email: true,
 })
 
 export type Email = Resolve<typeof Email>
 
-export interface UriRefinement {
-  uri: true
-}
-
-export const Uri: IRefineSchema<string, UriRefinement> = Refine(String, {
+export const Uri: IRefineSchema<string, { uri: true }> = Refine(String, {
   uri: true,
 })
 
 export type Uri = Resolve<typeof Uri>
 
-export interface IntegerRefinement {
-  integer: true
-}
-
-export const Integer: IRefineSchema<number, IntegerRefinement> = Refine(
+export const Integer: IRefineSchema<number, { integer: true }> = Refine(
   Number,
   {
     integer: true,
@@ -49,48 +37,32 @@ export const Integer: IRefineSchema<number, IntegerRefinement> = Refine(
 
 export type Integer = Resolve<typeof Integer>
 
-export interface PortRefinement {
-  port: true
-}
-
-export const Port: IRefineSchema<Integer, PortRefinement> = Refine(Integer, {
+export const Port: IRefineSchema<Integer, { port: true }> = Refine(Integer, {
   port: true,
 })
 
 export type Port = Resolve<typeof Port>
 
-export interface IpRefinement {
-  ip: true
-}
-
-export const Ip: IRefineSchema<string, IpRefinement> = Refine(String, {
+export const Ip: IRefineSchema<string, { ip: true }> = Refine(String, {
   ip: true,
 })
 
 export type Ip = Resolve<typeof Ip>
 
-export interface HostnameRefinement {
-  hostname: true
-}
-
-export const Hostname: IRefineSchema<string, HostnameRefinement> = Refine(
+export const Hostname: IRefineSchema<string, { hostname: true }> = Refine(
   String,
   { hostname: true },
 )
 
 export type Hostname = Resolve<typeof Hostname>
 
-export interface UuidRefinement {
-  uuid: true
-}
-
-export const Uuid: IRefineSchema<string, UuidRefinement> = Refine(String, {
+export const Uuid: IRefineSchema<string, { uuid: true }> = Refine(String, {
   uuid: true,
 })
 
 export type Uuid = Resolve<typeof Uuid>
 
-export interface MinRefinement<T extends number> {
+export interface Min<T extends number> {
   min: T
 }
 
@@ -98,11 +70,11 @@ export const Min = <T extends number>(min: T) => <
   S extends SchemaLike & (Resolve<S> extends number ? unknown : never)
 >(
   schema: S,
-): IRefineSchema<Resolve<S>, MinRefinement<T>> => {
+): IRefineSchema<Resolve<S>, Min<T>> => {
   return Refine(schema, { min })
 }
 
-export interface MaxRefinement<T extends number> {
+export interface Max<T extends number> {
   max: T
 }
 
@@ -110,11 +82,11 @@ export const Max = <T extends number>(max: T) => <
   S extends SchemaLike & (Resolve<S> extends number ? unknown : never)
 >(
   schema: S,
-): IRefineSchema<Resolve<S>, MaxRefinement<T>> => {
+): IRefineSchema<Resolve<S>, Max<T>> => {
   return Refine(schema, { max })
 }
 
-export interface MinLengthRefinement<T extends number> {
+export interface MinLength<T extends number> {
   minLength: T
 }
 
@@ -122,11 +94,11 @@ export const MinLength = <T extends number>(minLength: T) => <
   S extends SchemaLike & (Resolve<S> extends string ? unknown : never)
 >(
   schema: S,
-): IRefineSchema<Resolve<S>, MinLengthRefinement<T>> => {
+): IRefineSchema<Resolve<S>, MinLength<T>> => {
   return Refine(schema, { minLength })
 }
 
-export interface MaxLengthRefinement<T extends number> {
+export interface MaxLength<T extends number> {
   maxLength: T
 }
 
@@ -134,11 +106,11 @@ export const MaxLength = <T extends number>(maxLength: T) => <
   S extends SchemaLike & (Resolve<S> extends string ? unknown : never)
 >(
   schema: S,
-): IRefineSchema<Resolve<S>, MaxLengthRefinement<T>> => {
+): IRefineSchema<Resolve<S>, MaxLength<T>> => {
   return Refine(schema, { maxLength })
 }
 
-export interface MinItemsRefinement<T extends number> {
+export interface MinItems<T extends number> {
   minItems: T
 }
 
@@ -146,11 +118,11 @@ export const MinItems = <T extends number>(minItems: T) => <
   S extends SchemaLike & (Resolve<S> extends unknown[] ? unknown : never)
 >(
   schema: S,
-): IRefineSchema<Resolve<S>, MinItemsRefinement<T>> => {
+): IRefineSchema<Resolve<S>, MinItems<T>> => {
   return Refine(schema, { minItems })
 }
 
-export interface MaxItemsRefinement<T extends number> {
+export interface MaxItems<T extends number> {
   maxItems: T
 }
 
@@ -158,11 +130,11 @@ export const MaxItems = <T extends number>(maxItems: T) => <
   S extends SchemaLike & (Resolve<S> extends unknown[] ? unknown : never)
 >(
   schema: S,
-): IRefineSchema<Resolve<S>, MaxItemsRefinement<T>> => {
+): IRefineSchema<Resolve<S>, MaxItems<T>> => {
   return Refine(schema, { maxItems })
 }
 
-export interface UniqueItemsRefinement {
+export interface UniqueItems {
   uniqueItems: true
 }
 
@@ -170,7 +142,7 @@ export const UniqueItems = () => <
   S extends SchemaLike & (Resolve<S> extends unknown[] ? unknown : never)
 >(
   schema: S,
-): IRefineSchema<Resolve<S>, UniqueItemsRefinement> => {
+): IRefineSchema<Resolve<S>, UniqueItems> => {
   return Refine(schema, { uniqueItems: true })
 }
 

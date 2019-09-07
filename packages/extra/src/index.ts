@@ -157,3 +157,5 @@ export { IEncoder, IDecoder, ICodec } from './codec'
 export { Id64 } from './id'
 
 export * from './phone'
+
+export * from './wrap'

@@ -14,7 +14,6 @@ export type SqlValue = SqlPrimitive | SqlValueArray
 export interface SqlValueArray extends Array<SqlValue> {}
 
 export class SqlEncoder implements IEncoder<SqlValue> {
-
   public encode<S extends SchemaLike>(
     schemaLike: S,
     value: Resolve<S>,
@@ -29,6 +28,7 @@ export class SqlEncoder implements IEncoder<SqlValue> {
         return value as string | number
 
       case SchemaType.Optional:
+        // tslint:disable-next-line
         return value === undefined
           ? null
           : this.encode(schema.childSchema, value)

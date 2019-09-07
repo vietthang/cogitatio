@@ -337,10 +337,7 @@ describe('resolveJoiSchema', () => {
     },
     {
       name: 'id',
-      resolve: () => {
-        class A {}
-        return Id64<A>()
-      },
+      resolve: () => Id64,
       expected: {
         type: 'string',
       },

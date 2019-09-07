@@ -7,7 +7,7 @@ import {
   PipeTransform,
   Type,
 } from '@nestjs/common'
-import { memoize, objectSerializer } from '../../knex/src/utils'
+import { memoize, objectSerializer } from './utils'
 
 // @internal
 export const decoderSymbol = Symbol('Decoder')

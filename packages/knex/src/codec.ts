@@ -28,13 +28,11 @@ export class SqlEncoder implements IEncoder<SqlValue> {
         return value as string | number
 
       case SchemaType.Optional:
-        // tslint:disable-next-line
         return value === undefined
           ? null
           : this.encode(schema.childSchema, value)
 
       case SchemaType.Nullable:
-        // tslint:disable-next-line
         return value === null ? null : this.encode(schema.childSchema, value)
 
       case SchemaType.List:
@@ -80,7 +78,7 @@ export class SqlEncoder implements IEncoder<SqlValue> {
       case Buffer:
         return value as Buffer
       case RegExp:
-        throw new Error('RegExp is not supported yet')
+        return value.toString()
       default:
         throw new Error('invalid primitive type')
     }

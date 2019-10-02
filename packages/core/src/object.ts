@@ -1,16 +1,16 @@
-import { IBaseSchema, SchemaType } from './common'
-import { Resolve, resolveSchema, SchemaLike } from './schema'
+import { BaseSchema, SchemaType } from './common'
+import { Resolve, SchemaLike, resolveSchema } from './schema'
 
 export type Constructor<T extends {} = {}> = new (...args: any[]) => T
 
-export interface IObjectSchema<T extends {} = {}> extends IBaseSchema<T> {
+export interface ObjectSchema<T extends {} = {}> extends BaseSchema<T> {
   type: SchemaType.Object
-  fields: () => { [key in keyof T]: IBaseSchema<T[key]> }
+  fields: () => { [key in keyof T]: BaseSchema<T[key]> }
 }
 
 export function Record<M extends { [key in keyof M]: SchemaLike }>(
   fields: M,
-): IObjectSchema<{ [key in keyof M]: Resolve<M[key]> }> {
+): ObjectSchema<{ [key in keyof M]: Resolve<M[key]> }> {
   return {
     type: SchemaType.Object,
     fields: () =>

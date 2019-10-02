@@ -1,15 +1,15 @@
 import {
-  IRefineSchema,
   PrimitiveConstructor,
+  RefineSchema,
   Resolve,
-  resolveSchema,
   Schema,
   SchemaLike,
   SchemaType,
+  resolveSchema,
 } from '@cogitatio/core'
 import Ajv from 'ajv'
 import { JSONSchema4, JSONSchema4TypeName } from 'json-schema'
-import { ITaggedUnionSchema } from '../../core/src/taggedUnion'
+import { TaggedUnionSchema } from '../../core/src/taggedUnion'
 
 type Transformer<T, U> = (value: T) => U
 
@@ -17,12 +17,15 @@ function cache<T extends object, U>(
   transfomer: Transformer<T, U>,
 ): Transformer<T, U> {
   const resultCache = new WeakMap<T, U>()
+
   return (value: T): U => {
     if (resultCache.has(value)) {
       return resultCache.get(value)!
     }
     const result = transfomer(value)
+
     resultCache.set(value, result)
+
     return result
   }
 }
@@ -46,14 +49,16 @@ export class AjvDecoder {
         case SchemaType.Optional:
           return this.resolveJsonSchema(schema.childSchema)
 
-        case SchemaType.Nullable:
+        case SchemaType.Nullable: {
           const childJsonSchema = this.resolveJsonSchema(schema.childSchema)
+
           return {
             ...childJsonSchema,
             type: (Array.isArray(childJsonSchema.type)
               ? [...childJsonSchema.type, 'null']
               : [childJsonSchema.type, 'null']) as JSONSchema4TypeName[],
           }
+        }
 
         case SchemaType.List:
           return {
@@ -91,10 +96,11 @@ export class AjvDecoder {
   )
 
   private readonly resolveBrandSchema = cache(
-    (schema: IRefineSchema): JSONSchema4 => {
+    (schema: RefineSchema): JSONSchema4 => {
       return Object.entries(schema.brand as {}).reduce<JSONSchema4>(
         (jsonSchema, [key, v]) => {
           const value: any = v
+
           switch (key) {
             case 'email':
               return {
@@ -210,6 +216,7 @@ export class AjvDecoder {
         required: Object.entries(descriptor)
           .filter(([, s]) => {
             const schema = resolveSchema(s as any)
+
             return schema.type !== SchemaType.Optional
           })
           .map(([key]) => key),
@@ -258,7 +265,7 @@ export class AjvDecoder {
   )
 
   private readonly resolveTaggedUnionSchema = cache(
-    (schema: ITaggedUnionSchema): JSONSchema4 => {
+    (schema: TaggedUnionSchema): JSONSchema4 => {
       return {
         oneOf: Object.entries(schema.schemaMap).map(([key, childSchema]) => {
           return {
@@ -291,6 +298,7 @@ export class AjvDecoder {
       ...this.resolveJsonSchema(resolveSchema(schema)),
       $async: true,
     })
+
     return validate(value)
   }
 }

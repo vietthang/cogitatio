@@ -1,19 +1,17 @@
 import {
-  IPrimitiveSchema,
+  PrimitiveSchema,
   Resolve,
-  resolveSchema,
   SchemaLike,
   SchemaType,
+  resolveSchema,
 } from '@cogitatio/core'
-import { IEncoder } from '@cogitatio/extra'
+import { Encoder } from '@cogitatio/extra'
 
 export type SqlPrimitive = boolean | number | string | Date | Buffer | null
 
-export type SqlValue = SqlPrimitive | SqlValueArray
+export type SqlValue = SqlPrimitive | Array<SqlValue>
 
-export interface SqlValueArray extends Array<SqlValue> {}
-
-export class SqlEncoder implements IEncoder<SqlValue> {
+export class SqlEncoder implements Encoder<SqlValue> {
   public encode<S extends SchemaLike>(
     schemaLike: S,
     value: Resolve<S>,
@@ -58,7 +56,8 @@ export class SqlEncoder implements IEncoder<SqlValue> {
         throw new Error('unsupported schema type')
     }
   }
-  private encodePrimitive<S extends IPrimitiveSchema>(
+
+  private encodePrimitive<S extends PrimitiveSchema>(
     schema: S,
     value: Resolve<S>,
   ): SqlValue {

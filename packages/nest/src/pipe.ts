@@ -1,5 +1,5 @@
-import { resolveSchema, SchemaLike } from '@cogitatio/core'
-import { IDecoder } from '@cogitatio/extra'
+import { SchemaLike, resolveSchema } from '@cogitatio/core'
+import { Decoder } from '@cogitatio/extra'
 import {
   ArgumentMetadata,
   Inject,
@@ -18,19 +18,21 @@ export const pipeClasses = new Map()
 export const CogitatioPipe = memoize(
   (schemaLike?: SchemaLike): Type<PipeTransform> => {
     @Injectable()
-    class Pipe implements PipeTransform<any, any> {
+    class Pipe implements PipeTransform<unknown, unknown> {
       constructor(
         @Inject(decoderSymbol)
-        private readonly decoder: IDecoder<unknown>,
+        private readonly decoder: Decoder<unknown>,
       ) {}
 
-      public transform(value: any, metadata: ArgumentMetadata) {
+      public transform(value: unknown, metadata: ArgumentMetadata): unknown {
         const schema = schemaLike
           ? resolveSchema(schemaLike)
           : metadata.metatype
+
         if (!schema || schema === Object) {
           throw new Error('can not find schema')
         }
+
         return this.decoder.decode(schema, value)
       }
     }
@@ -44,6 +46,7 @@ export const CogitatioPipe = memoize(
     if (!schema) {
       return ''
     }
+
     return objectSerializer(resolveSchema(schema))
   },
 )

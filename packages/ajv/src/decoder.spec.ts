@@ -1,5 +1,3 @@
-import 'jest'
-
 import {
   Enum,
   List,
@@ -7,9 +5,9 @@ import {
   Optional,
   Property,
   Record,
-  resolveSchema,
   SchemaLike,
   Tuple,
+  resolveSchema,
 } from '@cogitatio/core'
 import {
   Default,
@@ -302,6 +300,7 @@ describe('resolveJoiSchema', () => {
           @Property(Integer, Default(1), Min(10))
           public complex!: Integer & Min<10>
         }
+
         return A
       },
       expected: {
@@ -329,6 +328,7 @@ describe('resolveJoiSchema', () => {
           Male = 'Male',
           Female = 'Female',
         }
+
         return Enum(Gender)
       },
       expected: {
@@ -352,6 +352,7 @@ describe('resolveJoiSchema', () => {
         ).toThrow()
       } else {
         const result = decoder.resolveJsonSchema(resolveSchema(resolve()))
+
         expect(result).toEqual(expected)
       }
     })

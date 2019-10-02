@@ -15,6 +15,7 @@ export const singleArrayPlugin: JoiDecoderPlugin = {
       if (schema.schemaType === 'array') {
         return (schema as Joi.ArraySchema).single()
       }
+
       return schema
     }),
 }
@@ -27,7 +28,7 @@ export const bigIntPlugin: JoiDecoderPlugin = {
         base: '!!"{{value}}" is not a bigint',
       },
       coerce(value, state, prefs) {
-        // tslint:disable-next-line
+        // eslint-disable-next-line valid-typeof
         if (typeof value === 'bigint') {
           return value
         }
@@ -47,6 +48,7 @@ export const bigIntPlugin: JoiDecoderPlugin = {
     if (schema.type === SchemaType.Primitive && schema.native === BigInt) {
       return (joi as any).bigint()
     }
+
     return undefined
   },
 }
@@ -78,11 +80,13 @@ export const regexPlugin: JoiDecoderPlugin = {
     if (schema.type === SchemaType.Primitive && schema.native === RegExp) {
       return (joi as any).regex()
     }
+
     return undefined
   },
 }
 
 export const phonePlugin: JoiDecoderPlugin = {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   transformJoi: joi => joi.extend(require('joi-phone-number')),
   resolveSchema(_joi, schema, resolveSchema) {
     if (schema.type === SchemaType.Brand && (schema.brand as any).phone) {
@@ -90,6 +94,7 @@ export const phonePlugin: JoiDecoderPlugin = {
         (schema.brand as any).phone,
       )
     }
+
     return undefined
   },
 }

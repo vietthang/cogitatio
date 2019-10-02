@@ -1,5 +1,3 @@
-import 'jest'
-
 import Knex from 'knex'
 import { queryBatch } from './loader'
 
@@ -53,6 +51,7 @@ describe('test loader', () => {
       const load = (input: Input) => queryBatch(querier, k0, input)
 
       const eventHandler = jest.fn()
+
       k0.on('query', eventHandler)
 
       const [u0, u1, u2] = await Promise.all([
@@ -67,7 +66,7 @@ describe('test loader', () => {
         }),
       ])
 
-      expect(eventHandler).toBeCalledTimes(1)
+      expect(eventHandler).toHaveBeenCalledTimes(1)
       expect(eventHandler.mock.calls[0][0]).toMatchObject({
         sql:
           'select "o".*, "i"."__index__" from (values (?, ?), (?, ?), (?, ?)) as "i" ("email", "__index__") inner join lateral (select "User".* from "User" where "email" = "i"."email") as "o" on ? ',

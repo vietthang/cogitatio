@@ -13,7 +13,7 @@ export function decorateClass<T extends {} = {}, Key extends keyof T = keyof T>(
   ctor: Constructor<T>,
   key: Key,
   schema: () => Schema,
-) {
+): void {
   reflectMap.set(ctor, {
     ...(reflectClass(ctor) || {}),
     [key]: schema,

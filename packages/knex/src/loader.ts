@@ -13,10 +13,11 @@ function createLoader<I extends { [key in keyof I]: Knex.Value } = {}>(
     async inputs => {
       const mapping = {}
       const proxy = new Proxy(mapping, {
-        get(target: any, key: string): any {
+        get(target: any, key: string): unknown {
           if (target[key] === undefined) {
             target[key] = query.raw('??', `i.${key}`)
           }
+
           return target[key]
         },
       })
@@ -80,6 +81,7 @@ const createLoaderMemoized = memoize(
     )
 
     const { sql, bindings } = qb(query, proxy).toSQL()
+
     return [sql, ...bindings].join('\0')
   },
 )

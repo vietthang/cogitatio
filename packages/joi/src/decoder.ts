@@ -1,15 +1,15 @@
 import {
-  IRefineSchema,
   PrimitiveConstructor,
+  RefineSchema,
   Resolve,
-  resolveSchema,
   Schema,
   SchemaLike,
   SchemaType,
+  resolveSchema,
 } from '@cogitatio/core'
-import { IDecoder } from '@cogitatio/extra'
+import { Decoder } from '@cogitatio/extra'
 import * as Joi from '@hapi/joi'
-import { ITaggedUnionSchema } from '../../core/src/taggedUnion'
+import { TaggedUnionSchema } from '../../core/src/taggedUnion'
 
 type Transformer<T, U> = (value: T) => U
 
@@ -17,12 +17,15 @@ function cache<T extends object, U>(
   transfomer: Transformer<T, U>,
 ): Transformer<T, U> {
   const resultCache = new WeakMap<T, U>()
+
   return (value: T): U => {
     if (resultCache.has(value)) {
       return resultCache.get(value)!
     }
     const result = transfomer(value)
+
     resultCache.set(value, result)
+
     return result
   }
 }
@@ -33,10 +36,6 @@ function isJoiStringSchema(schema: Joi.Schema): schema is Joi.StringSchema {
 
 function isJoiNumberSchema(schema: Joi.Schema): schema is Joi.NumberSchema {
   return schema.schemaType === 'number'
-}
-
-function isJoiObjectSchema(schema: Joi.Schema): schema is Joi.ObjectSchema {
-  return schema.schemaType === 'object'
 }
 
 function isJoiArraySchema(schema: Joi.Schema): schema is Joi.ArraySchema {
@@ -51,12 +50,13 @@ function guardResolve<T extends Joi.AnySchema, U>(
   if (!guard(schema)) {
     throw new Error('invalid')
   }
+
   return resolve(schema)
 }
 
 export type SchemaResolver = (schema: Schema) => Joi.Schema | undefined
 
-export interface IJoiDecoderOptions {
+export interface JoiDecoderOptions {
   joi: typeof Joi
 }
 
@@ -69,7 +69,7 @@ export interface JoiDecoderPlugin {
   ) => Joi.Schema | undefined
 }
 
-export class JoiDecoder implements IDecoder<unknown> {
+export class JoiDecoder implements Decoder<unknown> {
   public readonly resolveJoiSchema = cache(
     (schema: Schema): Joi.Schema => {
       for (const plugin of this.plugins) {
@@ -79,6 +79,7 @@ export class JoiDecoder implements IDecoder<unknown> {
             schema,
             this.resolveJoiSchema,
           )
+
           if (joiSchema) {
             return joiSchema
           }
@@ -135,7 +136,7 @@ export class JoiDecoder implements IDecoder<unknown> {
   )
 
   private readonly resolveBrandSchema = cache(
-    (schema: IRefineSchema): Joi.Schema => {
+    (schema: RefineSchema): Joi.Schema => {
       return Object.entries(schema.brand as {}).reduce(
         (joiSchema, [key, value]) => {
           switch (key) {
@@ -265,7 +266,7 @@ export class JoiDecoder implements IDecoder<unknown> {
   )
 
   private readonly resolveTaggedUnionSchema = cache(
-    (schema: ITaggedUnionSchema): Joi.Schema => {
+    (schema: TaggedUnionSchema): Joi.Schema => {
       return this.joi.alternatives(
         ...Object.entries(schema.schemaMap).map(([key, childSchema]) => {
           return this.joi.object({
@@ -297,9 +298,11 @@ export class JoiDecoder implements IDecoder<unknown> {
         presence: 'required',
       },
     )
+
     if (result.error) {
       throw result.error
     }
+
     return result.value as any
   }
 }

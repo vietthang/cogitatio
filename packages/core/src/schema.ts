@@ -1,40 +1,40 @@
-import { IAnySchema } from './any'
-import { IRefineSchema } from './brand'
+import { AnySchema } from './any'
+import { RefineSchema } from './brand'
 import { SchemaType } from './common'
-import { IDictionarySchema } from './dictionary'
-import { IEnumSchema } from './enum'
-import { IListSchema } from './list'
+import { DictionarySchema } from './dictionary'
+import { EnumSchema } from './enum'
+import { ListSchema } from './list'
 import { reflectClass } from './metadata'
-import { INullableSchema } from './nullable'
-import { Constructor, IObjectSchema } from './object'
-import { IOptionalSchema } from './optional'
+import { NullableSchema } from './nullable'
+import { Constructor, ObjectSchema } from './object'
+import { OptionalSchema } from './optional'
 import {
-  IPrimitiveSchema,
-  isPrimitiveConstructor,
   PrimitiveConstructor,
+  PrimitiveSchema,
   ResolvePrimitiveFromConstructor,
+  isPrimitiveConstructor,
 } from './primitive'
-import { ITaggedUnionSchema } from './taggedUnion'
-import { ITupleSchema } from './tuple'
+import { TaggedUnionSchema } from './taggedUnion'
+import { TupleSchema } from './tuple'
 
 export type Schema =
-  | IPrimitiveSchema
-  | IEnumSchema
-  | IOptionalSchema
-  | INullableSchema
-  | IListSchema
-  | IDictionarySchema
-  | ITupleSchema
-  | IObjectSchema
-  | IRefineSchema
-  | ITaggedUnionSchema
-  | IAnySchema
+  | PrimitiveSchema
+  | EnumSchema
+  | OptionalSchema
+  | NullableSchema
+  | ListSchema
+  | DictionarySchema
+  | TupleSchema
+  | ObjectSchema
+  | RefineSchema
+  | TaggedUnionSchema
+  | AnySchema
 
 export type Thunk<T> = T | (() => T)
 
 export type SchemaLike = Thunk<Schema | PrimitiveConstructor | Constructor>
 
-export type ObjectSchemaLike<T> = Thunk<IObjectSchema<T> | Constructor<T>>
+export type ObjectSchemaLike<T> = Thunk<ObjectSchema<T> | Constructor<T>>
 
 export type Resolve<S> = S extends PrimitiveConstructor
   ? ResolvePrimitiveFromConstructor<S>
@@ -58,7 +58,7 @@ function isClass(fn: unknown): fn is Constructor {
 
 export function resolveSchema(schema: SchemaLike): Schema {
   if (isPrimitiveConstructor(schema)) {
-    return { type: SchemaType.Primitive, native: schema } as IPrimitiveSchema
+    return { type: SchemaType.Primitive, native: schema } as PrimitiveSchema
   }
 
   if (typeof schema === 'function') {
@@ -72,7 +72,7 @@ export function resolveSchema(schema: SchemaLike): Schema {
               resolver(),
             ]),
           ),
-      } as IObjectSchema
+      } as ObjectSchema
     }
 
     return resolveSchema(schema())

@@ -1,14 +1,14 @@
 import { Resolve, SchemaLike } from '@cogitatio/core'
-import { IDecoder, IEncoder } from './codec'
+import { Decoder, Encoder } from './codec'
 
-export interface IWrapFuncOptions<
+export interface WrapFuncOptions<
   InSchemas extends SchemaLike[],
   OutSchema extends SchemaLike
 > {
   inSchemas: InSchemas
   outSchema: OutSchema
-  decoder: IDecoder<unknown>
-  encoder: IEncoder<unknown>
+  decoder: Decoder<unknown>
+  encoder: Encoder<unknown>
 }
 
 export function wrapFunc<
@@ -24,15 +24,17 @@ export function wrapFunc<
     outSchema,
     decoder,
     encoder,
-  }: IWrapFuncOptions<InSchemas, OutSchema>,
+  }: WrapFuncOptions<InSchemas, OutSchema>,
 ): Fn {
   return ((...args: unknown[]) => {
     const result = fn(
       ...(args.map((arg, i) => encoder.encode(inSchemas[i], arg)) as any),
     )
+
     if (typeof result.then === 'function') {
       return result.then((out: any) => decoder.decode(outSchema, out))
     }
+
     return decoder.decode(outSchema, result)
   }) as any
 }

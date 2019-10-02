@@ -1,19 +1,20 @@
+/* eslint @typescript-eslint/no-unused-vars: 0 */
 import {
   Constructor,
-  IDictionarySchema,
-  IEnumSchema,
-  IListSchema,
-  INullableSchema,
-  IObjectSchema,
-  IOptionalSchema,
-  IPrimitiveSchema,
-  IRefineSchema,
-  ITaggedUnionSchema,
-  ITupleSchema,
+  DictionarySchema,
+  EnumSchema,
+  ListSchema,
+  NullableSchema,
+  ObjectSchema,
+  OptionalSchema,
   PrimitiveConstructor,
+  PrimitiveSchema,
   Refine,
+  RefineSchema,
   Resolve,
   SchemaLike,
+  TaggedUnionSchema,
+  TupleSchema,
 } from '@cogitatio/core'
 
 export enum PhoneFormat {
@@ -33,24 +34,24 @@ export interface PhoneRefinement<
   }
 }
 
-export function PhoneNumber(): IRefineSchema<
+export function PhoneNumber(): RefineSchema<
   string,
   PhoneRefinement<'US', undefined>
 >
 
 export function PhoneNumber<C extends string>(
   defaultCountry: C,
-): IRefineSchema<string, PhoneRefinement<C, undefined>>
+): RefineSchema<string, PhoneRefinement<C, undefined>>
 
 export function PhoneNumber<C extends string, F extends PhoneFormat>(
   defaultCountry: C,
   format: F,
-): IRefineSchema<string, PhoneRefinement<C, F>>
+): RefineSchema<string, PhoneRefinement<C, F>>
 
 export function PhoneNumber(
-  defaultCountry: string = 'US',
+  defaultCountry = 'US',
   format?: PhoneFormat,
-) {
+): RefineSchema<string, PhoneRefinement<string, PhoneFormat | undefined>> {
   return Refine(String, {
     phone: {
       defaultCountry,

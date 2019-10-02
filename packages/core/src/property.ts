@@ -1,5 +1,5 @@
 import { decorateClass } from './metadata'
-import { Resolve, resolveSchema, Schema, SchemaLike } from './schema'
+import { Resolve, Schema, SchemaLike, resolveSchema } from './schema'
 
 export interface SafeDecorator<S extends SchemaLike> {
   readonly schema: () => Schema
@@ -93,7 +93,7 @@ export function Property(
   schema: SchemaLike,
   ...transformers: Array<Transformer<SchemaLike, SchemaLike>>
 ): SafeDecorator<any> {
-  const resolver = () =>
+  const resolver = (): Schema =>
     resolveSchema(transformers.reduce((s, t) => t(s), schema))
 
   return Object.assign(

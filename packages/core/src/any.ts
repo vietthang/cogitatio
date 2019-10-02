@@ -1,7 +1,7 @@
-import { IBaseSchema, SchemaType } from './common'
+import { BaseSchema, SchemaType } from './common'
 
-export interface IAnySchema extends IBaseSchema<unknown> {
+export interface AnySchema extends BaseSchema<unknown> {
   type: SchemaType.Any
 }
 
-export const Any: IAnySchema = { type: SchemaType.Any } as IAnySchema
+export const Any: AnySchema = { type: SchemaType.Any } as AnySchema

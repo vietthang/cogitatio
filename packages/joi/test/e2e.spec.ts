@@ -1,5 +1,3 @@
-import 'jest'
-
 import {
   Dictionary,
   Enum,
@@ -7,11 +5,11 @@ import {
   Nullable,
   Optional,
   Property,
-  resolveSchema,
   TaggedUnion,
   Tuple,
+  resolveSchema,
 } from '@cogitatio/core'
-import { IDecoder } from '@cogitatio/extra'
+import { Decoder } from '@cogitatio/extra'
 import assert from 'assert'
 import { JoiDecoder } from '../src'
 
@@ -91,6 +89,7 @@ describe('validate primitive', () => {
 
     it('should success with date value', () => {
       const date = new Date(2019, 0, 1)
+
       assert.deepStrictEqual(date, validate(date))
       assert.deepStrictEqual(date, validate(date.toISOString()))
       assert.deepStrictEqual(date, validate(date.getTime()))
@@ -281,7 +280,7 @@ describe('validate object', () => {
 })
 
 describe('validate TaggedUnion', () => {
-  const decoder: IDecoder<unknown> = new JoiDecoder()
+  const decoder: Decoder<unknown> = new JoiDecoder()
 
   const unionSchema = TaggedUnion('kind', {
     foo: String,

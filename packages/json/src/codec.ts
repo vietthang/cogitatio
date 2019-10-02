@@ -1,18 +1,17 @@
 import {
-  IObjectSchema,
-  IPrimitiveSchema,
+  ObjectSchema,
   Primitive,
+  PrimitiveSchema,
   Resolve,
-  resolveSchema,
-  Schema,
   SchemaLike,
   SchemaType,
+  resolveSchema,
 } from '@cogitatio/core'
-import { ICodec } from '@cogitatio/extra'
+import { Codec } from '@cogitatio/extra'
 import { decode, encode } from 'base64-arraybuffer'
 import { JsonValue } from './types'
 
-export class JsonCodec implements ICodec<JsonValue, JsonValue> {
+export class JsonCodec implements Codec<JsonValue, JsonValue> {
   public encode<S extends SchemaLike>(
     schemaLike: S,
     value: Resolve<S>,
@@ -100,10 +99,11 @@ export class JsonCodec implements ICodec<JsonValue, JsonValue> {
     }
   }
 
-  private encodeObject(schema: IObjectSchema, value: unknown): JsonValue {
+  private encodeObject(schema: ObjectSchema, value: unknown): JsonValue {
     if (typeof value !== 'object' || value === null) {
       throw new Error('invalid value type')
     }
+
     return Object.fromEntries(
       Object.entries(schema.fields()).map(([key, schema]) => {
         return [key, this.encode(schema as any, value)]
@@ -111,10 +111,11 @@ export class JsonCodec implements ICodec<JsonValue, JsonValue> {
     )
   }
 
-  private decodeObject(schema: IObjectSchema, value: JsonValue): unknown {
+  private decodeObject(schema: ObjectSchema, value: JsonValue): unknown {
     if (typeof value !== 'object' || value === null || Array.isArray(value)) {
       throw new Error('invalid value type')
     }
+
     return Object.fromEntries(
       Object.entries(schema.fields()).map(([key, schema]) => {
         return [key, this.decode(schema as any, value)]
@@ -122,7 +123,7 @@ export class JsonCodec implements ICodec<JsonValue, JsonValue> {
     )
   }
 
-  private encodePrimitive(schema: IPrimitiveSchema, value: unknown): JsonValue {
+  private encodePrimitive(schema: PrimitiveSchema, value: unknown): JsonValue {
     switch (schema.native) {
       case Boolean:
         return value as boolean
@@ -144,7 +145,7 @@ export class JsonCodec implements ICodec<JsonValue, JsonValue> {
   }
 
   private decodePrimitive(
-    schema: IPrimitiveSchema,
+    schema: PrimitiveSchema,
     value: JsonValue,
   ): Primitive {
     switch (schema.native) {

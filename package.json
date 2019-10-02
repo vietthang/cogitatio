@@ -6,11 +6,15 @@
   "scripts": {
     "clean": "lerna run clean --stream --parallel",
     "build": "lerna run build --stream --parallel",
-    "lint": "eslint packages",
+    "lint": "eslint --ext .ts packages",
+    "format": "eslint --fix --ext .ts packages",
     "pretest": "yarn lint",
     "test": "lerna run test --stream --parallel",
     "start": "yarn workspace @sample-monorepo/app start",
     "prettify": "yarn prettier \"packages/**/*.{js,ts,tsx}\" --write"
+  },
+  "engines": {
+    "node": ">=10.4.0"
   },
   "devDependencies": {
     "@types/base64-arraybuffer": "^0.1.0",
@@ -20,11 +24,13 @@
     "@types/node": "^12.7.2",
     "@typescript-eslint/eslint-plugin": "^2.3.2",
     "@typescript-eslint/parser": "^2.3.2",
-    "eslint": "^6.5.1",
+    "eslint": "^5.0.0",
     "eslint-config-airbnb": "^18.0.1",
     "eslint-config-prettier": "^6.3.0",
     "eslint-plugin-import": "2.18.2",
+    "eslint-plugin-jest": "^22.17.0",
     "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-node": "^10.0.0",
     "eslint-plugin-prettier": "^3.1.1",
     "eslint-plugin-react": "^7.15.1",
     "eslint-plugin-react-hooks": "^2.1.1",
@@ -32,11 +38,13 @@
     "lerna": "^3.16.4",
     "npm-run-all": "^4.1.5",
     "prettier": "^1.18.2",
+    "react": "^16.10.1",
+    "react-native": "^0.61.1",
     "rimraf": "^3.0.0",
     "ts-jest": "^24.1.0",
     "ts-node": "^8.3.0",
     "tsdx": "^0.8.0",
-    "typescript": "^3.6.2"
+    "typescript": "^3.7.0-beta"
   },
   "license": "MIT",
   "private": true,

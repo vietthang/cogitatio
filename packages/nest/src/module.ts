@@ -1,4 +1,4 @@
-import { IDecoder } from '@cogitatio/extra'
+import { Decoder } from '@cogitatio/extra'
 import { DynamicModule, Global } from '@nestjs/common'
 import {
   ClassProvider,
@@ -15,7 +15,7 @@ export type Provider<T> =
   | Omit<ExistingProvider<T>, 'provide'>
 
 export interface CogitatioModuleOptions {
-  decoder: Provider<IDecoder<unknown>>
+  decoder: Provider<Decoder<unknown>>
 }
 
 @Global()

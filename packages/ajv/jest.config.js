@@ -1,3 +1,4 @@
+/* eslint import/no-extraneous-dependencies: 0 */
 const { pathsToModuleNameMapper } = require('ts-jest/utils')
 const ts = require('typescript')
 const path = require('path')

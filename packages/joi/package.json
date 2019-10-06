@@ -28,5 +28,6 @@
   "devDependencies": {
     "joi-phone-number": "^3.0.2",
     "lerna": "^3.16.4"
-  }
+  },
+  "gitHead": "c07c2fdf7fd78c2d225d2d018895265911644171"
 }

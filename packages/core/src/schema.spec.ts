@@ -1,5 +1,3 @@
-import 'jest'
-
 import { Refine } from './brand'
 import { SchemaType } from './common'
 import { List } from './list'

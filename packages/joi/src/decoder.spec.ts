@@ -1,5 +1,3 @@
-import 'jest'
-
 import {
   Enum,
   List,
@@ -31,9 +29,10 @@ import {
 } from '@cogitatio/extra'
 import Joi from '@hapi/joi'
 import { JoiDecoder } from '../src'
+import { commonTypesPlugin } from './plugins'
 
 describe('resolveJoiSchema', () => {
-  const joiDecoder = new JoiDecoder()
+  const joiDecoder = new JoiDecoder([commonTypesPlugin]) // TODO refactor to plugins.spec.ts
 
   const testCases: Array<{
     name: string

@@ -1,6 +1,7 @@
 import 'jest'
 
 import {
+  Decoder,
   Dictionary,
   Enum,
   List,
@@ -11,7 +12,6 @@ import {
   TaggedUnion,
   Tuple,
 } from '@cogitatio/core'
-import { IDecoder } from '@cogitatio/extra'
 import assert from 'assert'
 import { JoiDecoder } from '../src'
 
@@ -281,7 +281,7 @@ describe('validate object', () => {
 })
 
 describe('validate TaggedUnion', () => {
-  const decoder: IDecoder<unknown> = new JoiDecoder()
+  const decoder: Decoder<unknown> = new JoiDecoder()
 
   const unionSchema = TaggedUnion('kind', {
     foo: String,

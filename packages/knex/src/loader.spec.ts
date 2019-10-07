@@ -1,5 +1,3 @@
-import 'jest'
-
 import Knex from 'knex'
 import { queryBatch } from './loader'
 

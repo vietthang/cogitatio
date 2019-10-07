@@ -1,5 +1,3 @@
-import 'jest'
-
 import { List, Optional } from '@cogitatio/core'
 import { PhoneFormat, PhoneNumber } from '@cogitatio/extra'
 import { JoiDecoder } from './decoder'

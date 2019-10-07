@@ -1,5 +1,5 @@
 import {
-  IRefineSchema,
+  Decoder,
   PrimitiveConstructor,
   Resolve,
   resolveSchema,
@@ -7,7 +7,6 @@ import {
   SchemaLike,
   SchemaType,
 } from '@cogitatio/core'
-import { IDecoder } from '@cogitatio/extra'
 import * as Joi from '@hapi/joi'
 import { ITaggedUnionSchema } from '../../core/src/taggedUnion'
 
@@ -27,33 +26,6 @@ function cache<T extends object, U>(
   }
 }
 
-function isJoiStringSchema(schema: Joi.Schema): schema is Joi.StringSchema {
-  return schema.schemaType === 'string'
-}
-
-function isJoiNumberSchema(schema: Joi.Schema): schema is Joi.NumberSchema {
-  return schema.schemaType === 'number'
-}
-
-function isJoiObjectSchema(schema: Joi.Schema): schema is Joi.ObjectSchema {
-  return schema.schemaType === 'object'
-}
-
-function isJoiArraySchema(schema: Joi.Schema): schema is Joi.ArraySchema {
-  return schema.schemaType === 'array'
-}
-
-function guardResolve<T extends Joi.AnySchema, U>(
-  schema: Joi.Schema,
-  guard: (s: Joi.Schema) => s is T,
-  resolve: (s: T) => U,
-) {
-  if (!guard(schema)) {
-    throw new Error('invalid')
-  }
-  return resolve(schema)
-}
-
 export type SchemaResolver = (schema: Schema) => Joi.Schema | undefined
 
 export interface IJoiDecoderOptions {
@@ -69,7 +41,7 @@ export interface JoiDecoderPlugin {
   ) => Joi.Schema | undefined
 }
 
-export class JoiDecoder implements IDecoder<unknown> {
+export class JoiDecoder implements Decoder<unknown> {
   public readonly resolveJoiSchema = cache(
     (schema: Schema): Joi.Schema => {
       for (const plugin of this.plugins) {
@@ -122,105 +94,12 @@ export class JoiDecoder implements IDecoder<unknown> {
         case SchemaType.Object:
           return this.resolveObjectSchema(schema.fields())
 
-        case SchemaType.Brand:
-          return this.resolveBrandSchema(schema)
-
         case SchemaType.TaggedUnion:
           return this.resolveTaggedUnionSchema(schema)
 
         default:
           throw new Error('unsupported')
       }
-    },
-  )
-
-  private readonly resolveBrandSchema = cache(
-    (schema: IRefineSchema): Joi.Schema => {
-      return Object.entries(schema.brand as {}).reduce(
-        (joiSchema, [key, value]) => {
-          switch (key) {
-            case 'email':
-              return value
-                ? guardResolve(joiSchema, isJoiStringSchema, s => s.email())
-                : joiSchema
-
-            case 'uri':
-              return value
-                ? guardResolve(joiSchema, isJoiStringSchema, s => s.uri())
-                : joiSchema
-
-            case 'integer':
-              return value
-                ? guardResolve(joiSchema, isJoiNumberSchema, s => s.integer())
-                : joiSchema
-
-            case 'port':
-              return value
-                ? guardResolve(joiSchema, isJoiNumberSchema, s => s.port())
-                : joiSchema
-
-            case 'ip':
-              return value
-                ? guardResolve(joiSchema, isJoiStringSchema, s => s.ip())
-                : joiSchema
-
-            case 'hostname':
-              return value
-                ? guardResolve(joiSchema, isJoiStringSchema, s => s.hostname())
-                : joiSchema
-
-            case 'uuid':
-              return value
-                ? guardResolve(joiSchema, isJoiStringSchema, s => s.uuid())
-                : joiSchema
-
-            case 'min':
-              return guardResolve(joiSchema, isJoiNumberSchema, s =>
-                s.min(value as number),
-              )
-
-            case 'max':
-              return guardResolve(joiSchema, isJoiNumberSchema, s =>
-                s.max(value as number),
-              )
-
-            case 'minLength':
-              return guardResolve(joiSchema, isJoiStringSchema, s =>
-                s.min(value as number),
-              )
-
-            case 'maxLength':
-              return guardResolve(joiSchema, isJoiStringSchema, s =>
-                s.max(value as number),
-              )
-
-            case 'minItems':
-              return guardResolve(joiSchema, isJoiArraySchema, s =>
-                s.min(value as number),
-              )
-
-            case 'maxItems':
-              return guardResolve(joiSchema, isJoiArraySchema, s =>
-                s.max(value as number),
-              )
-
-            case 'uniqueItems':
-              return guardResolve(joiSchema, isJoiArraySchema, s => s.unique())
-
-            case 'default':
-              return joiSchema.optional().default(value)
-
-            case 'id64':
-              return guardResolve(joiSchema, isJoiStringSchema, s =>
-                s.regex(/^\d+$/),
-              )
-
-            default:
-              throw new Error('unhandled refinement')
-          }
-        },
-        this.resolveJoiSchema(schema.childSchema),
-      )
     },
   )
 

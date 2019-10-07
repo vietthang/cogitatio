@@ -1,4 +1,5 @@
 import {
+  Decoder,
   Enum,
   List,
   Optional,
@@ -6,7 +7,7 @@ import {
   Resolve,
   SchemaLike,
 } from '@cogitatio/core'
-import { Default, IDecoder, Integer } from '@cogitatio/extra'
+import { Default, Integer } from '@cogitatio/extra'
 import jwt from 'jsonwebtoken'
 import { JwtAlgorithm } from './common'
 
@@ -41,7 +42,7 @@ export class JwtVerifyConfig {
 
 export class JwtVerifier<S extends SchemaLike> {
   constructor(
-    private readonly decoder: IDecoder<unknown>,
+    private readonly decoder: Decoder<unknown>,
     private readonly schema: S,
     private readonly config: JwtVerifyConfig,
   ) {}

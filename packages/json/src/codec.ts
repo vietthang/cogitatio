@@ -1,18 +1,17 @@
 import {
+  Codec,
   IObjectSchema,
   IPrimitiveSchema,
   Primitive,
   Resolve,
   resolveSchema,
-  Schema,
   SchemaLike,
   SchemaType,
 } from '@cogitatio/core'
-import { ICodec } from '@cogitatio/extra'
 import { decode, encode } from 'base64-arraybuffer'
 import { JsonValue } from './types'
 
-export class JsonCodec implements ICodec<JsonValue, JsonValue> {
+export class JsonCodec implements Codec<JsonValue, JsonValue> {
   public encode<S extends SchemaLike>(
     schemaLike: S,
     value: Resolve<S>,

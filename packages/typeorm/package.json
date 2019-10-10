@@ -1,0 +1,29 @@
+{
+  "name": "@cogitatio/typeorm",
+  "version": "0.0.5-alpha.0",
+  "main": "dist/index.js",
+  "types": "dist/packages/typeorm/src/index.d.ts",
+  "scripts": {
+    "clean": "rimraf ./dist",
+    "prebuild": "yarn clean",
+    "build": "tsdx build --tsconfig tsconfig.build.json --entry src/index.ts"
+  },
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "dataloader": "^1.4.0"
+  },
+  "files": [
+    "/src",
+    "/dist"
+  ],
+  "devDependencies": {
+    "mysql": "^2.17.1",
+    "pg": "^7.12.1"
+  },
+  "peerDependencies": {
+    "typeorm": "^0.2.19"
+  }
+}

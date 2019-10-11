@@ -1,6 +1,7 @@
 import DataLoader from 'dataloader'
 import {
   Connection,
+  ObjectLiteral,
   ObjectType,
   QueryRunner,
   SelectQueryBuilder,
@@ -50,7 +51,7 @@ async function doLoadGrouped<T>(
   entityClass: ObjectType<T>,
   aliasName: string,
   entries: Array<{
-    params: any[]
+    params: ObjectLiteral
     index: number
   }>,
 ): Promise<Array<Result<T>>> {
@@ -60,35 +61,52 @@ async function doLoadGrouped<T>(
   const escape = (name: string): string =>
     queryRunner.connection.driver.escape(name)
 
-  let joinFrag = sql
-  const joinBindings: any[] = []
-  const keys = new Array(entries[0].params.length)
-  for (let i = 0; i < keys.length; i++) {
-    keys[i] = ioId()
-    joinFrag = joinFrag.replace(/\?/, `${escape('i')}.${escape(keys[i])}`)
-  }
+  const joinFrag = sql
+  const paramKeys = Object.keys(entries[0].params)
+  const joinBindings: ObjectLiteral = Object.fromEntries(
+    paramKeys.map(key => [key, () => `${escape('i')}.${escape(key)}`]),
+  )
 
   const selectFrag = `o.*, i.__index__`
-  const selectBindings: any[] = []
-  const fromFrag = entries
-    .map(
-      () =>
-        `(SELECT ${keys
-          .map(key => `? AS ${escape(key)}`)
-          .concat(`? AS ${escape('__index__')}`)
-          .join(', ')})`,
-    )
-    .join(' UNION ALL ')
-  const fromBindings = entries.flatMap(({ params, index }) =>
-    params.concat(index),
+  const selectBindings: ObjectLiteral = {}
+  const [fromFrags, fromBindings] = entries.reduce<[string[], ObjectLiteral]>(
+    ([frags, params], entry, i) => {
+      const keys = Object.keys(entry.params)
+      const generatedKeys = keys.map(ioId)
+      const newSql = `(SELECT ${keys
+        .map((key, j) => `:${generatedKeys[j]} AS ${escape(key)}`)
+        .concat(`:i${i} AS ${escape('__index__')}`)
+        .join(', ')})`
+      return [
+        frags.concat(newSql),
+        {
+          ...params,
+          [`i${i}`]: entry.index,
+          ...Object.fromEntries(
+            generatedKeys.map((key, index) => [key, entry.params[keys[index]]]),
+          ),
+        },
+      ]
+    },
+    [[], {}],
   )
+  const fromFrag = fromFrags.join(' UNION ALL ')
 
   const finalSql = `SELECT ${selectFrag} FROM (${fromFrag}) AS ${escape(
     'i',
-  )} INNER JOIN LATERAL (${joinFrag}) AS ${escape('o')}`
-  const finalBindings = [...selectBindings, ...fromBindings, ...joinBindings]
+  )} INNER JOIN LATERAL (${joinFrag}) AS ${escape('o')} ON true`
+  const finalBindings = { ...selectBindings, ...fromBindings, ...joinBindings }
 
-  const results: any[] = await queryRunner.query(finalSql, finalBindings)
+  const [
+    rawSql,
+    rawParams,
+  ] = queryRunner.connection.driver.escapeQueryWithParameters(
+    finalSql,
+    finalBindings,
+    {},
+  )
+
+  const results: any[] = await queryRunner.query(rawSql, rawParams)
 
   return results.map(({ __index__, ...raw }) => {
     const entity = merge<T>(queryRunner.connection, entityClass, aliasName, raw)
@@ -111,7 +129,8 @@ async function doLoad<Ins extends any[], O>(
       const queryRunner = obtainQueryRunner(qb, () =>
         queryRunnerGetter(qb.connection),
       )
-      const [sql, params] = qb.getQueryAndParameters()
+      const sql = qb.getQuery()
+      const params = qb.getParameters()
       const mainAlias = qb.expressionMap.mainAlias
       if (!mainAlias) {
         throw new Error('TODO misssing main alias')
@@ -125,7 +144,7 @@ async function doLoad<Ins extends any[], O>(
         params,
         queryRunner,
         index,
-        entityClass: mainAlias.target as ObjectType<O>,
+        entityClass: mainAlias.target,
         aliasName: mainAlias.name,
       }
     })

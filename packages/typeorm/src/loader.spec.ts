@@ -1,7 +1,7 @@
-import { run } from 'jest-cli/build/cli'
 import {
   Column,
   Connection,
+  ConnectionOptions,
   createConnection,
   Entity,
   EntityManager,
@@ -26,7 +26,9 @@ class UserRepository {
     em: EntityManager,
     email: string,
   ): SelectQueryBuilder<User> {
-    return em.createQueryBuilder(User, 'User').where({ email })
+    return em
+      .createQueryBuilder(User, 'User')
+      .where('email = :email', { email })
   }
 
   public readonly findUserByEmailBatch = createLoadMany(
@@ -43,21 +45,11 @@ class UserRepository {
 
 const repository = new UserRepository()
 
-describe('test loader with mysql driver', () => {
+function runTestWithOptions(options: ConnectionOptions): void {
   let conn: Connection
 
   beforeAll(async () => {
-    conn = await createConnection({
-      type: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      database: 'test',
-      password: 'password',
-      entities: [User],
-      synchronize: true,
-      dropSchema: true,
-    })
+    conn = await createConnection(options)
 
     await conn
       .createQueryBuilder()
@@ -106,17 +98,17 @@ describe('test loader with mysql driver', () => {
       expect(spy).toBeCalledTimes(3)
       expect(spy).toHaveBeenNthCalledWith(
         1,
-        'SELECT `User`.`id` AS `User_id`, `User`.`email` AS `User_email` FROM `User` `User` WHERE `User`.`email` = ?',
+        'SELECT `User`.`id` AS `User_id`, `User`.`email` AS `User_email` FROM `User` `User` WHERE email = ?',
         ['user1@example.com'],
       )
       expect(spy).toHaveBeenNthCalledWith(
         2,
-        'SELECT `User`.`id` AS `User_id`, `User`.`email` AS `User_email` FROM `User` `User` WHERE `User`.`email` = ?',
+        'SELECT `User`.`id` AS `User_id`, `User`.`email` AS `User_email` FROM `User` `User` WHERE email = ?',
         ['user2@example.com'],
       )
       expect(spy).toHaveBeenNthCalledWith(
         3,
-        'SELECT `User`.`id` AS `User_id`, `User`.`email` AS `User_email` FROM `User` `User` WHERE `User`.`email` = ?',
+        'SELECT `User`.`id` AS `User_id`, `User`.`email` AS `User_email` FROM `User` `User` WHERE email = ?',
         ['invalid'],
       )
       expect(results).toEqual([
@@ -134,7 +126,7 @@ describe('test loader with mysql driver', () => {
 
     try {
       const em = conn.createEntityManager(runner)
-      const spied = jest.spyOn(runner, 'query')
+      const spy = jest.spyOn(runner, 'query')
 
       const results = await Promise.all([
         repository.findUserByEmailBatch(em, 'user1@example.com'),
@@ -142,9 +134,9 @@ describe('test loader with mysql driver', () => {
         repository.findUserByEmailBatch(em, 'invalid'),
       ])
 
-      expect(spied).toBeCalledTimes(1)
-      expect(spied).toHaveBeenLastCalledWith(
-        'SELECT o.*, i.__index__ FROM ((SELECT ? AS `k1`, ? AS `__index__`) UNION ALL (SELECT ? AS `k1`, ? AS `__index__`) UNION ALL (SELECT ? AS `k1`, ? AS `__index__`)) AS `i` INNER JOIN LATERAL (SELECT `User`.`id` AS `User_id`, `User`.`email` AS `User_email` FROM `User` `User` WHERE `User`.`email` = `i`.`k1`) AS `o`',
+      expect(spy).toBeCalledTimes(1)
+      expect(spy).toHaveBeenLastCalledWith(
+        'SELECT o.*, i.__index__ FROM ((SELECT ? AS `email`, ? AS `__index__`) UNION ALL (SELECT ? AS `email`, ? AS `__index__`) UNION ALL (SELECT ? AS `email`, ? AS `__index__`)) AS `i` INNER JOIN LATERAL (SELECT `User`.`id` AS `User_id`, `User`.`email` AS `User_email` FROM `User` `User` WHERE email = `i`.`email`) AS `o` ON true',
         ['user1@example.com', 0, 'user2@example.com', 1, 'invalid', 2],
       )
       expect(results).toEqual([
@@ -239,26 +231,53 @@ describe('test loader with mysql driver', () => {
       expect(spy).toBeCalledTimes(4)
       expect(spy).toHaveBeenNthCalledWith(
         1,
-        'SELECT o.*, i.__index__ FROM ((SELECT ? AS `__index__`)) AS `i` INNER JOIN LATERAL (SELECT `User`.`id` AS `User_id`, `User`.`email` AS `User_email` FROM `User` `User`) AS `o`',
+        'SELECT o.*, i.__index__ FROM ((SELECT ? AS `__index__`)) AS `i` INNER JOIN LATERAL (SELECT `User`.`id` AS `User_id`, `User`.`email` AS `User_email` FROM `User` `User`) AS `o` ON true',
         [0],
       )
       expect(spy).toHaveBeenNthCalledWith(
         2,
-        'SELECT o.*, i.__index__ FROM ((SELECT ? AS `k1`, ? AS `__index__`) UNION ALL (SELECT ? AS `k1`, ? AS `__index__`) UNION ALL (SELECT ? AS `k1`, ? AS `__index__`)) AS `i` INNER JOIN LATERAL (SELECT `User`.`id` AS `User_id`, `User`.`email` AS `User_email` FROM `User` `User` WHERE email = `i`.`k1`) AS `o`',
+        'SELECT o.*, i.__index__ FROM ((SELECT ? AS `email`, ? AS `__index__`) UNION ALL (SELECT ? AS `email`, ? AS `__index__`) UNION ALL (SELECT ? AS `email`, ? AS `__index__`)) AS `i` INNER JOIN LATERAL (SELECT `User`.`id` AS `User_id`, `User`.`email` AS `User_email` FROM `User` `User` WHERE email = `i`.`email`) AS `o` ON true',
         ['user1@example.com', 1, 'user2@example.com', 2, 'invalid', 3],
       )
       expect(spy).toHaveBeenNthCalledWith(
         3,
-        'SELECT o.*, i.__index__ FROM ((SELECT ? AS `k1`, ? AS `k2`, ? AS `__index__`) UNION ALL (SELECT ? AS `k1`, ? AS `k2`, ? AS `__index__`)) AS `i` INNER JOIN LATERAL (SELECT `User`.`id` AS `User_id`, `User`.`email` AS `User_email` FROM `User` `User` WHERE email = `i`.`k1` AND id = `i`.`k2`) AS `o`',
+        'SELECT o.*, i.__index__ FROM ((SELECT ? AS `email`, ? AS `id`, ? AS `__index__`) UNION ALL (SELECT ? AS `email`, ? AS `id`, ? AS `__index__`)) AS `i` INNER JOIN LATERAL (SELECT `User`.`id` AS `User_id`, `User`.`email` AS `User_email` FROM `User` `User` WHERE email = `i`.`email` AND id = `i`.`id`) AS `o` ON true',
         ['user1@example.com', '1', 4, 'user2@example.com', '1', 5],
       )
       expect(spy).toHaveBeenNthCalledWith(
         4,
-        'SELECT o.*, i.__index__ FROM ((SELECT ? AS `k1`, ? AS `__index__`)) AS `i` INNER JOIN LATERAL (SELECT `User`.`id` AS `User_id`, `User`.`email` AS `User_email` FROM `User` `User` WHERE id = `i`.`k1`) AS `o`',
+        'SELECT o.*, i.__index__ FROM ((SELECT ? AS `id`, ? AS `__index__`)) AS `i` INNER JOIN LATERAL (SELECT `User`.`id` AS `User_id`, `User`.`email` AS `User_email` FROM `User` `User` WHERE id = `i`.`id`) AS `o` ON true',
         ['1', 6],
       )
     } finally {
       await runner.release()
     }
   })
-})
+}
+
+describe('test loader with mysql driver', () =>
+  runTestWithOptions({
+    type: 'mysql',
+    host: 'localhost',
+    port: 3306,
+    username: 'root',
+    database: 'test',
+    password: 'password',
+    entities: [User],
+    synchronize: true,
+    dropSchema: true,
+  }))
+
+// describe('test loader with pg driver', () =>
+//   runTestWithOptions({
+//     type: 'postgres',
+//     host: 'localhost',
+//     port: 5432,
+//     username: 'postgres',
+//     database: 'test',
+//     password: 'password',
+//     entities: [User],
+//     synchronize: true,
+//     dropSchema: true,
+//     logging: true,
+//   }))

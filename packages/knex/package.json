@@ -1,6 +1,6 @@
 {
   "name": "@cogitatio/knex",
-  "version": "0.0.5-alpha.0",
+  "version": "0.0.5-alpha.2",
   "main": "dist/index.js",
   "types": "dist/packages/knex/src/index.d.ts",
   "scripts": {
@@ -14,8 +14,8 @@
     "access": "public"
   },
   "dependencies": {
-    "@cogitatio/core": "^0.0.5-alpha.0",
-    "@cogitatio/extra": "^0.0.5-alpha.0",
+    "@cogitatio/core": "^0.0.5-alpha.2",
+    "@cogitatio/extra": "^0.0.5-alpha.2",
     "dataloader": "^1.4.0",
     "knex": "^0.19.2"
   },

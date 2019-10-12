@@ -1,17 +1,17 @@
-import { IBaseSchema, SchemaType } from './common'
+import { BaseSchema, SchemaType } from './common'
 import { Resolve, resolveSchema, Schema, SchemaLike } from './schema'
 
-export interface INullableSchema<T extends unknown = unknown>
-  extends IBaseSchema<T | null> {
+export interface NullableSchema<T extends unknown = unknown>
+  extends BaseSchema<T | null> {
   type: SchemaType.Nullable
   childSchema: Schema
 }
 
 export function Nullable<S extends SchemaLike>(
   childSchema: S,
-): INullableSchema<Resolve<S>> {
+): NullableSchema<Resolve<S>> {
   return {
     type: SchemaType.Nullable,
     childSchema: resolveSchema(childSchema),
-  } as INullableSchema<Resolve<S>>
+  } as NullableSchema<Resolve<S>>
 }

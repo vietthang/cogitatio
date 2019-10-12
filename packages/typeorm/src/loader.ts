@@ -144,7 +144,7 @@ async function doLoad<Ins extends any[], O>(
         params,
         queryRunner,
         index,
-        entityClass: mainAlias.target,
+        entityClass: mainAlias.target as ObjectType<O>,
         aliasName: mainAlias.name,
       }
     })

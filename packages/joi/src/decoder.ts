@@ -8,7 +8,7 @@ import {
   SchemaType,
 } from '@cogitatio/core'
 import * as Joi from '@hapi/joi'
-import { ITaggedUnionSchema } from '../../core/src/taggedUnion'
+import { TaggedUnionSchema } from '../../core/src/taggedUnion'
 
 type Transformer<T, U> = (value: T) => U
 
@@ -64,7 +64,7 @@ export class JoiDecoder implements Decoder<unknown> {
           return this.resolvePrimitveSchema(schema.native)
 
         case SchemaType.Enum:
-          return this.joi.any().only(...Object.values(schema.enumValues))
+          return this.joi.any().valid(...Object.values(schema.enumValues))
 
         case SchemaType.Optional:
           return this.resolveJoiSchema(schema.childSchema).optional()
@@ -136,7 +136,7 @@ export class JoiDecoder implements Decoder<unknown> {
         case Buffer:
           return this.joi.binary()
         case RegExp:
-          return this.joi.object().type(RegExp)
+          return this.joi.object().instance(RegExp)
         default:
           throw new Error('invalid primitive type')
       }
@@ -144,11 +144,11 @@ export class JoiDecoder implements Decoder<unknown> {
   )
 
   private readonly resolveTaggedUnionSchema = cache(
-    (schema: ITaggedUnionSchema): Joi.Schema => {
+    (schema: TaggedUnionSchema): Joi.Schema => {
       return this.joi.alternatives(
         ...Object.entries(schema.schemaMap).map(([key, childSchema]) => {
           return this.joi.object({
-            [schema.discriminator]: this.joi.any().only(key),
+            [schema.discriminator]: this.joi.any().valid(key),
             [key]: this.resolveJoiSchema(
               resolveSchema(childSchema as SchemaLike),
             ),
@@ -179,6 +179,6 @@ export class JoiDecoder implements Decoder<unknown> {
     if (result.error) {
       throw result.error
     }
-    return result.value as any
+    return result.value
   }
 }

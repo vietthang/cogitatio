@@ -12,7 +12,7 @@ export enum SchemaType {
   TaggedUnion,
 }
 
-export interface IBaseSchema<T> {
+export interface BaseSchema<T> {
   readonly type: SchemaType
   readonly _: T
 }

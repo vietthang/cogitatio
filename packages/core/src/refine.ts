@@ -1,10 +1,10 @@
-import { IBaseSchema, SchemaType } from './common'
+import { BaseSchema, SchemaType } from './common'
 import { Resolve, resolveSchema, Schema, SchemaLike } from './schema'
 
-export interface IRefineSchema<
+export interface RefineSchema<
   T extends unknown = unknown,
   B extends unknown = unknown
-> extends IBaseSchema<T & B> {
+> extends BaseSchema<T & B> {
   readonly type: SchemaType.Brand
   readonly childSchema: Schema
   readonly brand: B
@@ -13,10 +13,10 @@ export interface IRefineSchema<
 export function Refine<S extends SchemaLike, B extends unknown = unknown>(
   childSchema: S,
   brand: B,
-): IRefineSchema<Resolve<S>, B> {
+): RefineSchema<Resolve<S>, B> {
   return {
     type: SchemaType.Brand,
     childSchema: resolveSchema(childSchema),
     brand,
-  } as IRefineSchema<Resolve<S>, B>
+  } as RefineSchema<Resolve<S>, B>
 }

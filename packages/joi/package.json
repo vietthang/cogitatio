@@ -16,17 +16,16 @@
   "dependencies": {
     "@cogitatio/core": "^0.0.5-alpha.0",
     "@cogitatio/extra": "^0.0.5-alpha.0",
-    "@hapi/joi": "^15.1.0"
+    "@hapi/joi": "^16.1.7"
   },
   "peerDependencies": {
-    "joi-phone-number": "^3.0.2"
+    "joi-phone-number": "https://github.com/hueniverse/joi-phone-number.git"
   },
   "files": [
     "/src",
     "/dist"
   ],
   "devDependencies": {
-    "joi-phone-number": "^3.0.2",
-    "lerna": "^3.16.4"
+    "joi-phone-number": "https://github.com/hueniverse/joi-phone-number.git"
   }
 }

@@ -233,7 +233,7 @@ describe('resolveJoiSchema', () => {
         }
         return Enum(Gender)
       },
-      expected: Joi.only('Male', 'Female'),
+      expected: Joi.valid('Male', 'Female'),
     },
     {
       name: 'id',

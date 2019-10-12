@@ -1,6 +1,6 @@
-import { Refine } from './brand'
 import { SchemaType } from './common'
 import { Property } from './property'
+import { Refine } from './refine'
 
 describe('test @Property', () => {
   it('should resolve primitive constructor correctly', () => {

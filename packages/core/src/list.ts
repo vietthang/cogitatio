@@ -1,17 +1,17 @@
-import { IBaseSchema, SchemaType } from './common'
+import { BaseSchema, SchemaType } from './common'
 import { Resolve, resolveSchema, Schema, SchemaLike } from './schema'
 
-export interface IListSchema<T extends unknown = unknown>
-  extends IBaseSchema<T[]> {
+export interface ListSchema<T extends unknown = unknown>
+  extends BaseSchema<T[]> {
   type: SchemaType.List
   childSchema: Schema
 }
 
 export function List<S extends SchemaLike>(
   childSchema: S,
-): IListSchema<Resolve<S>> {
+): ListSchema<Resolve<S>> {
   return {
     type: SchemaType.List,
     childSchema: resolveSchema(childSchema),
-  } as IListSchema<Resolve<S>>
+  } as ListSchema<Resolve<S>>
 }

@@ -1,15 +1,15 @@
-import { IBaseSchema, SchemaType } from './common'
+import { BaseSchema, SchemaType } from './common'
 import { Resolve, SchemaLike } from './schema'
 
 export type TaggedUnion<Discriminator extends string, T extends {}> = {
   [key in keyof T]: { [d in Discriminator]: key } & { [k in key]: T[key] }
 }[keyof T]
 
-export interface ITaggedUnionSchema<
+export interface TaggedUnionSchema<
   Discriminator extends string = string,
   T extends { [key in keyof T]: SchemaLike } = any
 >
-  extends IBaseSchema<
+  extends BaseSchema<
     TaggedUnion<Discriminator, { [key in keyof T]: Resolve<T[key]> }>
   > {
   type: SchemaType.TaggedUnion
@@ -23,10 +23,10 @@ export function TaggedUnion<
 >(
   discriminator: Discriminator,
   schemaMap: SM,
-): ITaggedUnionSchema<Discriminator, SM> {
+): TaggedUnionSchema<Discriminator, SM> {
   return {
     type: SchemaType.TaggedUnion,
     discriminator,
     schemaMap,
-  } as ITaggedUnionSchema<Discriminator, SM>
+  } as TaggedUnionSchema<Discriminator, SM>
 }

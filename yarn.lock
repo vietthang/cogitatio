@@ -762,35 +762,46 @@
     unique-filename "^1.1.1"
     which "^1.3.1"
 
-"@hapi/address@2.x.x":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@hapi/address/-/address-2.0.0.tgz#9f05469c88cb2fd3dcd624776b54ee95c312126a"
-  integrity sha512-mV6T0IYqb0xL1UALPFplXYQmR0twnXG0M6jUswpquqT2sD12BOiCiLy3EvMp/Fy7s3DZElC4/aPjEjo2jeZpvw==
+"@hapi/address@^2.1.2":
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/@hapi/address/-/address-2.1.2.tgz#1c794cd6dbf2354d1eb1ef10e0303f573e1c7222"
+  integrity sha512-O4QDrx+JoGKZc6aN64L04vqa7e41tIiLU+OvKdcYaEMP97UttL0f9GIi9/0A4WAMx0uBd6SidDIhktZhgOcN8Q==
 
-"@hapi/bourne@1.x.x":
-  version "1.3.2"
-  resolved "https://registry.yarnpkg.com/@hapi/bourne/-/bourne-1.3.2.tgz#0a7095adea067243ce3283e1b56b8a8f453b242a"
-  integrity sha512-1dVNHT76Uu5N3eJNTYcvxee+jzX4Z9lfciqRRHCU27ihbUcYi+iSc2iml5Ke1LXe1SyJCLA0+14Jh4tXJgOppA==
+"@hapi/formula@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@hapi/formula/-/formula-1.2.0.tgz#994649c7fea1a90b91a0a1e6d983523f680e10cd"
+  integrity sha512-UFbtbGPjstz0eWHb+ga/GM3Z9EzqKXFWIbSOFURU0A/Gku0Bky4bCk9/h//K2Xr3IrCfjFNhMm4jyZ5dbCewGA==
 
 "@hapi/hoek@8.x.x":
   version "8.2.1"
   resolved "https://registry.yarnpkg.com/@hapi/hoek/-/hoek-8.2.1.tgz#924af04cbb22e17359c620d2a9c946e63f58eb77"
   integrity sha512-JPiBy+oSmsq3St7XlipfN5pNA6bDJ1kpa73PrK/zR29CVClDVqy04AanM/M/qx5bSF+I61DdCfAvRrujau+zRg==
 
-"@hapi/joi@^15.1.0":
-  version "15.1.1"
-  resolved "https://registry.yarnpkg.com/@hapi/joi/-/joi-15.1.1.tgz#c675b8a71296f02833f8d6d243b34c57b8ce19d7"
-  integrity sha512-entf8ZMOK8sc+8YfeOlM8pCfg3b5+WZIKBfUaaJT8UsjAAPjartzxIYm3TIbjvA4u+u++KbcXD38k682nVHDAQ==
-  dependencies:
-    "@hapi/address" "2.x.x"
-    "@hapi/bourne" "1.x.x"
-    "@hapi/hoek" "8.x.x"
-    "@hapi/topo" "3.x.x"
+"@hapi/hoek@^8.2.4":
+  version "8.3.0"
+  resolved "https://registry.yarnpkg.com/@hapi/hoek/-/hoek-8.3.0.tgz#2b9db1cd00f3891005c77b3a8d608b88a6d0aa4d"
+  integrity sha512-C0QL9bmgUXTSuf8nDeGrpMjtJG7tPUr8wG6/wxPbP62tGwCwQtdMSJYfESowmY4P3Hn593f+8OzNY5bckcu/LQ==
 
-"@hapi/topo@3.x.x":
-  version "3.1.3"
-  resolved "https://registry.yarnpkg.com/@hapi/topo/-/topo-3.1.3.tgz#c7a02e0d936596d29f184e6d7fdc07e8b5efce11"
-  integrity sha512-JmS9/vQK6dcUYn7wc2YZTqzIKubAQcJKu2KCKAru6es482U5RT5fP1EXCPtlXpiK7PR0On/kpQKI4fRKkzpZBQ==
+"@hapi/joi@^16.1.7":
+  version "16.1.7"
+  resolved "https://registry.yarnpkg.com/@hapi/joi/-/joi-16.1.7.tgz#360857223a87bb1f5f67691537964c1b4908ed93"
+  integrity sha512-anaIgnZhNooG3LJLrTFzgGALTiO97zRA1UkvQHm9KxxoSiIzCozB3RCNCpDnfhTJD72QlrHA8nwGmNgpFFCIeg==
+  dependencies:
+    "@hapi/address" "^2.1.2"
+    "@hapi/formula" "^1.2.0"
+    "@hapi/hoek" "^8.2.4"
+    "@hapi/pinpoint" "^1.0.2"
+    "@hapi/topo" "^3.1.3"
+
+"@hapi/pinpoint@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@hapi/pinpoint/-/pinpoint-1.0.2.tgz#025b7a36dbbf4d35bf1acd071c26b20ef41e0d13"
+  integrity sha512-dtXC/WkZBfC5vxscazuiJ6iq4j9oNx1SHknmIr8hofarpKUZKmlUVYVIhNVzIEgK5Wrc4GMHL5lZtt1uS2flmQ==
+
+"@hapi/topo@^3.1.3":
+  version "3.1.5"
+  resolved "https://registry.yarnpkg.com/@hapi/topo/-/topo-3.1.5.tgz#3baea17e456530edad69a75c3fc7cde97dd6d331"
+  integrity sha512-bi9m1jrui9LlvtVdLaHv0DqeOoe+I8dep+nEcTgW6XxJHL3xArQcilYz3tIp0cRC4gWlsVtABK7vNKg4jzEmAA==
   dependencies:
     "@hapi/hoek" "8.x.x"
 
@@ -1750,12 +1761,10 @@
     "@types/minimatch" "*"
     "@types/node" "*"
 
-"@types/hapi__joi@*", "@types/hapi__joi@15.0.3":
-  version "15.0.3"
-  resolved "https://registry.yarnpkg.com/@types/hapi__joi/-/hapi__joi-15.0.3.tgz#eeeca99e3829636975bf39532d6e8279409c78f2"
-  integrity sha512-kncvQstpAQSjQ+J+tL2oYerjOEepv+yJHKM/JD/NmFZyDcy3rYOBcMJhdHRDjBxuSZu3ipGECszhgtmug9VSuw==
-  dependencies:
-    "@types/hapi__joi" "*"
+"@types/hapi__joi@^16.0.1":
+  version "16.0.1"
+  resolved "https://registry.yarnpkg.com/@types/hapi__joi/-/hapi__joi-16.0.1.tgz#ec227341ec7ce2091066cccebc3b14f6c527ba6b"
+  integrity sha512-U4I9Pfk4qH6TCXlg55qOc3F730QndZi86hGWlZHPHY7b3J+MCDIAO6EejbkaLWk7U15v+jn2J3GRVKD4ruhS2Q==
 
 "@types/istanbul-lib-coverage@*", "@types/istanbul-lib-coverage@^2.0.0":
   version "2.0.1"
@@ -4721,10 +4730,10 @@ globrex@^0.1.1:
   resolved "https://registry.yarnpkg.com/globrex/-/globrex-0.1.2.tgz#dd5d9ec826232730cd6793a5e33a9302985e6098"
   integrity sha512-uHJgbwAMwNFf5mLst7IWLNg14x1CkeqglJb/K3doi4dw6q2IvAAmM/Y81kevy83wP+Sst+nutFTYOGg3d1lsxg==
 
-google-libphonenumber@3.2.3:
-  version "3.2.3"
-  resolved "https://registry.yarnpkg.com/google-libphonenumber/-/google-libphonenumber-3.2.3.tgz#5e5c138c81b8734ebbe5ed354f6cdd22e1b53e95"
-  integrity sha512-8n4JyRptifaIRlHANKRlfqLR8fANm7+Q+1qvDuUsUeStSLtLGTVsZWe1llWDfgWTm1y07cEUyiRuNIv6cs2ovg==
+google-libphonenumber@3.2.4:
+  version "3.2.4"
+  resolved "https://registry.yarnpkg.com/google-libphonenumber/-/google-libphonenumber-3.2.4.tgz#91d3fe62ca531f154165e6580b1c55ff6bd53abf"
+  integrity sha512-gxUVpo/3+ZlUdbvE/u9E0VoKjimLhugw0pWD4I/j4cRF1jh+1wNzQXcCmf2mMa726ai39o5N7DcXCW3Shv0s3A==
 
 google-libphonenumber@3.2.5:
   version "3.2.5"
@@ -5823,19 +5832,18 @@ jest@^24.8.0, jest@^24.9.0:
     import-local "^2.0.0"
     jest-cli "^24.9.0"
 
-joi-phone-number@^3.0.2:
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/joi-phone-number/-/joi-phone-number-3.0.2.tgz#bea433537bb3090f396674a2e317bd726232109a"
-  integrity sha512-2GxVZuOv2REBK9IVaRRT7TUtIKnz2HK9bhGdABaTmJO1cNTC3SZ45ySQp7loKgPDuyACUnianWLemmDvZT0IgQ==
-  dependencies:
-    google-libphonenumber "3.2.3"
-
 joi-phone-number@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/joi-phone-number/-/joi-phone-number-3.1.0.tgz#469f78e303a37247dda15943c8e94f934132b938"
   integrity sha512-TlGxXu2genngxJ/yk78tfqlo0AiT9MX7ZL+38+ZeX2slfV46njLTDLFZke9/Lz1EduTa46TGKRgaFd9K+XoZwA==
   dependencies:
     google-libphonenumber "3.2.5"
+
+"joi-phone-number@https://github.com/hueniverse/joi-phone-number.git":
+  version "3.0.3"
+  resolved "https://github.com/hueniverse/joi-phone-number.git#085cbab7ee3cfa06360fa96fd40d5e20799cc40f"
+  dependencies:
+    google-libphonenumber "3.2.4"
 
 jpjs@^1.2.1:
   version "1.2.1"

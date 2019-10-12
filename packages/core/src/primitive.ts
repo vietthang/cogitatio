@@ -1,4 +1,4 @@
-import { IBaseSchema, SchemaType } from './common'
+import { BaseSchema, SchemaType } from './common'
 
 export type PrimitiveConstructor =
   | typeof Boolean
@@ -28,9 +28,9 @@ export function isPrimitiveConstructor(
   }
 }
 
-export interface IPrimitiveSchema<
+export interface PrimitiveSchema<
   C extends PrimitiveConstructor = PrimitiveConstructor
-> extends IBaseSchema<ResolvePrimitiveFromConstructor<C>> {
+> extends BaseSchema<ResolvePrimitiveFromConstructor<C>> {
   type: SchemaType.Primitive
   native: C
 }
@@ -56,8 +56,8 @@ export type ResolvePrimitiveFromConstructor<
   : never
 
 export type ResolvePrimitive<
-  S extends IPrimitiveSchema
-> = S extends IPrimitiveSchema<infer C>
+  S extends PrimitiveSchema
+> = S extends PrimitiveSchema<infer C>
   ? (C extends typeof Boolean
       ? boolean
       : C extends typeof Number
@@ -105,7 +105,7 @@ export type ReverseResolvePrimitive<T extends Primitive> = T extends boolean
   ? typeof RegExp
   : never
 
-export type PrimitiveDecorator<S extends IPrimitiveSchema> = <
+export type PrimitiveDecorator<S extends PrimitiveSchema> = <
   T extends ResolvePrimitive<S> extends T[Key]
     ? (T[Key] extends ResolvePrimitive<S> ? {} : never)
     : never,

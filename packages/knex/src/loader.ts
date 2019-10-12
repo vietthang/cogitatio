@@ -68,7 +68,7 @@ function createLoader<I extends { [key in keyof I]: Knex.Value } = {}>(
 
 const createLoaderMemoized = memoize(
   createLoader,
-  (qb, query) => query,
+  (_qb, query) => query,
   (qb, query) => {
     const proxy = new Proxy(
       {},

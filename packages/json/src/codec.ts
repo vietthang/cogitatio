@@ -1,8 +1,8 @@
 import {
   Codec,
-  IObjectSchema,
-  IPrimitiveSchema,
+  ObjectSchema,
   Primitive,
+  PrimitiveSchema,
   Resolve,
   resolveSchema,
   SchemaLike,
@@ -99,7 +99,7 @@ export class JsonCodec implements Codec<JsonValue, JsonValue> {
     }
   }
 
-  private encodeObject(schema: IObjectSchema, value: unknown): JsonValue {
+  private encodeObject(schema: ObjectSchema, value: unknown): JsonValue {
     if (typeof value !== 'object' || value === null) {
       throw new Error('invalid value type')
     }
@@ -110,7 +110,7 @@ export class JsonCodec implements Codec<JsonValue, JsonValue> {
     )
   }
 
-  private decodeObject(schema: IObjectSchema, value: JsonValue): unknown {
+  private decodeObject(schema: ObjectSchema, value: JsonValue): unknown {
     if (typeof value !== 'object' || value === null || Array.isArray(value)) {
       throw new Error('invalid value type')
     }
@@ -121,7 +121,7 @@ export class JsonCodec implements Codec<JsonValue, JsonValue> {
     )
   }
 
-  private encodePrimitive(schema: IPrimitiveSchema, value: unknown): JsonValue {
+  private encodePrimitive(schema: PrimitiveSchema, value: unknown): JsonValue {
     switch (schema.native) {
       case Boolean:
         return value as boolean
@@ -143,7 +143,7 @@ export class JsonCodec implements Codec<JsonValue, JsonValue> {
   }
 
   private decodePrimitive(
-    schema: IPrimitiveSchema,
+    schema: PrimitiveSchema,
     value: JsonValue,
   ): Primitive {
     switch (schema.native) {

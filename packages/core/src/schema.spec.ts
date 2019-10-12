@@ -1,8 +1,8 @@
-import { Refine } from './brand'
 import { SchemaType } from './common'
 import { List } from './list'
-import { IObjectSchema, Record } from './object'
+import { ObjectSchema, Record } from './object'
 import { Property } from './property'
+import { Refine } from './refine'
 import { resolveSchema } from './schema'
 import { Tuple } from './tuple'
 
@@ -68,7 +68,7 @@ describe('test resolveSchema', () => {
     }
     const schema = resolveSchema(A)
     expect(schema.type).toEqual(SchemaType.Object)
-    expect((schema as IObjectSchema).fields()).toStrictEqual({
+    expect((schema as ObjectSchema).fields()).toStrictEqual({
       str: {
         type: SchemaType.Primitive,
         native: String,
@@ -83,7 +83,7 @@ describe('test resolveSchema', () => {
   it('should handle raw object dictionary fine', () => {
     const schema = resolveSchema(Record({ num: Number, str: String }))
     expect(schema.type).toStrictEqual(SchemaType.Object)
-    expect((schema as IObjectSchema).fields()).toStrictEqual({
+    expect((schema as ObjectSchema).fields()).toStrictEqual({
       str: {
         type: SchemaType.Primitive,
         native: String,

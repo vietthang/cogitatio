@@ -5,14 +5,14 @@ import { JoiDecoderPlugin } from './decoder'
 export const emptyPlugin: JoiDecoderPlugin = {
   transformJoi: joi =>
     joi.defaults(schema => {
-      return schema.empty(Joi.any().only(null, ''))
+      return schema.empty(Joi.any().valid(null, ''))
     }),
 }
 
 export const singleArrayPlugin: JoiDecoderPlugin = {
   transformJoi: joi =>
     joi.defaults(schema => {
-      if (schema.schemaType === 'array') {
+      if (schema.type === 'array') {
         return (schema as Joi.ArraySchema).single()
       }
       return schema
@@ -22,24 +22,15 @@ export const singleArrayPlugin: JoiDecoderPlugin = {
 export const bigIntPlugin: JoiDecoderPlugin = {
   transformJoi: joi =>
     joi.extend({
-      name: 'bigint',
-      language: {
+      type: 'bigint',
+      messages: {
         base: '!!"{{value}}" is not a bigint',
       },
-      coerce(value, state, prefs) {
-        // tslint:disable-next-line
-        if (typeof value === 'bigint') {
-          return value
-        }
-
-        if (!prefs.convert) {
-          return this.createError('bigint.base', { value }, state, prefs)
-        }
-
+      coerce(value, helpers) {
         try {
-          return BigInt(value)
+          return { value: BigInt(value) }
         } catch (err) {
-          return this.createError('bigint.base', { value }, state, prefs)
+          return helpers.error('bigint.base', { value })
         }
       },
     }),
@@ -54,23 +45,19 @@ export const bigIntPlugin: JoiDecoderPlugin = {
 export const regexPlugin: JoiDecoderPlugin = {
   transformJoi: joi =>
     joi.extend({
-      name: 'regex',
-      language: {
+      type: 'regex',
+      messages: {
         base: '!!"{{value}}" is not a regex',
       },
-      coerce(value, state, prefs) {
+      coerce(value, helpers) {
         if (value instanceof RegExp) {
-          return value
-        }
-
-        if (!prefs.convert) {
-          return this.createError('regex.base', { value }, state, prefs)
+          return { value }
         }
 
         try {
-          return RegExp(value)
+          return { value: RegExp(value) }
         } catch (err) {
-          return this.createError('regex.base', { value }, state, prefs)
+          return helpers.error('regex.base', { value })
         }
       },
     }),
@@ -94,20 +81,49 @@ export const phonePlugin: JoiDecoderPlugin = {
   },
 }
 
+const MAX_INTEGER_64 = BigInt(2) ** BigInt(64) - BigInt(1)
+
+export const id64Plugin: JoiDecoderPlugin = {
+  transformJoi: joi =>
+    joi.extend({
+      type: 'id64',
+      messages: {
+        base: '!!"{{value}}" is not a id64',
+      },
+      coerce(value, helpers) {
+        try {
+          const bi = BigInt(value)
+          if (bi > 0 && bi <= MAX_INTEGER_64) {
+            return { value: bi.toString() }
+          }
+          return helpers.error('id64.base', { value })
+        } catch (err) {
+          return helpers.error('id64.base', { value })
+        }
+      },
+    }),
+  resolveSchema(joi, schema) {
+    if (schema.type === SchemaType.Primitive && schema.native === BigInt) {
+      return (joi as any).bigint()
+    }
+    return undefined
+  },
+}
+
 function isJoiStringSchema(schema: Joi.Schema): schema is Joi.StringSchema {
-  return schema.schemaType === 'string'
+  return schema.type === 'string'
 }
 
 function isJoiNumberSchema(schema: Joi.Schema): schema is Joi.NumberSchema {
-  return schema.schemaType === 'number'
+  return schema.type === 'number'
 }
 
 function isJoiObjectSchema(schema: Joi.Schema): schema is Joi.ObjectSchema {
-  return schema.schemaType === 'object'
+  return schema.type === 'object'
 }
 
 function isJoiArraySchema(schema: Joi.Schema): schema is Joi.ArraySchema {
-  return schema.schemaType === 'array'
+  return schema.type === 'array'
 }
 
 function guardResolve<T extends Joi.AnySchema, U>(

@@ -1,6 +1,6 @@
 {
   "name": "@cogitatio/typeorm",
-  "version": "0.0.5-alpha.3",
+  "version": "0.0.5-alpha.4",
   "main": "dist/index.js",
   "types": "dist/packages/typeorm/src/index.d.ts",
   "scripts": {

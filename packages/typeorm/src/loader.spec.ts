@@ -14,8 +14,8 @@ import { createLoadMany } from './loader'
 @Index(['email'])
 @Entity('User')
 class User {
-  @PrimaryColumn({ type: 'bigint', generated: 'increment' })
-  public id!: string
+  @PrimaryColumn({ type: 'int', generated: 'increment' })
+  public id!: number
 
   @Column({ type: 'varchar' })
   public email!: string
@@ -55,28 +55,28 @@ function runTestWithOptions(options: ConnectionOptions): void {
       .createQueryBuilder()
       .insert()
       .into(User)
-      .values({ id: '1', email: 'user1@example.com' })
+      .values({ id: 1, email: 'user1@example.com' })
       .execute()
 
     await conn
       .createQueryBuilder()
       .insert()
       .into(User)
-      .values({ id: '2', email: 'user2@example.com' })
+      .values({ id: 2, email: 'user2@example.com' })
       .execute()
 
     await conn
       .createQueryBuilder()
       .insert()
       .into(User)
-      .values({ id: '3', email: 'user3@example.com' })
+      .values({ id: 3, email: 'user3@example.com' })
       .execute()
 
     await conn
       .createQueryBuilder()
       .insert()
       .into(User)
-      .values({ id: '4', email: 'user4@example.com' })
+      .values({ id: 4, email: 'user4@example.com' })
       .execute()
   })
 
@@ -112,8 +112,8 @@ function runTestWithOptions(options: ConnectionOptions): void {
         ['invalid'],
       )
       expect(results).toEqual([
-        [{ id: '1', email: 'user1@example.com' }],
-        [{ id: '2', email: 'user2@example.com' }],
+        [{ id: 1, email: 'user1@example.com' }],
+        [{ id: 2, email: 'user2@example.com' }],
         [],
       ])
     } finally {
@@ -140,8 +140,8 @@ function runTestWithOptions(options: ConnectionOptions): void {
         ['user1@example.com', 0, 'user2@example.com', 1, 'invalid', 2],
       )
       expect(results).toEqual([
-        [{ id: '1', email: 'user1@example.com' }],
-        [{ id: '2', email: 'user2@example.com' }],
+        [{ id: 1, email: 'user1@example.com' }],
+        [{ id: 2, email: 'user2@example.com' }],
         [],
       ])
     } finally {
@@ -167,11 +167,11 @@ function runTestWithOptions(options: ConnectionOptions): void {
       ])
 
       expect(results).toEqual([
-        [{ id: '1', email: 'user1@example.com' }],
-        [{ id: '2', email: 'user2@example.com' }],
+        [{ id: 1, email: 'user1@example.com' }],
+        [{ id: 2, email: 'user2@example.com' }],
         [],
-        [{ id: '1', email: 'user1@example.com' }],
-        [{ id: '2', email: 'user2@example.com' }],
+        [{ id: 1, email: 'user1@example.com' }],
+        [{ id: 2, email: 'user2@example.com' }],
       ])
 
       expect(runner0Spy).toBeCalledTimes(1)
@@ -215,17 +215,17 @@ function runTestWithOptions(options: ConnectionOptions): void {
 
       expect(results).toEqual([
         [
-          { id: '1', email: 'user1@example.com' },
-          { id: '2', email: 'user2@example.com' },
-          { id: '3', email: 'user3@example.com' },
-          { id: '4', email: 'user4@example.com' },
+          { id: 1, email: 'user1@example.com' },
+          { id: 2, email: 'user2@example.com' },
+          { id: 3, email: 'user3@example.com' },
+          { id: 4, email: 'user4@example.com' },
         ],
-        [{ id: '1', email: 'user1@example.com' }],
-        [{ id: '2', email: 'user2@example.com' }],
+        [{ id: 1, email: 'user1@example.com' }],
+        [{ id: 2, email: 'user2@example.com' }],
         [],
-        [{ id: '1', email: 'user1@example.com' }],
+        [{ id: 1, email: 'user1@example.com' }],
         [],
-        [{ id: '1', email: 'user1@example.com' }],
+        [{ id: 1, email: 'user1@example.com' }],
       ])
 
       expect(spy).toBeCalledTimes(4)
@@ -251,6 +251,39 @@ function runTestWithOptions(options: ConnectionOptions): void {
       )
     } finally {
       await runner.release()
+    }
+  })
+
+  it('when request with multiple query runners, it should fail independently', async () => {
+    const runner0 = conn.createQueryRunner()
+    runner0.query = async () => {
+      throw new Error('mock')
+    }
+    const runner1 = conn.createQueryRunner()
+
+    try {
+      const em0 = conn.createEntityManager(runner0)
+      const em1 = conn.createEntityManager(runner1)
+
+      await Promise.all([
+        expect(
+          repository.findUserByEmailNoBatch(em0, 'user1@example.com'),
+        ).rejects.toStrictEqual(new Error('mock')),
+        expect(
+          repository.findUserByEmailNoBatch(em1, 'user2@example.com'),
+        ).resolves.toEqual([{ id: 2, email: 'user2@example.com' }]),
+      ])
+
+      await Promise.all([
+        expect(
+          repository.findUserByEmailBatch(em0, 'user1@example.com'),
+        ).rejects.toStrictEqual(new Error('mock')),
+        expect(
+          repository.findUserByEmailBatch(em1, 'user2@example.com'),
+        ).resolves.toEqual([{ id: 2, email: 'user2@example.com' }]),
+      ])
+    } finally {
+      await Promise.all([runner0.release(), runner1.release()])
     }
   })
 }

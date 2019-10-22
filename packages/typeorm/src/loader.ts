@@ -7,13 +7,10 @@ import {
   SelectQueryBuilder,
 } from 'typeorm'
 import { DriverUtils } from 'typeorm/driver/DriverUtils'
-import { Either, groupBy, left, objectSerializer, right } from './utils'
+import { groupBy, objectId } from './utils'
 
-function obtainQueryRunner(
-  qb: SelectQueryBuilder<any>,
-  ioQueryRunner: () => QueryRunner,
-): QueryRunner {
-  return (qb as any).queryRunner || ioQueryRunner
+function getQueryRunner(qb: SelectQueryBuilder<any>): QueryRunner | undefined {
+  return (qb as any).queryRunner
 }
 
 function merge<T>(
@@ -97,16 +94,13 @@ async function doLoadGrouped<T>(
   )} INNER JOIN LATERAL (${joinFrag}) AS ${escape('o')} ON true`
   const finalBindings = { ...selectBindings, ...fromBindings, ...joinBindings }
 
-  const [
-    rawSql,
-    rawParams,
-  ] = queryRunner.connection.driver.escapeQueryWithParameters(
-    finalSql,
-    finalBindings,
-    {},
+  const results: any[] = await queryRunner.query(
+    ...queryRunner.connection.driver.escapeQueryWithParameters(
+      finalSql,
+      finalBindings,
+      {},
+    ),
   )
-
-  const results: any[] = await queryRunner.query(rawSql, rawParams)
 
   return results.map(({ __index__, ...raw }) => {
     const entity = merge<T>(queryRunner.connection, entityClass, aliasName, raw)
@@ -119,16 +113,11 @@ async function doLoad<Ins extends any[], O>(
   querier: (...inputs: Ins) => SelectQueryBuilder<O>,
   inputs: Ins[],
 ): Promise<Array<Array<Result<O>> | Error>> {
-  let queryRunner: QueryRunner | undefined
-  const queryRunnerGetter = (connection: Connection) =>
-    (queryRunner = queryRunner || connection.createQueryRunner('slave'))
-
   const entries = inputs
     .map(args => querier(...args))
     .map((qb, index) => {
-      const queryRunner = obtainQueryRunner(qb, () =>
-        queryRunnerGetter(qb.connection),
-      )
+      const queryRunner = getQueryRunner(qb)
+      const connection = qb.connection
       const sql = qb.getQuery()
       const params = qb.getParameters()
       const mainAlias = qb.expressionMap.mainAlias
@@ -140,6 +129,7 @@ async function doLoad<Ins extends any[], O>(
       }
 
       return {
+        connection,
         sql,
         params,
         queryRunner,
@@ -151,33 +141,45 @@ async function doLoad<Ins extends any[], O>(
 
   const grouped = groupBy(
     entries,
-    ({ sql, queryRunner, entityClass, aliasName }) => {
+    ({ connection, sql, queryRunner, entityClass, aliasName }) => {
       return [
-        objectSerializer(queryRunner),
+        objectId(connection),
+        queryRunner && objectId(queryRunner),
         sql,
-        objectSerializer(entityClass),
+        objectId(entityClass),
         aliasName,
       ].join('\0')
     },
   )
 
-  const results: Array<Either<Error, Array<Result<O>>>> = await Promise.all(
-    grouped.map(entries =>
-      doLoadGrouped(
-        entries[0].queryRunner,
-        entries[0].sql,
-        entries[0].entityClass,
-        entries[0].aliasName,
-        entries,
-      )
-        .then(right)
-        .catch(error => {
-          if (error instanceof Error) {
-            return left(error)
-          }
-          return left(new Error(error))
-        }),
-    ),
+  const results: Array<Error | Array<Result<O>>> = await Promise.all(
+    grouped.map(async entries => {
+      let queryRunner = entries[0].queryRunner
+      let managed = false
+      if (!queryRunner) {
+        queryRunner = entries[0].connection.createQueryRunner('slave')
+        managed = true
+      }
+
+      try {
+        return await doLoadGrouped(
+          queryRunner,
+          entries[0].sql,
+          entries[0].entityClass,
+          entries[0].aliasName,
+          entries,
+        )
+      } catch (error) {
+        if (error instanceof Error) {
+          return error
+        }
+        return new Error(error)
+      } finally {
+        if (managed) {
+          await queryRunner.release()
+        }
+      }
+    }),
   )
 
   return entries.map(({ index }) => {
@@ -185,10 +187,10 @@ async function doLoad<Ins extends any[], O>(
       entries.find(entry => entry.index === index),
     )
     const result = results[matchedIndex]
-    if (result.__either === 'Left') {
-      return result.value
+    if (result instanceof Error) {
+      return result
     }
-    return result.value.filter(result => result.index === index)
+    return result.filter(result => result.index === index)
   })
 }
 
@@ -220,7 +222,10 @@ export function createLoadOne<Ins extends any[], O>(
   querier: (...inputs: Ins) => SelectQueryBuilder<O>,
   dataLoaderOptions?: DataLoader.Options<Ins, Array<Result<O>>>,
 ): Loader<Ins, O | undefined> {
-  const dataLoader = createDataLoader(querier, dataLoaderOptions)
+  const dataLoader = createDataLoader(
+    (...inputs: Ins) => querier(...inputs).limit(1),
+    dataLoaderOptions,
+  )
 
   return async (...values) => {
     const results = await dataLoader.load(values)
@@ -247,7 +252,10 @@ export function createLoadRawOne<Ins extends any[], O>(
   querier: (...inputs: Ins) => SelectQueryBuilder<O>,
   dataLoaderOptions?: DataLoader.Options<Ins, Array<Result<O>>>,
 ): Loader<Ins, any | undefined> {
-  const dataLoader = createDataLoader(querier, dataLoaderOptions)
+  const dataLoader = createDataLoader(
+    (...inputs: Ins) => querier(...inputs).limit(1),
+    dataLoaderOptions,
+  )
 
   return async (...values) => {
     const results = await dataLoader.load(values)

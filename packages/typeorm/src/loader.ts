@@ -194,13 +194,22 @@ async function doLoad<Ins extends any[], O>(
   })
 }
 
-function createDataLoader<Ins extends any[], O>(
+export interface LoaderOptions<Ins extends any[], O>
+  extends DataLoader.Options<Ins, Array<Result<O>>> {
+  notFoundHandler?: (...ins: Ins) => Error
+}
+
+function defaultNotFoundHandler(): Error {
+  return new Error('Not found')
+}
+
+export function createDataLoader<Ins extends any[], O>(
   querier: (...inputs: Ins) => SelectQueryBuilder<O>,
-  dataLoaderOptions?: DataLoader.Options<Ins, Array<Result<O>>>,
+  options?: DataLoader.Options<Ins, Array<Result<O>>>,
 ): DataLoader<Ins, Array<Result<O>>> {
   return new DataLoader<Ins, Array<Result<O>>>(
     inputs => doLoad(querier, inputs),
-    dataLoaderOptions,
+    options,
   )
 }
 
@@ -208,9 +217,9 @@ export type Loader<Ins extends any[], O> = (...ins: Ins) => Promise<O>
 
 export function createLoadMany<Ins extends any[], O>(
   querier: (...inputs: Ins) => SelectQueryBuilder<O>,
-  dataLoaderOptions?: DataLoader.Options<Ins, Array<Result<O>>>,
+  options?: DataLoader.Options<Ins, Array<Result<O>>>,
 ): Loader<Ins, O[]> {
-  const dataLoader = createDataLoader(querier, dataLoaderOptions)
+  const dataLoader = createDataLoader(querier, options)
 
   return async (...values) => {
     const results = await dataLoader.load(values)
@@ -220,11 +229,11 @@ export function createLoadMany<Ins extends any[], O>(
 
 export function createLoadOne<Ins extends any[], O>(
   querier: (...inputs: Ins) => SelectQueryBuilder<O>,
-  dataLoaderOptions?: DataLoader.Options<Ins, Array<Result<O>>>,
+  options?: DataLoader.Options<Ins, Array<Result<O>>>,
 ): Loader<Ins, O | undefined> {
   const dataLoader = createDataLoader(
     (...inputs: Ins) => querier(...inputs).limit(1),
-    dataLoaderOptions,
+    options,
   )
 
   return async (...values) => {
@@ -236,11 +245,32 @@ export function createLoadOne<Ins extends any[], O>(
   }
 }
 
+export function createGetOne<Ins extends any[], O>(
+  querier: (...inputs: Ins) => SelectQueryBuilder<O>,
+  options?: LoaderOptions<Ins, O>,
+): Loader<Ins, O> {
+  const dataLoader = createDataLoader(
+    (...inputs: Ins) => querier(...inputs).limit(1),
+    options,
+  )
+
+  return async (...ins) => {
+    const results = await dataLoader.load(ins)
+    if (!results.length) {
+      const notFoundHandler: (...ins: Ins) => Error =
+        (options && options.notFoundHandler && options.notFoundHandler) ||
+        defaultNotFoundHandler
+      throw notFoundHandler(...ins)
+    }
+    return results[0].entity
+  }
+}
+
 export function createLoadRawMany<Ins extends any[], O>(
   querier: (...inputs: Ins) => SelectQueryBuilder<O>,
-  dataLoaderOptions?: DataLoader.Options<Ins, Array<Result<O>>>,
+  options?: DataLoader.Options<Ins, Array<Result<O>>>,
 ): Loader<Ins, any[]> {
-  const dataLoader = createDataLoader(querier, dataLoaderOptions)
+  const dataLoader = createDataLoader(querier, options)
 
   return async (...values) => {
     const results = await dataLoader.load(values)
@@ -250,17 +280,38 @@ export function createLoadRawMany<Ins extends any[], O>(
 
 export function createLoadRawOne<Ins extends any[], O>(
   querier: (...inputs: Ins) => SelectQueryBuilder<O>,
-  dataLoaderOptions?: DataLoader.Options<Ins, Array<Result<O>>>,
+  options?: DataLoader.Options<Ins, Array<Result<O>>>,
 ): Loader<Ins, any | undefined> {
   const dataLoader = createDataLoader(
     (...inputs: Ins) => querier(...inputs).limit(1),
-    dataLoaderOptions,
+    options,
   )
 
   return async (...values) => {
     const results = await dataLoader.load(values)
     if (!results.length) {
       return undefined
+    }
+    return results[0].raw
+  }
+}
+
+export function createGetRawOne<Ins extends any[], O>(
+  querier: (...inputs: Ins) => SelectQueryBuilder<O>,
+  options?: LoaderOptions<Ins, O>,
+): Loader<Ins, O> {
+  const dataLoader = createDataLoader(
+    (...inputs: Ins) => querier(...inputs).limit(1),
+    options,
+  )
+
+  return async (...ins) => {
+    const results = await dataLoader.load(ins)
+    if (!results.length) {
+      const notFoundHandler: (...ins: Ins) => Error =
+        (options && options.notFoundHandler && options.notFoundHandler) ||
+        defaultNotFoundHandler
+      throw notFoundHandler(...ins)
     }
     return results[0].raw
   }

@@ -1,5 +1,5 @@
 export {
-  createDataLoader,
+  loaderProvider as createDataLoader,
   createLoadMany,
   createLoadOne,
   createGetOne,

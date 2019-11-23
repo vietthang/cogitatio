@@ -33,6 +33,9 @@ class UserRepository {
 
   public readonly findUserByEmailBatch = createLoadMany(
     UserRepository.createBuilder,
+    {
+      cacheContextFn: () => global,
+    },
   )
 
   public findUserByEmailNoBatch(
@@ -135,7 +138,9 @@ function runTestWithOptions(options: ConnectionOptions): void {
       ])
 
       expect(spy).toBeCalledTimes(1)
-      expect(spy).toHaveBeenLastCalledWith(
+      expect(
+        spy,
+      ).toHaveBeenLastCalledWith(
         'SELECT o.*, i.__index__ FROM ((SELECT ? AS `email`, ? AS `__index__`) UNION ALL (SELECT ? AS `email`, ? AS `__index__`) UNION ALL (SELECT ? AS `email`, ? AS `__index__`)) AS `i` INNER JOIN LATERAL (SELECT `User`.`id` AS `User_id`, `User`.`email` AS `User_email` FROM `User` `User` WHERE email = `i`.`email`) AS `o` ON true',
         ['user1@example.com', 0, 'user2@example.com', 1, 'invalid', 2],
       )
@@ -197,6 +202,9 @@ function runTestWithOptions(options: ConnectionOptions): void {
           qb = qb.andWhere('id = :id', { id })
         }
         return qb
+      },
+      {
+        cacheContextFn: () => global,
       },
     )
 
@@ -301,6 +309,7 @@ describe('test loader with mysql driver', () =>
     dropSchema: true,
   }))
 
+// TODO
 // describe('test loader with pg driver', () =>
 //   runTestWithOptions({
 //     type: 'postgres',

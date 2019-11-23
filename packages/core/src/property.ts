@@ -5,7 +5,9 @@ export interface SafeDecorator<S extends SchemaLike> {
   readonly schema: () => Schema
   <
     T extends Resolve<S> extends T[Key]
-      ? (T[Key] extends Resolve<S> ? {} : never)
+      ? T[Key] extends Resolve<S>
+        ? {}
+        : never
       : never,
     Key extends keyof T
   >(

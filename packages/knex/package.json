@@ -16,14 +16,14 @@
   "dependencies": {
     "@cogitatio/core": "^0.0.5-alpha.2",
     "@cogitatio/extra": "^0.0.5-alpha.2",
-    "dataloader": "^1.4.0",
-    "knex": "^0.19.2"
+    "dataloader": "^2.0.0",
+    "knex": "^0.20.2"
   },
   "files": [
     "/src",
     "/dist"
   ],
   "devDependencies": {
-    "pg": "^7.12.1"
+    "pg": "^7.14.0"
   }
 }

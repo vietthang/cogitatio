@@ -58,23 +58,23 @@ export type ResolvePrimitiveFromConstructor<
 export type ResolvePrimitive<
   S extends PrimitiveSchema
 > = S extends PrimitiveSchema<infer C>
-  ? (C extends typeof Boolean
-      ? boolean
-      : C extends typeof Number
-      ? number
-      : C extends typeof String
-      ? string
-      : C extends typeof BigInt
-      ? bigint
-      : C extends typeof Date
-      ? Date
-      : C extends typeof ArrayBuffer
-      ? ArrayBuffer
-      : C extends typeof Buffer
-      ? Buffer
-      : C extends typeof RegExp
-      ? RegExp
-      : never)
+  ? C extends typeof Boolean
+    ? boolean
+    : C extends typeof Number
+    ? number
+    : C extends typeof String
+    ? string
+    : C extends typeof BigInt
+    ? bigint
+    : C extends typeof Date
+    ? Date
+    : C extends typeof ArrayBuffer
+    ? ArrayBuffer
+    : C extends typeof Buffer
+    ? Buffer
+    : C extends typeof RegExp
+    ? RegExp
+    : never
   : never
 
 export type Primitive =
@@ -107,7 +107,9 @@ export type ReverseResolvePrimitive<T extends Primitive> = T extends boolean
 
 export type PrimitiveDecorator<S extends PrimitiveSchema> = <
   T extends ResolvePrimitive<S> extends T[Key]
-    ? (T[Key] extends ResolvePrimitive<S> ? {} : never)
+    ? T[Key] extends ResolvePrimitive<S>
+      ? {}
+      : never
     : never,
   Key extends keyof T
 >(

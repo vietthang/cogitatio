@@ -1,3 +1,4 @@
+/* tslint:disable:await-promise */
 import Knex from 'knex'
 import { queryBatch } from './loader'
 

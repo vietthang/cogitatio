@@ -25,7 +25,7 @@ describe('validate primitive', () => {
       assert.throws(() => validate(0))
       assert.throws(() => validate({}))
       assert.throws(() => validate('foo'))
-      assert.throws(() => validate(100n))
+      assert.throws(() => validate(BigInt(100)))
     })
 
     it('should success with boolean value', () => {
@@ -42,7 +42,7 @@ describe('validate primitive', () => {
     it('should failed with non-number value', () => {
       assert.throws(() => validate({}))
       assert.throws(() => validate('foo'))
-      assert.throws(() => validate(100n))
+      assert.throws(() => validate(BigInt(100)))
     })
 
     it('should success with number value', () => {
@@ -60,7 +60,7 @@ describe('validate primitive', () => {
       assert.throws(() => validate(0))
       assert.throws(() => validate({}))
       assert.throws(() => validate(false))
-      assert.throws(() => validate(100n))
+      assert.throws(() => validate(BigInt(100)))
     })
 
     it('should success with string value', () => {
@@ -75,7 +75,7 @@ describe('validate primitive', () => {
       assert.throws(() => validate(0))
       assert.throws(() => validate({}))
       assert.throws(() => validate(false))
-      assert.throws(() => validate(100n))
+      assert.throws(() => validate(BigInt(100)))
     })
   })
 
@@ -86,7 +86,7 @@ describe('validate primitive', () => {
       assert.throws(() => validate({}))
       assert.throws(() => validate('foo'))
       assert.throws(() => validate(false))
-      assert.throws(() => validate(100n))
+      assert.throws(() => validate(BigInt(100)))
     })
 
     it('should success with date value', () => {
@@ -103,7 +103,7 @@ describe('validate primitive', () => {
     it('should failed with invalid array buffer value', () => {
       assert.throws(() => validate({}))
       assert.throws(() => validate(false))
-      assert.throws(() => validate(100n))
+      assert.throws(() => validate(BigInt(100)))
     })
 
     it('should success with buffer value', () => {
@@ -119,7 +119,7 @@ describe('validate primitive', () => {
     it('should failed with invalid array buffer value', () => {
       assert.throws(() => validate({}))
       assert.throws(() => validate(false))
-      assert.throws(() => validate(100n))
+      assert.throws(() => validate(BigInt(100)))
     })
 
     it('should success with buffer value', () => {
@@ -161,7 +161,7 @@ describe('validate optional', () => {
     assert.throws(() => validate(0))
     assert.throws(() => validate({}))
     assert.throws(() => validate(false))
-    assert.throws(() => validate(100n))
+    assert.throws(() => validate(BigInt(100)))
     assert.throws(() => validate(null))
   })
 
@@ -179,7 +179,7 @@ describe('validate nullable', () => {
     assert.throws(() => validate(0))
     assert.throws(() => validate({}))
     assert.throws(() => validate(false))
-    assert.throws(() => validate(100n))
+    assert.throws(() => validate(BigInt(100)))
     assert.throws(() => validate(undefined))
   })
 
@@ -197,7 +197,7 @@ describe('validate list', () => {
     assert.throws(() => validate(0))
     assert.throws(() => validate({}))
     assert.throws(() => validate(false))
-    assert.throws(() => validate(100n))
+    assert.throws(() => validate(BigInt(100)))
     assert.throws(() => validate(undefined))
     assert.throws(() => validate([10]))
   })
@@ -215,7 +215,7 @@ describe('validate dictionary', () => {
   it('should failed with non string dictionaary value', () => {
     assert.throws(() => validate(0))
     assert.throws(() => validate(false))
-    assert.throws(() => validate(100n))
+    assert.throws(() => validate(BigInt(100)))
     assert.throws(() => validate(undefined))
     assert.throws(() => validate([10]))
     assert.throws(() => validate(['foo']))
@@ -236,7 +236,7 @@ describe('validate tuple', () => {
     assert.throws(() => validate(0))
     assert.throws(() => validate({}))
     assert.throws(() => validate(false))
-    assert.throws(() => validate(100n))
+    assert.throws(() => validate(BigInt(100)))
     assert.throws(() => validate(undefined))
     assert.throws(() => validate([10]))
     assert.throws(() => validate([]))
@@ -263,7 +263,7 @@ describe('validate object', () => {
     assert.throws(() => validate(0))
     assert.throws(() => validate({}))
     assert.throws(() => validate(false))
-    assert.throws(() => validate(100n))
+    assert.throws(() => validate(BigInt(100)))
     assert.throws(() => validate(undefined))
     assert.throws(() => validate([10]))
     assert.throws(() => validate([]))

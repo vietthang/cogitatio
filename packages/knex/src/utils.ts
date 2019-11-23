@@ -2,8 +2,6 @@ export type ArgsMapper<T extends any[], U> = (...args: T) => U
 
 export type ParamsOf<T> = T extends (...args: infer P) => any ? P : never
 
-const contextMap = new WeakMap<object, Map<string, any>>()
-
 let nextId = 0
 const objectIdMap = new WeakMap<object, string>()
 
@@ -22,6 +20,8 @@ export function memoize<T>(
   contextMapper: ArgsMapper<ParamsOf<T>, object> = () => global,
   keyMapper: ArgsMapper<ParamsOf<T>, string> = () => '',
 ): T {
+  const contextMap = new WeakMap<object, Map<string, any>>()
+
   return (((...args: ParamsOf<T>): any => {
     const context = contextMapper(...args)
     let memoizeMap = contextMap.get(context)

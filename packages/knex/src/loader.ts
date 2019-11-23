@@ -47,6 +47,7 @@ function createLoader<I extends { [key in keyof I]: Knex.Value } = {}>(
         ],
       )
 
+      /* tslint:disable-next-line:await-promise */
       const results: any[] = await query
         .select('o.*', 'i.__index__')
         .from(valuesFrag)

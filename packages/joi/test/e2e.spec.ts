@@ -72,10 +72,17 @@ describe('validate primitive', () => {
     const validate = (i: unknown) => decoder.decode(resolveSchema(BigInt), i)
 
     it('should failed with any value', () => {
-      assert.throws(() => validate(0))
       assert.throws(() => validate({}))
-      assert.throws(() => validate(false))
-      assert.throws(() => validate(BigInt(100)))
+      assert.throws(() => validate(1.1))
+      assert.throws(() => validate('1.1'))
+      assert.throws(() => validate('a'))
+    })
+
+    it('should success with valid string & number value', () => {
+      assert.strictEqual(BigInt(0), validate(0))
+      assert.strictEqual(BigInt(0), validate(false))
+      assert.strictEqual(BigInt(1), validate('1'))
+      assert.strictEqual(BigInt(100), validate(BigInt(100)))
     })
   })
 

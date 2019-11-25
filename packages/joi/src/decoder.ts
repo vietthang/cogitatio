@@ -26,6 +26,11 @@ function cache<T extends object, U>(
   }
 }
 
+// @internal
+export function refineBigInt(value: any): BigInt {
+  return BigInt(value)
+}
+
 export type SchemaResolver = (schema: Schema) => Joi.Schema | undefined
 
 export interface IJoiDecoderOptions {
@@ -91,8 +96,14 @@ export class JoiDecoder implements Decoder<unknown> {
                 this.resolveJoiSchema(childSchema),
               ),
             )
+
         case SchemaType.Object:
           return this.resolveObjectSchema(schema.fields())
+
+        case SchemaType.Refinement:
+          return this.resolveJoiSchema(schema.childSchema).custom(
+            schema.refineFunction,
+          )
 
         case SchemaType.TaggedUnion:
           return this.resolveTaggedUnionSchema(schema)
@@ -128,7 +139,7 @@ export class JoiDecoder implements Decoder<unknown> {
         case String:
           return this.joi.string()
         case BigInt:
-          throw new Error('bigint is not supported by joi yet')
+          return this.joi.any().custom(refineBigInt)
         case Date:
           return this.joi.date()
         case ArrayBuffer:

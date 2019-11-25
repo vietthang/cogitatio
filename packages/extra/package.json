@@ -15,5 +15,14 @@
   "files": [
     "/src",
     "/dist"
-  ]
+  ],
+  "dependencies": {
+    "@hapi/joi": "^16.1.8"
+  },
+  "peerDependencies": {
+    "google-libphonenumber": "^3.2.6"
+  },
+  "devDependencies": {
+    "google-libphonenumber": "^3.2.6"
+  }
 }

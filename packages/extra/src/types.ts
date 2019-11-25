@@ -15,133 +15,79 @@ import {
   TaggedUnionSchema,
   TupleSchema,
 } from '@cogitatio/core'
+import * as Joi from '@hapi/joi'
 
-export const Email = Refine(String, {
-  email: true as const,
-})
+function joiSchemaToValidator(schema: Joi.Schema): (input: any) => any {
+  return input => {
+    const { error, value } = schema.validate(input)
+    if (error) {
+      return error
+    }
+    return value
+  }
+}
+
+// Email
+
+// @internal
+export const refineEmail = joiSchemaToValidator(Joi.string().email())
+
+export const Email = Refine<{ email: true }>()(String, refineEmail)
 
 export type Email = Resolve<typeof Email>
 
-export const Uri = Refine(String, {
-  uri: true,
-})
+// Uri
+
+// @internal
+export const refineUri = joiSchemaToValidator(Joi.string().uri())
+
+export const Uri = Refine<{ uri: true }>()(String, refineUri)
 
 export type Uri = Resolve<typeof Uri>
 
-export const Integer = Refine(Number, {
-  integer: true,
-})
+// Integer
+
+// @internal
+export const refineInteger = joiSchemaToValidator(Joi.number().integer())
+
+export const Integer = Refine<{
+  integer: true
+}>()(Number, refineInteger)
 
 export type Integer = Resolve<typeof Integer>
 
-export const Port = Refine(Integer, {
-  port: true,
-})
+// Port
+
+// @internal
+export const refinePort = joiSchemaToValidator(Joi.number().port())
+
+export const Port = Refine<{ port: true }>()(Integer, refinePort)
 
 export type Port = Resolve<typeof Port>
 
-export const Ip = Refine(String, {
-  ip: true as const,
-})
+// Ip
+
+// @internal
+export const refineIp = joiSchemaToValidator(Joi.string().ip())
+
+export const Ip = Refine<{ ip: true }>()(String, refineIp)
 
 export type Ip = Resolve<typeof Ip>
 
-export const Hostname = Refine(String, { hostname: true })
+// Hostname
+
+// @internal
+export const refineHostname = joiSchemaToValidator(Joi.string().hostname())
+
+export const Hostname = Refine<{ hostname: true }>()(String, refineHostname)
 
 export type Hostname = Resolve<typeof Hostname>
 
-export const Uuid = Refine(String, {
-  uuid: true as const,
-})
+// Uuid
+
+// @internal
+export const refineUuid = joiSchemaToValidator(Joi.string().uuid())
+
+export const Uuid = Refine<{ uuid: true }>()(String, refineUuid)
 
 export type Uuid = Resolve<typeof Uuid>
-
-export interface Min<T extends number> {
-  min: T
-}
-
-export const Min = <T extends number>(min: T) => <
-  S extends SchemaLike & (Resolve<S> extends number ? unknown : never)
->(
-  schema: S,
-): RefineSchema<Resolve<S>, Min<T>> => {
-  return Refine(schema, { min })
-}
-
-export interface Max<T extends number> {
-  max: T
-}
-
-export const Max = <T extends number>(max: T) => <
-  S extends SchemaLike & (Resolve<S> extends number ? unknown : never)
->(
-  schema: S,
-): RefineSchema<Resolve<S>, Max<T>> => {
-  return Refine(schema, { max })
-}
-
-export interface MinLength<T extends number> {
-  minLength: T
-}
-
-export const MinLength = <T extends number>(minLength: T) => <
-  S extends SchemaLike & (Resolve<S> extends string ? unknown : never)
->(
-  schema: S,
-): RefineSchema<Resolve<S>, MinLength<T>> => {
-  return Refine(schema, { minLength })
-}
-
-export interface MaxLength<T extends number> {
-  maxLength: T
-}
-
-export const MaxLength = <T extends number>(maxLength: T) => <
-  S extends SchemaLike & (Resolve<S> extends string ? unknown : never)
->(
-  schema: S,
-): RefineSchema<Resolve<S>, MaxLength<T>> => {
-  return Refine(schema, { maxLength })
-}
-
-export interface MinItems<T extends number> {
-  minItems: T
-}
-
-export const MinItems = <T extends number>(minItems: T) => <
-  S extends SchemaLike & (Resolve<S> extends unknown[] ? unknown : never)
->(
-  schema: S,
-): RefineSchema<Resolve<S>, MinItems<T>> => {
-  return Refine(schema, { minItems })
-}
-
-export interface MaxItems<T extends number> {
-  maxItems: T
-}
-
-export const MaxItems = <T extends number>(maxItems: T) => <
-  S extends SchemaLike & (Resolve<S> extends unknown[] ? unknown : never)
->(
-  schema: S,
-): RefineSchema<Resolve<S>, MaxItems<T>> => {
-  return Refine(schema, { maxItems })
-}
-
-export interface UniqueItems {
-  uniqueItems: true
-}
-
-export const UniqueItems = () => <
-  S extends SchemaLike & (Resolve<S> extends unknown[] ? unknown : never)
->(
-  schema: S,
-): RefineSchema<Resolve<S>, UniqueItems> => {
-  return Refine(schema, { uniqueItems: true })
-}
-
-export const Default = (defaultValue: unknown) => <S extends SchemaLike>(
-  schema: S,
-): RefineSchema<Resolve<S>, unknown> => {
-  return Refine(schema, { default: defaultValue })
-}

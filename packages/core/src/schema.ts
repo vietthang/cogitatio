@@ -13,7 +13,7 @@ import {
   PrimitiveSchema,
   ResolvePrimitiveFromConstructor,
 } from './primitive'
-import { RefineSchema } from './refine'
+import { RefineConstructor, RefineSchema } from './refine'
 import { TaggedUnionSchema } from './taggedUnion'
 import { TupleSchema } from './tuple'
 
@@ -32,7 +32,9 @@ export type Schema =
 
 export type Thunk<T> = T | (() => T)
 
-export type SchemaLike = Thunk<Schema | PrimitiveConstructor | Constructor>
+export type SchemaLike = Thunk<
+  Schema | PrimitiveConstructor | RefineConstructor | Constructor
+>
 
 export type ObjectSchemaLike<T> = Thunk<ObjectSchema<T> | Constructor<T>>
 
@@ -40,6 +42,8 @@ export type Resolve<S> = S extends PrimitiveConstructor
   ? ResolvePrimitiveFromConstructor<S>
   : S extends Constructor<infer T>
   ? T
+  : S extends RefineConstructor
+  ? S['refineSchema']['_']
   : S extends Schema
   ? S['_']
   : never
@@ -54,6 +58,10 @@ function isClass(fn: unknown): fn is Constructor {
   }
 
   return false
+}
+
+function isRefineSchema(fn: any): fn is RefineConstructor {
+  return fn.refineSchema
 }
 
 export function resolveSchema(schema: SchemaLike): Schema {
@@ -73,6 +81,10 @@ export function resolveSchema(schema: SchemaLike): Schema {
             ]),
           ),
       } as ObjectSchema
+    }
+
+    if (isRefineSchema(schema)) {
+      return schema.refineSchema
     }
 
     return resolveSchema(schema())

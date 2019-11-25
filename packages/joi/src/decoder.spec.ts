@@ -10,29 +10,28 @@ import {
   Tuple,
 } from '@cogitatio/core'
 import {
-  Default,
   Email,
   Hostname,
   Id64,
   Integer,
   Ip,
-  Max,
-  MaxItems,
-  MaxLength,
-  Min,
-  MinItems,
-  MinLength,
   Port,
-  UniqueItems,
+  refineEmail,
+  refineHostname,
+  refineInteger,
+  refineIp,
+  refinePort,
+  refineUri,
+  refineUuid,
   Uri,
   Uuid,
 } from '@cogitatio/extra'
 import Joi from '@hapi/joi'
-import { JoiDecoder } from '../src'
-import { commonTypesPlugin } from './plugins'
+import { refineId64 } from '../../extra/src/id64'
+import { JoiDecoder, refineBigInt } from '../src'
 
 describe('resolveJoiSchema', () => {
-  const joiDecoder = new JoiDecoder([commonTypesPlugin]) // TODO refactor to plugins.spec.ts
+  const joiDecoder = new JoiDecoder([]) // TODO refactor to plugins.spec.ts
 
   const testCases: Array<{
     name: string
@@ -98,106 +97,44 @@ describe('resolveJoiSchema', () => {
     {
       name: 'bigint',
       resolve: () => BigInt,
-      throws: true,
+      expected: Joi.any().custom(refineBigInt),
     },
     {
       name: 'email',
       resolve: () => Email,
-      expected: Joi.string().email(),
+      expected: Joi.string().custom(refineEmail),
     },
     {
       name: 'uri',
       resolve: () => Uri,
-      expected: Joi.string().uri(),
+      expected: Joi.string().custom(refineUri),
     },
     {
       name: 'integer',
       resolve: () => Integer,
-      expected: Joi.number().integer(),
+      expected: Joi.number().custom(refineInteger),
     },
     {
       name: 'port',
       resolve: () => Port,
       expected: Joi.number()
-        .integer()
-        .port(),
+        .custom(refineInteger)
+        .custom(refinePort),
     },
     {
       name: 'ip',
       resolve: () => Ip,
-      expected: Joi.string().ip(),
+      expected: Joi.string().custom(refineIp),
     },
     {
       name: 'hostname',
       resolve: () => Hostname,
-      expected: Joi.string().hostname(),
+      expected: Joi.string().custom(refineHostname),
     },
     {
       name: 'uuid',
       resolve: () => Uuid,
-      expected: Joi.string().uuid(),
-    },
-    {
-      name: 'min',
-      resolve: () => Min(0)(Number),
-      expected: Joi.number().min(0),
-    },
-    {
-      name: 'min integer',
-      resolve: () => Min(0)(Integer),
-      expected: Joi.number()
-        .integer()
-        .min(0),
-    },
-    {
-      name: 'max',
-      resolve: () => Max(100)(Number),
-      expected: Joi.number().max(100),
-    },
-    {
-      name: 'minLength',
-      resolve: () => MinLength(1)(String),
-      expected: Joi.string().min(1),
-    },
-    {
-      name: 'minLength email',
-      resolve: () => MinLength(1)(Email),
-      expected: Joi.string()
-        .email()
-        .min(1),
-    },
-    {
-      name: 'maxLength',
-      resolve: () => MaxLength(100)(String),
-      expected: Joi.string().max(100),
-    },
-    {
-      name: 'minItems string[]',
-      resolve: () => MinItems(1)(List(String)),
-      expected: Joi.array()
-        .items(Joi.string())
-        .min(1),
-    },
-    {
-      name: 'maxItems string[]',
-      resolve: () => MaxItems(1)(List(String)),
-      expected: Joi.array()
-        .items(Joi.string())
-        .max(1),
-    },
-    {
-      name: 'default',
-      resolve: () => Default('1')(String),
-      expected: Joi.string()
-        .optional()
-        .default('1'),
-    },
-    {
-      name: 'uniqueItems',
-      resolve: () => UniqueItems()(List(String)),
-      expected: Joi.array()
-        .items(Joi.string())
-        .unique(),
+      expected: Joi.string().custom(refineUuid),
     },
     {
       name: 'class',
@@ -208,20 +145,12 @@ describe('resolveJoiSchema', () => {
 
           @Property(Number)
           public num!: number
-
-          @Property(Integer, Default(1), Min(10))
-          public complex!: Integer & Min<10>
         }
         return A
       },
       expected: Joi.object({
         str: Joi.string(),
         num: Joi.number(),
-        complex: Joi.number()
-          .integer()
-          .min(10)
-          .optional()
-          .default(1),
       }),
     },
     {
@@ -238,7 +167,7 @@ describe('resolveJoiSchema', () => {
     {
       name: 'id',
       resolve: () => Id64,
-      expected: Joi.string().regex(/^\d+$/),
+      expected: Joi.string().custom(refineId64),
     },
   ]
 
@@ -250,7 +179,7 @@ describe('resolveJoiSchema', () => {
         ).toThrow()
       } else {
         const result = joiDecoder.resolveJoiSchema(resolveSchema(resolve()))
-        expect(result.describe()).toEqual(expected!.describe())
+        expect(result.describe()).toMatchObject(expected!.describe())
       }
     })
   }

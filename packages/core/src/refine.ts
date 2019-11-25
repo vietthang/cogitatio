@@ -5,18 +5,32 @@ export interface RefineSchema<
   T extends unknown = unknown,
   B extends unknown = unknown
 > extends BaseSchema<T & B> {
-  readonly type: SchemaType.Brand
+  readonly type: SchemaType.Refinement
   readonly childSchema: Schema
-  readonly brand: B
+  readonly refineFunction: (value: T) => T
 }
 
-export function Refine<S extends SchemaLike, B extends unknown = unknown>(
-  childSchema: S,
-  brand: B,
-): RefineSchema<Resolve<S>, B> {
-  return {
-    type: SchemaType.Brand,
-    childSchema: resolveSchema(childSchema),
-    brand,
-  } as RefineSchema<Resolve<S>, B>
+export interface RefineConstructor<T = any, B = any> {
+  (value: T): T & B
+  refineSchema: RefineSchema<T, B>
+}
+
+export function Refine<B extends unknown>() {
+  return <S extends SchemaLike>(
+    childSchema: S,
+    refineFunction: (value: Resolve<S>) => Resolve<S>,
+  ): RefineConstructor<Resolve<S>, B> => {
+    return Object.assign(
+      (value: Resolve<S>) => {
+        return value
+      },
+      {
+        refineSchema: {
+          type: SchemaType.Refinement,
+          childSchema: resolveSchema(childSchema),
+          refineFunction,
+        } as RefineSchema<Resolve<S>, B>,
+      },
+    )
+  }
 }

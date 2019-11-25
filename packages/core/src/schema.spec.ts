@@ -116,13 +116,5 @@ describe('test resolveSchema', () => {
         },
       ],
     })
-    expect(Refine(String, { email: true } as const)).toEqual({
-      type: SchemaType.Brand,
-      brand: { email: true },
-      childSchema: {
-        type: SchemaType.Primitive,
-        native: String,
-      },
-    })
   })
 })

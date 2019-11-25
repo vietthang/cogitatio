@@ -8,7 +8,7 @@ export enum SchemaType {
   Dictionary,
   Tuple,
   Object,
-  Brand,
+  Refinement,
   TaggedUnion,
 }
 

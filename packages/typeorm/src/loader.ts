@@ -71,8 +71,8 @@ async function doLoadGrouped<T>(
       const keys = Object.keys(entry.params)
       const generatedKeys = keys.map(ioId)
       const newSql = `(SELECT ${keys
-        .map((key, j) => `:${generatedKeys[j]} AS ${escape(key)}`)
-        .concat(`:i${i} AS ${escape('__index__')}`)
+        .map((key, j) => `:${generatedKeys[j]}::text AS ${escape(key)}`)
+        .concat(`:i${i}::text AS ${escape('__index__')}`)
         .join(', ')})`
       return [
         frags.concat(newSql),

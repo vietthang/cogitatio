@@ -15,7 +15,7 @@ export class JwtVerifyConfig {
   @Property(String)
   public readonly key!: string
 
-  @Property(List(Enum(JwtAlgorithm)), Default([JwtAlgorithm.HS256]))
+  @Property(Default([JwtAlgorithm.HS256], List(Enum(JwtAlgorithm))))
   public readonly algorithms!: JwtAlgorithm[]
 
   @Property(Optional(List(String)))

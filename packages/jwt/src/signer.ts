@@ -15,7 +15,7 @@ export class JwtSignConfig {
   @Property(String)
   public readonly key!: string
 
-  @Property(Enum(JwtAlgorithm), Default(JwtAlgorithm.HS256))
+  @Property(Default(JwtAlgorithm.HS256, Enum(JwtAlgorithm)))
   public readonly algorithm!: JwtAlgorithm
 
   @Property(Optional(String))

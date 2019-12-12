@@ -1,6 +1,6 @@
 {
   "name": "@cogitatio/joi",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "main": "dist/index.js",
   "types": "dist/packages/joi/src/index.d.ts",
   "scripts": {
@@ -15,7 +15,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@cogitatio/core": "^0.0.7",
+    "@cogitatio/core": "^0.0.8",
     "@hapi/joi": "^16.1.7"
   },
   "files": [

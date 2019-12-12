@@ -61,7 +61,7 @@ export type Integer = Resolve<typeof Integer>
 // @internal
 export const refinePort = joiSchemaToValidator(Joi.number().port())
 
-export const Port = Refine<{ port: true }>()(Integer, refinePort)
+export const Port = Refine<{ port: true }>()(Number, refinePort)
 
 export type Port = Resolve<typeof Port>
 

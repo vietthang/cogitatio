@@ -31,6 +31,11 @@ export function refineBigInt(value: any): BigInt {
   return BigInt(value)
 }
 
+// @internal
+export function refineURL(value: any): URL {
+  return new URL(value)
+}
+
 export type SchemaResolver = (schema: Schema) => Joi.Schema | undefined
 
 export interface IJoiDecoderOptions {
@@ -148,6 +153,8 @@ export class JoiDecoder implements Decoder<unknown> {
           return this.joi.binary()
         case RegExp:
           return this.joi.object().instance(RegExp)
+        case URL:
+          return this.joi.any().custom(refineURL)
         default:
           throw new Error('invalid primitive type')
       }

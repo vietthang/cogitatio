@@ -61,7 +61,7 @@ function isClass(fn: unknown): fn is Constructor {
 }
 
 function isRefineSchema(fn: any): fn is RefineConstructor {
-  return fn.refineSchema
+  return fn.schema !== undefined
 }
 
 export function resolveSchema(schema: SchemaLike): Schema {

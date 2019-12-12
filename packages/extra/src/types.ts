@@ -21,7 +21,7 @@ function joiSchemaToValidator(schema: Joi.Schema): (input: any) => any {
   return input => {
     const { error, value } = schema.validate(input)
     if (error) {
-      return error
+      throw error
     }
     return value
   }
@@ -36,32 +36,17 @@ export const Email = Refine<{ email: true }>()(String, refineEmail)
 
 export type Email = Resolve<typeof Email>
 
-// Uri
-
-// @internal
-export const refineUri = joiSchemaToValidator(Joi.string().uri())
-
-export const Uri = Refine<{ uri: true }>()(String, refineUri)
-
-export type Uri = Resolve<typeof Uri>
-
-// Integer
-
-// @internal
-export const refineInteger = joiSchemaToValidator(Joi.number().integer())
-
-export const Integer = Refine<{
-  integer: true
-}>()(Number, refineInteger)
-
-export type Integer = Resolve<typeof Integer>
-
 // Port
 
 // @internal
-export const refinePort = joiSchemaToValidator(Joi.number().port())
+export const refinePort = (value: bigint) => {
+  if (value < BigInt(0) || value > BigInt(65535)) {
+    throw new Error('invalid port number')
+  }
+  return value
+}
 
-export const Port = Refine<{ port: true }>()(Number, refinePort)
+export const Port = Refine<{ port: true }>()(BigInt, refinePort)
 
 export type Port = Resolve<typeof Port>
 

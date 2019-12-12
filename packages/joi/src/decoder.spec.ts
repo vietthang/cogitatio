@@ -13,17 +13,13 @@ import {
   Email,
   Hostname,
   Id64,
-  Integer,
   Ip,
   Port,
   refineEmail,
   refineHostname,
-  refineInteger,
   refineIp,
   refinePort,
-  refineUri,
   refineUuid,
-  Uri,
   Uuid,
 } from '@cogitatio/extra'
 import Joi from '@hapi/joi'
@@ -105,20 +101,10 @@ describe('resolveJoiSchema', () => {
       expected: Joi.string().custom(refineEmail),
     },
     {
-      name: 'uri',
-      resolve: () => Uri,
-      expected: Joi.string().custom(refineUri),
-    },
-    {
-      name: 'integer',
-      resolve: () => Integer,
-      expected: Joi.number().custom(refineInteger),
-    },
-    {
       name: 'port',
       resolve: () => Port,
-      expected: Joi.number()
-        .custom(refineInteger)
+      expected: Joi.any()
+        .custom(refineBigInt)
         .custom(refinePort),
     },
     {

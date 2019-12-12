@@ -1,6 +1,6 @@
 {
   "name": "@cogitatio/jwt",
-  "version": "0.0.6",
+  "version": "0.0.7-alpha.0",
   "main": "dist/index.js",
   "types": "dist/packages/jwt/src/index.d.ts",
   "scripts": {
@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@cogitatio/core": "^0.0.6",
-    "@cogitatio/extra": "^0.0.6",
+    "@cogitatio/extra": "^0.0.7-alpha.0",
     "jsonwebtoken": "^8.5.1"
   },
   "files": [

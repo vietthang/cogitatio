@@ -43,7 +43,7 @@ export type Resolve<S> = S extends PrimitiveConstructor
   : S extends Constructor<infer T>
   ? T
   : S extends RefineConstructor
-  ? S['refineSchema']['_']
+  ? S['schema']['_']
   : S extends Schema
   ? S['_']
   : never
@@ -84,7 +84,7 @@ export function resolveSchema(schema: SchemaLike): Schema {
     }
 
     if (isRefineSchema(schema)) {
-      return schema.refineSchema
+      return schema.schema
     }
 
     return resolveSchema(schema())

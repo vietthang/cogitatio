@@ -12,7 +12,7 @@ export interface RefineSchema<
 
 export interface RefineConstructor<T = any, B = any> {
   (value: T): T & B
-  refineSchema: RefineSchema<T, B>
+  schema: RefineSchema<T, B>
 }
 
 export function Refine<B extends unknown>() {
@@ -25,7 +25,7 @@ export function Refine<B extends unknown>() {
         return value
       },
       {
-        refineSchema: {
+        schema: {
           type: SchemaType.Refinement,
           childSchema: resolveSchema(childSchema),
           refineFunction,

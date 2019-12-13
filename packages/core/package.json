@@ -6,7 +6,7 @@
   "scripts": {
     "clean": "rimraf ./dist",
     "prebuild": "yarn clean",
-    "build": "tsdx build --tsconfig tsconfig.build.json --entry src/index.ts",
+    "build": "tsdx build --target node --tsconfig tsconfig.build.json --entry src/index.ts",
     "test": "jest"
   },
   "license": "MIT",

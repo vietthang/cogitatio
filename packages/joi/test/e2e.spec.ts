@@ -290,7 +290,7 @@ describe('validate object', () => {
 describe('validate TaggedUnion', () => {
   const decoder: Decoder<unknown> = new JoiDecoder()
 
-  const unionSchema = TaggedUnion('kind', {
+  const unionSchema = TaggedUnion({
     foo: String,
     bar: Number,
   })
@@ -298,20 +298,20 @@ describe('validate TaggedUnion', () => {
 
   assert.throws(() => validate({}))
   assert.throws(() => validate({ foo: 'string', bar: 0 }))
-  assert.throws(() => validate({ kind: 'foo', bar: 0 }))
-  assert.throws(() => validate({ kind: 'foo', foo: 0 }))
-  assert.throws(() => validate({ kind: 'bar', bar: 'bar' }))
+  assert.throws(() => validate({ type: 'foo', bar: 0 }))
+  assert.throws(() => validate({ type: 'foo', foo: 0 }))
+  assert.throws(() => validate({ type: 'bar', bar: 'bar' }))
 
-  expect(validate({ kind: 'foo', foo: 'str' })).toStrictEqual({
-    kind: 'foo',
+  expect(validate({ type: 'foo', foo: 'str' })).toStrictEqual({
+    type: 'foo',
     foo: 'str',
   })
-  expect(validate({ kind: 'bar', bar: 0 })).toStrictEqual({
-    kind: 'bar',
+  expect(validate({ type: 'bar', bar: 0 })).toStrictEqual({
+    type: 'bar',
     bar: 0,
   })
-  expect(validate({ kind: 'bar', bar: '0' })).toStrictEqual({
-    kind: 'bar',
+  expect(validate({ type: 'bar', bar: '0' })).toStrictEqual({
+    type: 'bar',
     bar: 0,
   })
 })

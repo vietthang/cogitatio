@@ -7,7 +7,7 @@ import {
   Resolve,
   SchemaLike,
 } from '@cogitatio/core'
-import { Default, Integer } from '@cogitatio/extra'
+import { Default } from '@cogitatio/extra'
 import jwt from 'jsonwebtoken'
 import { JwtAlgorithm } from './common'
 
@@ -21,8 +21,8 @@ export class JwtVerifyConfig {
   @Property(Optional(List(String)))
   public readonly audience?: string[]
 
-  @Property(Optional(Integer))
-  public readonly clockTolerance?: Integer
+  @Property(Optional(BigInt))
+  public readonly clockTolerance?: bigint
 
   @Property(Optional(List(String)))
   public readonly issuer?: string[]
@@ -51,7 +51,7 @@ export class JwtVerifier<S extends SchemaLike> {
     const decoded = jwt.verify(token, this.config.key, {
       algorithms: this.config.algorithms,
       audience: this.config.audience,
-      clockTolerance: this.config.clockTolerance,
+      clockTolerance: Number(this.config.clockTolerance),
       issuer: this.config.issuer,
       ignoreExpiration: this.config.ignoreExpiration,
       ignoreNotBefore: this.config.ignoreNotBefore,

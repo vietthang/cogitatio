@@ -36,8 +36,6 @@ export type SchemaLike = Thunk<
   Schema | PrimitiveConstructor | RefineConstructor | Constructor
 >
 
-export type ObjectSchemaLike<T> = Thunk<ObjectSchema<T> | Constructor<T>>
-
 export type Resolve<S> = S extends PrimitiveConstructor
   ? ResolvePrimitiveFromConstructor<S>
   : S extends Constructor<infer T>

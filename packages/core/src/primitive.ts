@@ -1,3 +1,4 @@
+import * as Temporal from 'cogitatio-tc39-temporal'
 import { BaseSchema, SchemaType } from './common'
 
 export type PrimitiveConstructor =
@@ -10,6 +11,10 @@ export type PrimitiveConstructor =
   | typeof Buffer
   | typeof RegExp
   | typeof URL
+  | typeof Temporal.Date
+  | typeof Temporal.Time
+  | typeof Temporal.DateTime
+  | typeof Temporal.Duration
 
 export function isPrimitiveConstructor(
   value: any,
@@ -24,6 +29,10 @@ export function isPrimitiveConstructor(
     case Buffer:
     case RegExp:
     case URL:
+    case Temporal.Date:
+    case Temporal.Time:
+    case Temporal.DateTime:
+    case Temporal.Duration:
       return true
     default:
       return false
@@ -57,6 +66,14 @@ export type ResolvePrimitiveFromConstructor<
   ? RegExp
   : C extends typeof URL
   ? URL
+  : C extends typeof Temporal.Date
+  ? Temporal.Date
+  : C extends typeof Temporal.Time
+  ? Temporal.Time
+  : C extends typeof Temporal.DateTime
+  ? Temporal.DateTime
+  : C extends typeof Temporal.Duration
+  ? Temporal.Duration
   : never
 
 export type ResolvePrimitive<
@@ -80,6 +97,14 @@ export type ResolvePrimitive<
     ? RegExp
     : C extends typeof URL
     ? URL
+    : C extends typeof Temporal.Date
+    ? Temporal.Date
+    : C extends typeof Temporal.Time
+    ? Temporal.Time
+    : C extends typeof Temporal.DateTime
+    ? Temporal.DateTime
+    : C extends typeof Temporal.Duration
+    ? Temporal.Duration
     : never
   : never
 
@@ -93,6 +118,10 @@ export type Primitive =
   | Buffer
   | RegExp
   | URL
+  | Temporal.Date
+  | Temporal.Time
+  | Temporal.DateTime
+  | Temporal.Duration
 
 export type ReverseResolvePrimitive<T extends Primitive> = T extends boolean
   ? typeof Boolean
@@ -112,16 +141,12 @@ export type ReverseResolvePrimitive<T extends Primitive> = T extends boolean
   ? typeof RegExp
   : T extends URL
   ? typeof URL
+  : T extends Temporal.Date
+  ? typeof Temporal.Date
+  : T extends Temporal.Time
+  ? typeof Temporal.Time
+  : T extends Temporal.DateTime
+  ? typeof Temporal.DateTime
+  : T extends Temporal.Duration
+  ? typeof Temporal.Duration
   : never
-
-export type PrimitiveDecorator<S extends PrimitiveSchema> = <
-  T extends ResolvePrimitive<S> extends T[Key]
-    ? T[Key] extends ResolvePrimitive<S>
-      ? {}
-      : never
-    : never,
-  Key extends keyof T
->(
-  target: T,
-  key: Key,
-) => void

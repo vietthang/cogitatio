@@ -7,8 +7,7 @@
     "clean": "rimraf ./dist",
     "prebuild": "yarn clean",
     "build": "tsdx build --tsconfig tsconfig.build.json --entry src/index.ts",
-    "test": "jest",
-    "prepublish": "yarn build"
+    "test": "jest"
   },
   "license": "MIT",
   "publishConfig": {
@@ -17,5 +16,9 @@
   "files": [
     "/src",
     "/dist"
-  ]
+  ],
+  "gitHead": "43ae38cd6035e72f15549a261ebd390613c8b56d",
+  "dependencies": {
+    "cogitatio-tc39-temporal": "^1.0.1"
+  }
 }

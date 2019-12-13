@@ -8,6 +8,7 @@ import {
   SchemaType,
 } from '@cogitatio/core'
 import * as Joi from '@hapi/joi'
+import * as Temporal from 'cogitatio-tc39-temporal'
 import { TaggedUnionSchema } from '../../core/src/taggedUnion'
 
 type Transformer<T, U> = (value: T) => U
@@ -34,6 +35,23 @@ export function refineBigInt(value: any): BigInt {
 // @internal
 export function refineURL(value: any): URL {
   return new URL(value)
+}
+
+// @internal
+export function refineTemporalDate(value: any): Temporal.Date {
+  return Temporal.Date.from(value)
+}
+// @internal
+export function refineTemporalTime(value: any): Temporal.Time {
+  return Temporal.Time.from(value)
+}
+// @internal
+export function refineTemporalDateTime(value: any): Temporal.DateTime {
+  return Temporal.DateTime.from(value)
+}
+// @internal
+export function refineTemporalDuration(value: any): Temporal.Duration {
+  return Temporal.Duration.from(value)
 }
 
 export type SchemaResolver = (schema: Schema) => Joi.Schema | undefined
@@ -155,6 +173,14 @@ export class JoiDecoder implements Decoder<unknown> {
           return this.joi.object().instance(RegExp)
         case URL:
           return this.joi.any().custom(refineURL)
+        case Temporal.Date:
+          return this.joi.any().custom(refineTemporalDate)
+        case Temporal.Time:
+          return this.joi.any().custom(refineTemporalTime)
+        case Temporal.DateTime:
+          return this.joi.any().custom(refineTemporalDateTime)
+        case Temporal.Duration:
+          return this.joi.any().custom(refineTemporalDuration)
         default:
           throw new Error('invalid primitive type')
       }
@@ -166,7 +192,7 @@ export class JoiDecoder implements Decoder<unknown> {
       return this.joi.alternatives(
         ...Object.entries(schema.schemaMap).map(([key, childSchema]) => {
           return this.joi.object({
-            [schema.discriminator]: this.joi.any().valid(key),
+            type: this.joi.any().valid(key),
             [key]: this.resolveJoiSchema(
               resolveSchema(childSchema as SchemaLike),
             ),

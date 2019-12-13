@@ -2881,10 +2881,10 @@ codecov@^3.6.1:
     teeny-request "^3.11.3"
     urlgrey "^0.4.4"
 
-cogitatio-tc39-temporal@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/cogitatio-tc39-temporal/-/cogitatio-tc39-temporal-1.0.1.tgz#1ab7ed7647c4e893e2b917784aff2acf84637ad1"
-  integrity sha512-iSXoHnmTRPfbQYz9m0QBenVxVZOuBDziwNI+UHKHupsjy/Dw6rq3OgcM/SlMJTc9TiTbYNev3r/6HNcSU3xRfQ==
+cogitatio-tc39-temporal@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/cogitatio-tc39-temporal/-/cogitatio-tc39-temporal-1.0.2.tgz#8ed77dd13915177f68288fc11d106c1c4b2e2eae"
+  integrity sha512-eK3tf+JFRYN5M+LZChqjNsVoaq+yTI3qZZYMIQv7F6YyQsd0/vOwDDDxgMm1aabTIchCCqYgp1xDP0xmijd1GQ==
   dependencies:
     big-integer "^1.6.48"
     codecov "^3.6.1"

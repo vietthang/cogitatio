@@ -11,6 +11,7 @@ export type PrimitiveConstructor =
   | typeof Buffer
   | typeof RegExp
   | typeof URL
+  | typeof Temporal.Absolute
   | typeof Temporal.Date
   | typeof Temporal.Time
   | typeof Temporal.DateTime
@@ -29,6 +30,7 @@ export function isPrimitiveConstructor(
     case Buffer:
     case RegExp:
     case URL:
+    case Temporal.Absolute:
     case Temporal.Date:
     case Temporal.Time:
     case Temporal.DateTime:
@@ -66,6 +68,8 @@ export type ResolvePrimitiveFromConstructor<
   ? RegExp
   : C extends typeof URL
   ? URL
+  : C extends typeof Temporal.Absolute
+  ? Temporal.Absolute
   : C extends typeof Temporal.Date
   ? Temporal.Date
   : C extends typeof Temporal.Time
@@ -97,6 +101,8 @@ export type ResolvePrimitive<
     ? RegExp
     : C extends typeof URL
     ? URL
+    : C extends typeof Temporal.Absolute
+    ? Temporal.Absolute
     : C extends typeof Temporal.Date
     ? Temporal.Date
     : C extends typeof Temporal.Time
@@ -118,6 +124,7 @@ export type Primitive =
   | Buffer
   | RegExp
   | URL
+  | Temporal.Absolute
   | Temporal.Date
   | Temporal.Time
   | Temporal.DateTime
@@ -141,6 +148,8 @@ export type ReverseResolvePrimitive<T extends Primitive> = T extends boolean
   ? typeof RegExp
   : T extends URL
   ? typeof URL
+  : T extends Temporal.Absolute
+  ? typeof Temporal.Absolute
   : T extends Temporal.Date
   ? typeof Temporal.Date
   : T extends Temporal.Time

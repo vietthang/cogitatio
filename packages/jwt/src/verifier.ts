@@ -8,8 +8,10 @@ import {
   SchemaLike,
 } from '@cogitatio/core'
 import { Default } from '@cogitatio/extra'
+import { Duration } from 'cogitatio-tc39-temporal'
 import jwt from 'jsonwebtoken'
 import { JwtAlgorithm } from './common'
+import { durationToSeconds } from './utils'
 
 export class JwtVerifyConfig {
   @Property(String)
@@ -21,8 +23,8 @@ export class JwtVerifyConfig {
   @Property(Optional(List(String)))
   public readonly audience?: string[]
 
-  @Property(Optional(BigInt))
-  public readonly clockTolerance?: bigint
+  @Property(Optional(Duration))
+  public readonly clockTolerance?: Duration
 
   @Property(Optional(List(String)))
   public readonly issuer?: string[]
@@ -51,7 +53,9 @@ export class JwtVerifier<S extends SchemaLike> {
     const decoded = jwt.verify(token, this.config.key, {
       algorithms: this.config.algorithms,
       audience: this.config.audience,
-      clockTolerance: Number(this.config.clockTolerance),
+      clockTolerance:
+        this.config.clockTolerance &&
+        durationToSeconds(this.config.clockTolerance),
       issuer: this.config.issuer,
       ignoreExpiration: this.config.ignoreExpiration,
       ignoreNotBefore: this.config.ignoreNotBefore,

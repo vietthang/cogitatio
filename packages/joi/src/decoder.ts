@@ -38,6 +38,11 @@ export function refineURL(value: any): URL {
 }
 
 // @internal
+export function refineTemporalAbsolute(value: any): Temporal.Absolute {
+  return Temporal.Absolute.from(value)
+}
+
+// @internal
 export function refineTemporalDate(value: any): Temporal.Date {
   return Temporal.Date.from(value)
 }
@@ -173,6 +178,8 @@ export class JoiDecoder implements Decoder<unknown> {
           return this.joi.object().instance(RegExp)
         case URL:
           return this.joi.any().custom(refineURL)
+        case Temporal.Absolute:
+          return this.joi.any().custom(refineTemporalAbsolute)
         case Temporal.Date:
           return this.joi.any().custom(refineTemporalDate)
         case Temporal.Time:

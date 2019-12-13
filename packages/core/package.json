@@ -17,8 +17,8 @@
     "/src",
     "/dist"
   ],
-  "gitHead": "43ae38cd6035e72f15549a261ebd390613c8b56d",
+  "gitHead": "55d89eb86637153bdb66b00718f3c3749c83990a",
   "dependencies": {
-    "cogitatio-tc39-temporal": "^1.0.1"
+    "cogitatio-tc39-temporal": "^1.0.2"
   }
 }

@@ -7,7 +7,8 @@ import {
   Resolve,
   SchemaLike,
 } from '@cogitatio/core'
-import { Default, Integer } from '@cogitatio/extra'
+import { Default } from '@cogitatio/extra'
+import { Duration } from 'cogitatio-tc39-temporal'
 import jwt from 'jsonwebtoken'
 import { JwtAlgorithm } from './common'
 
@@ -21,11 +22,11 @@ export class JwtSignConfig {
   @Property(Optional(String))
   public readonly keyid?: string
 
-  @Property(Optional(Integer))
-  public readonly expiresIn?: Integer
+  @Property(Optional(Duration))
+  public readonly expiresIn?: Duration
 
-  @Property(Optional(Integer))
-  public readonly notBefore?: Integer
+  @Property(Optional(Duration))
+  public readonly notBefore?: Duration
 
   @Property(Optional(List(String)))
   public readonly audience?: string[]
@@ -63,7 +64,8 @@ export class JwtSigner<S extends SchemaLike> {
       {
         algorithm: this.config.algorithm,
         keyid: this.config.keyid,
-        expiresIn: this.config.notBefore,
+        expiresIn: this.config.expiresIn && this.config.expiresIn.toString(),
+        notBefore: this.config.notBefore && this.config.notBefore.toString(),
         audience: this.config.audience,
         issuer: this.config.issuer,
         jwtid: this.config.jwtid,

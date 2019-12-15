@@ -27,7 +27,7 @@ import { refineId64 } from '../../extra/src/id64'
 import { JoiDecoder, refineBigInt } from '../src'
 
 describe('resolveJoiSchema', () => {
-  const joiDecoder = new JoiDecoder([]) // TODO refactor to plugins.spec.ts
+  const joiDecoder = new JoiDecoder()
 
   const testCases: Array<{
     name: string

@@ -1,13 +1,14 @@
 {
-  "name": "@cogitatio/extra",
-  "version": "0.0.11",
+  "name": "@cogitatio/nestjs-logger",
+  "version": "0.0.1-alpha.13",
   "main": "dist/index.js",
-  "types": "dist/packages/extra/src/index.d.ts",
+  "types": "dist/packages/nestjs-logger/src/index.d.ts",
   "scripts": {
     "clean": "rimraf ./dist",
     "prebuild": "yarn clean",
     "build": "tsdx build --target node --tsconfig tsconfig.build.json --entry src/index.ts",
-    "prepublishOnly": "yarn build"
+    "prepublishOnly": "yarn build",
+    "test": "jest"
   },
   "license": "MIT",
   "publishConfig": {
@@ -18,14 +19,12 @@
     "/dist"
   ],
   "dependencies": {
-    "@hapi/joi": "^16.1.8"
+    "winston": "^3.2.1"
   },
   "peerDependencies": {
-    "google-libphonenumber": "^3.2.6"
+    "@nestjs-utils/common": "0.0.1-alpha.0"
   },
   "devDependencies": {
-    "@types/google-libphonenumber": "^7.4.17",
-    "google-libphonenumber": "^3.2.6"
-  },
-  "gitHead": "55d89eb86637153bdb66b00718f3c3749c83990a"
+    "@nestjs/testing": "^6.10.11"
+  }
 }

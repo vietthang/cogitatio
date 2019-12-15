@@ -1,0 +1,33 @@
+{
+  "name": "@cogitatio/nestjs-rc",
+  "version": "0.0.1-alpha.14",
+  "main": "dist/index.js",
+  "types": "dist/packages/nestjs-rc/src/index.d.ts",
+  "scripts": {
+    "clean": "rimraf ./dist",
+    "prebuild": "yarn clean",
+    "build": "tsdx build --target node --tsconfig tsconfig.build.json --entry src/index.ts",
+    "prepublishOnly": "yarn build"
+  },
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "/src",
+    "/dist"
+  ],
+  "peerDependencies": {
+    "@cogitatio/core": "^0.0.11",
+    "@cogitatio/extra": "^0.0.11",
+    "@nestjs/common": "^6.10.11",
+    "@nestjs/core": "^6.10.11"
+  },
+  "dependencies": {
+    "@cogitatio/nestjs-validation": "^0.0.1-alpha.13",
+    "rc": "^1.2.8"
+  },
+  "devDependencies": {
+    "@types/rc": "^1.1.0"
+  }
+}

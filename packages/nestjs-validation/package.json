@@ -1,8 +1,8 @@
 {
-  "name": "@cogitatio/extra",
-  "version": "0.0.11",
+  "name": "@cogitatio/nestjs-validation",
+  "version": "0.0.1-alpha.13",
   "main": "dist/index.js",
-  "types": "dist/packages/extra/src/index.d.ts",
+  "types": "dist/packages/nestjs-validation/src/index.d.ts",
   "scripts": {
     "clean": "rimraf ./dist",
     "prebuild": "yarn clean",
@@ -17,15 +17,15 @@
     "/src",
     "/dist"
   ],
-  "dependencies": {
-    "@hapi/joi": "^16.1.8"
-  },
   "peerDependencies": {
-    "google-libphonenumber": "^3.2.6"
+    "@cogitatio/core": "^0.0.11",
+    "@cogitatio/extra": "^0.0.11",
+    "@cogitatio/joi": "^0.0.11",
+    "@nestjs/common": "^6.10.11",
+    "@nestjs/core": "^6.10.11"
   },
   "devDependencies": {
-    "@types/google-libphonenumber": "^7.4.17",
-    "google-libphonenumber": "^3.2.6"
-  },
-  "gitHead": "55d89eb86637153bdb66b00718f3c3749c83990a"
+    "@nestjs/common": "^6.10.11",
+    "@nestjs/core": "^6.10.11"
+  }
 }

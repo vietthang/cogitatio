@@ -7,7 +7,7 @@
     "clean": "rimraf ./dist",
     "prebuild": "yarn clean",
     "build": "tsdx build --target node --tsconfig tsconfig.build.json --entry src/index.ts",
-    "prepublish": "yarn build"
+    "prepublishOnly": "yarn build"
   },
   "license": "MIT",
   "publishConfig": {
@@ -22,5 +22,8 @@
     "/src",
     "/dist"
   ],
-  "gitHead": "55d89eb86637153bdb66b00718f3c3749c83990a"
+  "gitHead": "55d89eb86637153bdb66b00718f3c3749c83990a",
+  "devDependencies": {
+    "@types/jsonwebtoken": "^8.3.5"
+  }
 }

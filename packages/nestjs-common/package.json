@@ -1,8 +1,8 @@
 {
-  "name": "@cogitatio/extra",
-  "version": "0.0.11",
+  "name": "@cogitatio/nestjs-common",
+  "version": "0.0.1-alpha.13",
   "main": "dist/index.js",
-  "types": "dist/packages/extra/src/index.d.ts",
+  "types": "dist/packages/nestjs-common/src/index.d.ts",
   "scripts": {
     "clean": "rimraf ./dist",
     "prebuild": "yarn clean",
@@ -17,15 +17,17 @@
     "/src",
     "/dist"
   ],
-  "dependencies": {
-    "@hapi/joi": "^16.1.8"
+  "devDependencies": {
+    "@types/flake-idgen": "^0.1.30",
+    "@types/uuid": "^3.4.6",
+    "uuid": "^3.3.3"
   },
   "peerDependencies": {
-    "google-libphonenumber": "^3.2.6"
+    "uuid": "^3.3.3"
   },
-  "devDependencies": {
-    "@types/google-libphonenumber": "^7.4.17",
-    "google-libphonenumber": "^3.2.6"
-  },
-  "gitHead": "55d89eb86637153bdb66b00718f3c3749c83990a"
+  "dependencies": {
+    "flake-idgen": "^1.1.2",
+    "@cogitatio/core": "^0.0.11",
+    "@cogitatio/extra": "^0.0.11"
+  }
 }

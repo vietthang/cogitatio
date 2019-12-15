@@ -8,7 +8,7 @@
     "prebuild": "yarn clean",
     "build": "tsdx build --target node --tsconfig tsconfig.build.json --entry src/index.ts",
     "test": "jest",
-    "prepublish": "yarn build"
+    "prepublishOnly": "yarn build"
   },
   "license": "MIT",
   "publishConfig": {
@@ -23,7 +23,11 @@
   ],
   "devDependencies": {
     "mysql": "^2.17.1",
-    "pg": "^7.14.0"
+    "pg": "^7.14.0",
+    "typeorm": "^0.2.21"
+  },
+  "peerDependencies": {
+    "typeorm": "^0.2.21"
   },
   "gitHead": "55d89eb86637153bdb66b00718f3c3749c83990a"
 }

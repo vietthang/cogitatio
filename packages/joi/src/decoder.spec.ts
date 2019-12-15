@@ -140,6 +140,29 @@ describe('resolveJoiSchema', () => {
       }),
     },
     {
+      name: 'nested class',
+      resolve: () => {
+        class A {
+          @Property(String)
+          public str!: string
+
+          @Property(Number)
+          public num!: number
+        }
+        class B {
+          @Property(A)
+          public a!: A
+        }
+        return B
+      },
+      expected: Joi.object({
+        a: Joi.object({
+          str: Joi.string(),
+          num: Joi.number(),
+        }),
+      }),
+    },
+    {
       name: 'enum',
       resolve: () => {
         enum Gender {

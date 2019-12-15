@@ -49,5 +49,6 @@
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-uglify": "^6.0.3"
   },
-  "types": "index.d.ts"
+  "types": "index.d.ts",
+  "gitHead": "43351e734f3e5dac4ef7a3d717e0b8280e6ff1c3"
 }

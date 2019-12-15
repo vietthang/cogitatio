@@ -29,5 +29,5 @@
   "peerDependencies": {
     "typeorm": "^0.2.21"
   },
-  "gitHead": "55d89eb86637153bdb66b00718f3c3749c83990a"
+  "gitHead": "43351e734f3e5dac4ef7a3d717e0b8280e6ff1c3"
 }

@@ -7,7 +7,8 @@
     "clean": "rimraf ./dist",
     "prebuild": "yarn clean",
     "build": "tsdx build --target node --tsconfig tsconfig.build.json --entry src/index.ts",
-    "prepublishOnly": "yarn build"
+    "prepublishOnly": "yarn build",
+    "test": "jest"
   },
   "license": "MIT",
   "publishConfig": {
@@ -28,6 +29,7 @@
   "dependencies": {
     "flake-idgen": "^1.1.2",
     "@cogitatio/core": "^0.0.11",
-    "@cogitatio/extra": "^0.0.11"
+    "@cogitatio/extra": "^0.0.11",
+    "@cogitatio/tc39-temporal": "^0.0.11"
   }
 }

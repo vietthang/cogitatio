@@ -14,7 +14,7 @@ const { reporter } = Pretty;
 import Assert from 'assert';
 const { ok: assert, equal, throws } = Assert;
 
-import { Absolute } from 'tc39-temporal';
+import { Absolute } from '@cogitatio/tc39-temporal';
 
 describe('Absolute', () => {
   describe('Structure', () => {
@@ -147,10 +147,7 @@ describe('Absolute', () => {
       equal(Absolute.from('1976-11-18T15:23:30Z').getEpochMilliseconds(), Date.UTC(1976, 10, 18, 15, 23, 30));
     });
     it('1976-11-18T15:23:30.123Z', () => {
-      equal(
-        Absolute.from('1976-11-18T15:23:30.123Z').getEpochMilliseconds(),
-        Date.UTC(1976, 10, 18, 15, 23, 30, 123)
-      );
+      equal(Absolute.from('1976-11-18T15:23:30.123Z').getEpochMilliseconds(), Date.UTC(1976, 10, 18, 15, 23, 30, 123));
     });
     it('1976-11-18T15:23:30.123456Z', () => {
       equal(
@@ -165,19 +162,21 @@ describe('Absolute', () => {
       );
     });
     it('Absolute.from(-1n)', () => {
-      equal(`${ Absolute.from(-1n) }`, '1969-12-31T23:59:59.999999999Z');
+      equal(`${Absolute.from(-1n)}`, '1969-12-31T23:59:59.999999999Z');
     });
     it('Absolute.from({}) throws', () => throws(() => Absolute.from({}), RangeError));
   });
-  describe('Absolute.plus works', ()=>{
-    describe('cross epoch in ms', ()=>{
+  describe('Absolute.plus works', () => {
+    describe('cross epoch in ms', () => {
       const abs = Absolute.from('1969-12-25T12:23:45.678901234Z');
       const one = abs.minus({ days: 10, nanoseconds: 800 });
       const two = abs.plus({ days: 10, nanoseconds: 800 });
       const three = two.minus({ days: 20, nanoseconds: 1600 });
       const four = one.plus({ days: 20, nanoseconds: 1600 });
-      it(`(${abs}).minus({ days: 10, nanoseconds: 800 }) = ${one}`, () => equal(`${one}`, '1969-12-15T12:23:45.678900434Z'));
-      it(`(${abs}).plus({ days: 10, nanoseconds: 800 }) = ${two}`, () => equal(`${two}`, '1970-01-04T12:23:45.678902034Z'));
+      it(`(${abs}).minus({ days: 10, nanoseconds: 800 }) = ${one}`, () =>
+        equal(`${one}`, '1969-12-15T12:23:45.678900434Z'));
+      it(`(${abs}).plus({ days: 10, nanoseconds: 800 }) = ${two}`, () =>
+        equal(`${two}`, '1970-01-04T12:23:45.678902034Z'));
       it(`(${two}).minus({ days: 20, nanoseconds: 1600 }) = ${one}`, () => equal(`${three}`, `${one}`));
       it(`(${one}).plus( days: 20, nanoseconds: 1600 }) = ${two}`, () => equal(`${four}`, `${two}`));
     });

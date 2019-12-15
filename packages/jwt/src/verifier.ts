@@ -8,7 +8,7 @@ import {
   SchemaLike,
 } from '@cogitatio/core'
 import { Default } from '@cogitatio/extra'
-import { Duration } from 'cogitatio-tc39-temporal'
+import { Temporal } from '@cogitatio/tc39-temporal'
 import jwt from 'jsonwebtoken'
 import { JwtAlgorithm } from './common'
 import { durationToSeconds } from './utils'
@@ -23,8 +23,8 @@ export class JwtVerifyConfig {
   @Property(Optional(List(String)))
   public readonly audience?: string[]
 
-  @Property(Optional(Duration))
-  public readonly clockTolerance?: Duration
+  @Property(Optional(Temporal.Duration))
+  public readonly clockTolerance?: Temporal.Duration
 
   @Property(Optional(List(String)))
   public readonly issuer?: string[]

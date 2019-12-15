@@ -7,7 +7,7 @@ const { reporter } = Pretty;
 import { strict as assert } from 'assert';
 const { throws, equal } = assert;
 
-import { Duration } from 'tc39-temporal';
+import { Duration } from '@cogitatio/tc39-temporal';
 
 describe('Duration', () => {
   describe('Construction', () => {
@@ -35,8 +35,9 @@ describe('Duration', () => {
       const from = Duration.from(orig);
       equal(from, orig);
     });
-    it(`Duration.from({ milliseconds: 5 }) == PT0.005S`, () => equal(`${ Duration.from({ milliseconds: 5 }) }`, 'PT0.005S'));
-    it(`Duration.from("P1D") == P1D`, () => equal(`${ Duration.from("P1D") }`, 'P1D'));
+    it(`Duration.from({ milliseconds: 5 }) == PT0.005S`, () =>
+      equal(`${Duration.from({ milliseconds: 5 })}`, 'PT0.005S'));
+    it(`Duration.from("P1D") == P1D`, () => equal(`${Duration.from('P1D')}`, 'P1D'));
     it('Duration.from({}) throws', () => throws(() => Duration.from({}), RangeError));
   });
 });

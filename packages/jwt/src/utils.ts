@@ -1,6 +1,6 @@
-import { Duration } from 'cogitatio-tc39-temporal'
+import { Temporal } from '@cogitatio/tc39-temporal'
 
-export function durationToSeconds(duration: Duration): number {
+export function durationToSeconds(duration: Temporal.Duration): number {
   if (duration.months !== 0 || duration.years !== 0) {
     throw new Error('dont support convert duration with months & years yet')
   }

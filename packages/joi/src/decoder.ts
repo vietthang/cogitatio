@@ -7,8 +7,8 @@ import {
   SchemaLike,
   SchemaType,
 } from '@cogitatio/core'
+import { Temporal } from '@cogitatio/tc39-temporal'
 import * as Joi from '@hapi/joi'
-import * as Temporal from 'cogitatio-tc39-temporal'
 import { TaggedUnionSchema } from '../../core/src/taggedUnion'
 
 type Transformer<T, U> = (value: T) => U
@@ -56,39 +56,25 @@ export function refineTemporalDateTime(value: any): Temporal.DateTime {
 }
 // @internal
 export function refineTemporalDuration(value: any): Temporal.Duration {
+  if (typeof value === 'number') {
+    return Temporal.Duration.from({ milliseconds: value })
+  }
+  // tslint:disable-next-line:valid-typeof
+  if (typeof value === 'bigint') {
+    return Temporal.Duration.from({ milliseconds: value })
+  }
   return Temporal.Duration.from(value)
 }
 
 export type SchemaResolver = (schema: Schema) => Joi.Schema | undefined
 
 export interface IJoiDecoderOptions {
-  joi: typeof Joi
-}
-
-export interface JoiDecoderPlugin {
-  transformJoi?: (j: Joi.Root) => Joi.Root
-  resolveSchema?: (
-    joi: Joi.Root,
-    schema: Schema,
-    resolveJoiSchema: (s: Schema) => Joi.Schema,
-  ) => Joi.Schema | undefined
+  joi?: typeof Joi
 }
 
 export class JoiDecoder implements Decoder<unknown> {
   public readonly resolveJoiSchema = cache(
     (schema: Schema): Joi.Schema => {
-      for (const plugin of this.plugins) {
-        if (plugin.resolveSchema) {
-          const joiSchema = plugin.resolveSchema(
-            this.joi,
-            schema,
-            this.resolveJoiSchema,
-          )
-          if (joiSchema) {
-            return joiSchema
-          }
-        }
-      }
       switch (schema.type) {
         case SchemaType.Any:
           return this.joi.any()
@@ -109,6 +95,7 @@ export class JoiDecoder implements Decoder<unknown> {
           return this.joi
             .array()
             .items(this.resolveJoiSchema(schema.childSchema))
+            .single()
 
         case SchemaType.Dictionary:
           return this.joi
@@ -211,10 +198,8 @@ export class JoiDecoder implements Decoder<unknown> {
 
   private readonly joi: Joi.Root
 
-  constructor(private readonly plugins: JoiDecoderPlugin[] = []) {
-    this.joi = plugins.reduce((joi, plugin) => {
-      return plugin.transformJoi ? plugin.transformJoi(joi) : joi
-    }, Joi)
+  constructor(options: IJoiDecoderOptions = {}) {
+    this.joi = options.joi ?? Joi
   }
 
   public decode<S extends SchemaLike>(schema: S, value: unknown): Resolve<S> {

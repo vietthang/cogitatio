@@ -14,7 +14,7 @@ const { reporter } = Pretty;
 import Assert from 'assert';
 const { ok: assert, equal } = Assert;
 
-import * as Temporal from 'tc39-temporal';
+import * as Temporal from '@cogitatio/tc39-temporal';
 
 describe('Exports', () => {
   const named = Object.keys(Temporal);

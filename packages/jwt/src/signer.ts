@@ -8,7 +8,7 @@ import {
   SchemaLike,
 } from '@cogitatio/core'
 import { Default } from '@cogitatio/extra'
-import { Duration } from 'cogitatio-tc39-temporal'
+import { Temporal } from '@cogitatio/tc39-temporal'
 import jwt from 'jsonwebtoken'
 import { JwtAlgorithm } from './common'
 
@@ -22,11 +22,11 @@ export class JwtSignConfig {
   @Property(Optional(String))
   public readonly keyid?: string
 
-  @Property(Optional(Duration))
-  public readonly expiresIn?: Duration
+  @Property(Optional(Temporal.Duration))
+  public readonly expiresIn?: Temporal.Duration
 
-  @Property(Optional(Duration))
-  public readonly notBefore?: Duration
+  @Property(Optional(Temporal.Duration))
+  public readonly notBefore?: Temporal.Duration
 
   @Property(Optional(List(String)))
   public readonly audience?: string[]

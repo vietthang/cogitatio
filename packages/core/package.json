@@ -20,6 +20,6 @@
   ],
   "gitHead": "55d89eb86637153bdb66b00718f3c3749c83990a",
   "dependencies": {
-    "cogitatio-tc39-temporal": "^1.0.2"
+    "@cogitatio/tc39-temporal": "^0.0.11"
   }
 }

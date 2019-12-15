@@ -201,7 +201,7 @@ function resolvedOptions() {
 function format(datetime, ...rest) {
   const { absolute, formatter } = extractOverrides(datetime, this);
   if (absolute && formatter) {
-    return formatter.format(absolute.getEpochMilliseconds());
+    return formatter.format(Number(absolute.getEpochMilliseconds()));
   }
   if (datetime instanceof Duration) {
     return this[DURATION].format(datetime, ...rest);

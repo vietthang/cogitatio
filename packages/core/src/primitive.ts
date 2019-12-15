@@ -1,4 +1,4 @@
-import * as Temporal from 'cogitatio-tc39-temporal'
+import { Temporal } from '@cogitatio/tc39-temporal'
 import { BaseSchema, SchemaType } from './common'
 
 export type PrimitiveConstructor =

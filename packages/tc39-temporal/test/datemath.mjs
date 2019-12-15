@@ -14,7 +14,7 @@ const { reporter } = Pretty;
 import Assert from 'assert';
 const { ok: assert, equal } = Assert;
 
-import * as Temporal from 'tc39-temporal';
+import * as Temporal from '@cogitatio/tc39-temporal';
 
 describe('Date.difference(simple, simple)', () => {
   build('Before Leap Day', '2020-01-03', '2020-02-15');

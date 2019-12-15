@@ -1,13 +1,13 @@
 {
   "name": "@cogitatio/tc39-temporal",
-  "version": "1.0.3",
+  "version": "0.0.11",
   "description": "TC39 Proposal: Temporal",
   "main": "index.js",
   "scripts": {
     "coverage": "c8 report --reporter html",
-    "test": "node --no-warnings --experimental-modules --icu-data-dir node_modules/full-icu/icudt64l.dat --loader ./test/resolve.source.mjs ./test/all.mjs",
+    "test": "node --no-warnings --experimental-modules --icu-data-dir ../../node_modules/full-icu/icudt63l.dat --loader ./test/resolve.source.mjs ./test/all.mjs",
     "codecov": "npm install codecov && NODE_V8_COVERAGE=coverage/tmp npm run test && c8 report --reporter=text-lcov > coverage/tests.lcov && codecov",
-    "pretty": "prettier --write lib/*.*(m)js test/*.*(m)js",
+    "pretty": "prettier --write src/*.*(m)js test/*.*(m)js",
     "build": "rollup -c rollup.config.js",
     "prepublishOnly": "npm run build"
   },
@@ -32,7 +32,6 @@
   "homepage": "https://github.com/tc39/proposal-temporal#readme",
   "dependencies": {
     "big-integer": "^1.6.48",
-    "codecov": "^3.6.1",
     "es-abstract": "^1.14.2"
   },
   "devDependencies": {
@@ -40,25 +39,15 @@
     "@babel/preset-env": "^7.6.2",
     "@pipobscure/demitasse": "^1.0.10",
     "@pipobscure/demitasse-pretty": "^1.0.10",
-    "@types/big-integer": "0.0.31",
     "c8": "^6.0.1",
+    "codecov": "^3.6.1",
     "core-js": "^3.2.1",
     "full-icu": "^1.3.0",
-    "prettier": "^1.18.2",
     "rollup": "^1.23.1",
     "rollup-plugin-babel": "^4.3.3",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-uglify": "^6.0.3"
-  },
-  "prettier": {
-    "printWidth": 120,
-    "trailingComma": "none",
-    "tabWidth": 2,
-    "semi": true,
-    "singleQuote": true,
-    "bracketSpacing": true,
-    "arrowParens": "always"
   },
   "types": "index.d.ts"
 }

@@ -7,7 +7,7 @@ const { reporter } = Pretty;
 import { strict as assert } from 'assert';
 const { throws, equal } = assert;
 
-import { YearMonth } from 'tc39-temporal';
+import { YearMonth } from '@cogitatio/tc39-temporal';
 
 describe('YearMonth', () => {
   describe('Construction', () => {
@@ -23,7 +23,8 @@ describe('YearMonth', () => {
         equal(`${YearMonth.from('2019-10-01T09:00:00Z')}`, '2019-10'));
       it(`YearMonth.from('1976-11') == (1976-11)`, () => equal(`${YearMonth.from('1976-11')}`, '1976-11'));
       it(`YearMonth.from('1976-11-18') == (1976-11)`, () => equal(`${YearMonth.from('1976-11-18')}`, '1976-11'));
-      it('YearMonth.from({ year: 2019, month: 11 }) == 2019-11', () => equal(`${ YearMonth.from({ year: 2019, month: 11 }) }`, '2019-11'));
+      it('YearMonth.from({ year: 2019, month: 11 }) == 2019-11', () =>
+        equal(`${YearMonth.from({ year: 2019, month: 11 })}`, '2019-11'));
       it('YearMonth.from(2019-11) == 2019-11', () => {
         const orig = new YearMonth(2019, 11);
         const actu = YearMonth.from(orig);

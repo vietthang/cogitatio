@@ -1,6 +1,6 @@
 {
   "name": "@cogitatio/tc39-temporal",
-  "version": "0.0.12-alpha.0",
+  "version": "0.0.12-alpha.1",
   "description": "TC39 Proposal: Temporal",
   "main": "index.js",
   "scripts": {

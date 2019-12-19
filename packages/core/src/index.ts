@@ -20,7 +20,7 @@ export * from './object'
 
 export * from './refine'
 
-export * from './taggedUnion'
+export * from './tagged-union'
 
 export * from './any'
 

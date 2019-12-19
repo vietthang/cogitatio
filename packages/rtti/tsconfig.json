@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "include": ["../../packages/**/*.ts"],
+  "compilerOptions": {
+    "rootDir": "../../",
+    "module": "commonjs",
+    "plugins": [{ "transform": "./src/transformer.ts" }]
+  }
+}

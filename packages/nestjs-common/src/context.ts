@@ -34,3 +34,28 @@ export class Context {
     return new Context(this, { [key]: value })
   }
 }
+
+export type DispatchActionState<T> = T | ((state: T) => T | Promise<T>)
+
+export const contextSymbol = Symbol('Context')
+
+export async function setContext(
+  container: any,
+  dispatch: DispatchActionState<Context>,
+): Promise<void> {
+  if (typeof dispatch !== 'function') {
+    return Object.defineProperty(container, contextSymbol, {
+      enumerable: false,
+      value: dispatch,
+    })
+  }
+  const currentContext = getContext(container)
+  return Object.defineProperty(container, contextSymbol, {
+    enumerable: false,
+    value: await dispatch(currentContext),
+  })
+}
+
+export function getContext(container: any): Context {
+  return container[contextSymbol] || Context.background
+}

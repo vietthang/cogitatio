@@ -9,7 +9,7 @@ import {
 } from '@cogitatio/core'
 import { Temporal } from '@cogitatio/tc39-temporal'
 import * as Joi from '@hapi/joi'
-import { TaggedUnionSchema } from '../../core/src/taggedUnion'
+import { TaggedUnionSchema } from '../../core/src/tagged-union'
 
 type Transformer<T, U> = (value: T) => U
 
@@ -113,7 +113,7 @@ export class JoiDecoder implements Decoder<unknown> {
             )
 
         case SchemaType.Object:
-          return this.resolveObjectSchema(schema.fields())
+          return this.resolveObjectSchema(schema.fields)
 
         case SchemaType.Refinement:
           return this.resolveJoiSchema(schema.childSchema).custom(

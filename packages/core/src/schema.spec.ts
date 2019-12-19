@@ -68,30 +68,30 @@ describe('test resolveSchema', () => {
     }
     const schema = resolveSchema(A)
     expect(schema.type).toEqual(SchemaType.Object)
-    expect((schema as ObjectSchema).fields()).toStrictEqual({
-      str: {
-        type: SchemaType.Primitive,
-        native: String,
-      },
-      num: {
-        type: SchemaType.Primitive,
-        native: Number,
-      },
+    const fields = (schema as ObjectSchema<any>).fields
+    expect(Object.keys(fields)).toEqual(['str', 'num'])
+    expect(resolveSchema(fields.str)).toEqual({
+      type: SchemaType.Primitive,
+      native: String,
+    })
+    expect(resolveSchema(fields.num)).toEqual({
+      type: SchemaType.Primitive,
+      native: Number,
     })
   })
 
   it('should handle raw object dictionary fine', () => {
     const schema = resolveSchema(Record({ num: Number, str: String }))
     expect(schema.type).toStrictEqual(SchemaType.Object)
-    expect((schema as ObjectSchema).fields()).toStrictEqual({
-      str: {
-        type: SchemaType.Primitive,
-        native: String,
-      },
-      num: {
-        type: SchemaType.Primitive,
-        native: Number,
-      },
+    const fields = (schema as ObjectSchema<any>).fields
+    expect(Object.keys(fields)).toEqual(['num', 'str'])
+    expect(resolveSchema(fields.num)).toEqual({
+      type: SchemaType.Primitive,
+      native: Number,
+    })
+    expect(resolveSchema(fields.str)).toEqual({
+      type: SchemaType.Primitive,
+      native: String,
     })
   })
 

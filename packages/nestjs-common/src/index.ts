@@ -1,4 +1,4 @@
-export { Context, TypedKey } from './context'
+export { Context, TypedKey, setContext, getContext } from './context'
 
 export { AppError, formatErrorToJSON } from './error'
 
@@ -18,8 +18,6 @@ export {
 } from './error-util'
 
 export {
-  setContext,
-  getContext,
   ClientIdContextKey,
   ClientId,
   clientIdMiddleware,

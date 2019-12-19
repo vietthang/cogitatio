@@ -1,5 +1,5 @@
 import { AnySchema } from './any'
-import { SchemaType } from './common'
+import { BaseSchema, SchemaType } from './common'
 import { DictionarySchema } from './dictionary'
 import { EnumSchema } from './enum'
 import { ListSchema } from './list'
@@ -14,7 +14,7 @@ import {
   ResolvePrimitiveFromConstructor,
 } from './primitive'
 import { RefineConstructor, RefineSchema } from './refine'
-import { TaggedUnionSchema } from './taggedUnion'
+import { TaggedUnionSchema } from './tagged-union'
 import { TupleSchema } from './tuple'
 
 export type Schema =
@@ -62,23 +62,16 @@ function isRefineSchema(fn: any): fn is RefineConstructor {
   return fn.schema !== undefined
 }
 
-export function resolveSchema(schema: SchemaLike): Schema {
+export function resolveSchema(
+  schema: SchemaLike | Thunk<BaseSchema<any>>,
+): Schema {
   if (isPrimitiveConstructor(schema)) {
     return { type: SchemaType.Primitive, native: schema } as PrimitiveSchema
   }
 
   if (typeof schema === 'function') {
     if (isClass(schema)) {
-      return {
-        type: SchemaType.Object,
-        fields: () =>
-          Object.fromEntries(
-            Object.entries(reflectClass(schema)).map(([key, resolver]) => [
-              key,
-              resolver(),
-            ]),
-          ),
-      } as ObjectSchema
+      return reflectClass(schema)
     }
 
     if (isRefineSchema(schema)) {
@@ -88,5 +81,5 @@ export function resolveSchema(schema: SchemaLike): Schema {
     return resolveSchema(schema())
   }
 
-  return schema
+  return schema as any
 }

@@ -1,0 +1,27 @@
+{
+  "name": "@cogitatio/rtti",
+  "version": "0.0.12-alpha.1",
+  "main": "dist/index.js",
+  "types": "dist/packages/rtti/src/index.d.ts",
+  "scripts": {
+    "clean": "rimraf ./dist",
+    "prebuild": "yarn clean",
+    "build": "tsdx build --target node --tsconfig tsconfig.build.json --entry src/index.ts",
+    "test:TODO": "jest",
+    "prepublishOnly": "yarn build"
+  },
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "/src",
+    "/dist"
+  ],
+  "gitHead": "43351e734f3e5dac4ef7a3d717e0b8280e6ff1c3",
+  "dependencies": {},
+  "devDependencies": {
+    "ttypescript": "^1.5.8",
+    "typescript": "^3.7.3"
+  }
+}

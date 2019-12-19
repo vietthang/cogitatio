@@ -1,4 +1,5 @@
-import { decorateClass } from './metadata'
+import { decorateClass, decorateProperty } from './metadata'
+import { Constructor, ObjectSchema } from './object'
 import { Resolve, resolveSchema, Schema, SchemaLike } from './schema'
 
 export interface SafeDecorator<S extends SchemaLike> {
@@ -25,8 +26,14 @@ export function Property(schema: SchemaLike): SafeDecorator<any> {
 
   return Object.assign(
     <T extends {}>(target: T, key: keyof T) => {
-      decorateClass<T, keyof T>(target.constructor as any, key, resolver)
+      decorateProperty<T, keyof T>(target.constructor as any, key, resolver)
     },
     { schema: resolver },
   )
+}
+
+export function Class<T>(objectSchema: ObjectSchema<T>) {
+  return <TFunction extends Constructor<T>>(target: TFunction) => {
+    decorateClass(target, objectSchema)
+  }
 }

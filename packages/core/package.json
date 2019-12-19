@@ -1,6 +1,6 @@
 {
   "name": "@cogitatio/core",
-  "version": "0.0.12-alpha.1",
+  "version": "0.0.12-alpha.2",
   "main": "dist/index.js",
   "types": "dist/packages/core/src/index.d.ts",
   "scripts": {
@@ -20,6 +20,6 @@
   ],
   "gitHead": "43351e734f3e5dac4ef7a3d717e0b8280e6ff1c3",
   "dependencies": {
-    "@cogitatio/tc39-temporal": "^0.0.12-alpha.1"
+    "@cogitatio/tc39-temporal": "^0.0.12-alpha.2"
   }
 }

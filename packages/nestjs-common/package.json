@@ -1,6 +1,6 @@
 {
   "name": "@cogitatio/nestjs-common",
-  "version": "0.0.12-alpha.1",
+  "version": "0.0.12-alpha.2",
   "main": "dist/index.js",
   "types": "dist/packages/nestjs-common/src/index.d.ts",
   "scripts": {
@@ -27,9 +27,9 @@
     "uuid": "^3.3.3"
   },
   "dependencies": {
-    "@cogitatio/core": "^0.0.12-alpha.1",
-    "@cogitatio/extra": "^0.0.12-alpha.1",
-    "@cogitatio/tc39-temporal": "^0.0.12-alpha.1",
+    "@cogitatio/core": "^0.0.12-alpha.2",
+    "@cogitatio/extra": "^0.0.12-alpha.2",
+    "@cogitatio/tc39-temporal": "^0.0.12-alpha.2",
     "flake-idgen": "^1.1.2"
   },
   "gitHead": "43351e734f3e5dac4ef7a3d717e0b8280e6ff1c3"

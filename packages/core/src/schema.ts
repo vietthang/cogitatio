@@ -1,5 +1,5 @@
 import { AnySchema } from './any'
-import { BaseSchema, SchemaType } from './common'
+import { SchemaType } from './common'
 import { DictionarySchema } from './dictionary'
 import { EnumSchema } from './enum'
 import { ListSchema } from './list'
@@ -16,6 +16,7 @@ import {
 import { RefineConstructor, RefineSchema } from './refine'
 import { TaggedUnionSchema } from './tagged-union'
 import { TupleSchema } from './tuple'
+import { memoized, Transformer } from './utils'
 
 export type Schema =
   | PrimitiveSchema
@@ -51,35 +52,50 @@ function isClass(fn: unknown): fn is Constructor {
     return false
   }
 
-  if (/^class[\s{]/.test(fn.toString())) {
-    return true
-  }
-
-  return false
+  return !!fn.prototype
 }
 
-function isRefineSchema(fn: any): fn is RefineConstructor {
+function isRefineConstructor(fn: any): fn is RefineConstructor<any, any> {
   return fn.schema !== undefined
 }
 
-export function resolveSchema(
-  schema: SchemaLike | Thunk<BaseSchema<any>>,
-): Schema {
-  if (isPrimitiveConstructor(schema)) {
-    return { type: SchemaType.Primitive, native: schema } as PrimitiveSchema
-  }
-
-  if (typeof schema === 'function') {
-    if (isClass(schema)) {
-      return reflectClass(schema)
+export const resolveSchema: Transformer<[SchemaLike], Schema> = memoized(
+  (schema: SchemaLike) => {
+    if (isPrimitiveConstructor(schema)) {
+      return { type: SchemaType.Primitive, native: schema } as PrimitiveSchema
     }
 
-    if (isRefineSchema(schema)) {
-      return schema.schema
+    if (typeof schema === 'function') {
+      if (isClass(schema)) {
+        return reflectClass(schema)
+      }
+
+      if (isRefineConstructor(schema)) {
+        return schema.schema
+      }
+
+      return resolveSchema(schema())
     }
 
-    return resolveSchema(schema())
-  }
+    return schema
+  },
+  schema => {
+    if (isPrimitiveConstructor(schema)) {
+      return schema
+    }
 
-  return schema as any
-}
+    if (typeof schema === 'function') {
+      if (isClass(schema)) {
+        return schema
+      }
+
+      if (isRefineConstructor(schema)) {
+        return schema.schema
+      }
+
+      return schema()
+    }
+
+    return schema
+  },
+)

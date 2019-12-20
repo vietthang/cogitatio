@@ -1,4 +1,5 @@
 // tslint:disable:no-bitwise
+import * as path from 'path'
 import * as ts from 'typescript'
 import {
   EnumValue,
@@ -584,41 +585,72 @@ export default function transformer<T extends ts.Node>(
 
   return context => {
     const visit: ts.Visitor = node => {
-      if (ts.isDecorator(node) && ts.isClassDeclaration(node.parent)) {
-        const decoratorExpr = node.expression
+      // filter to get decorator node
+      if (!ts.isDecorator(node)) {
+        return ts.visitEachChild(node, child => visit(child), context)
+      }
 
-        if (
-          ts.isIdentifier(decoratorExpr) &&
-          decoratorExpr.getText() === 'GenerateClassRtti'
-        ) {
-          const classType = typeChecker.getTypeAtLocation(node.parent)
+      // filter only class decorator
+      if (!ts.isClassDeclaration(node.parent)) {
+        return ts.visitEachChild(node, child => visit(child), context)
+      }
 
-          return ts.createDecorator(
+      // filter to decorator that is identifier
+      const decoratorExpr = node.expression
+      if (!ts.isIdentifier(decoratorExpr)) {
+        return ts.visitEachChild(node, child => visit(child), context)
+      }
+
+      const decoratorExprSymbol = typeChecker.getSymbolAtLocation(decoratorExpr)
+      if (!decoratorExprSymbol) {
+        throw new Error('decorator symbol not found?')
+      }
+
+      // the following step filter only identifier with original symbol in './decorators.ts' file & is exported
+      // variable named "GenerateClassRtti"
+      const originalSymbol = typeChecker.getAliasedSymbol(decoratorExprSymbol)
+      if (originalSymbol.getName() !== 'GenerateClassRtti') {
+        return ts.visitEachChild(node, child => visit(child), context)
+      }
+
+      const variableDeclaration = originalSymbol
+        .getDeclarations()
+        ?.find(d => ts.isVariableDeclaration(d)) as
+        | ts.VariableDeclaration
+        | undefined
+      if (!variableDeclaration) {
+        return ts.visitEachChild(node, child => visit(child), context)
+      }
+
+      const sourceFile = variableDeclaration.getSourceFile()
+      if (path.resolve(__dirname, './decorators.ts') !== sourceFile.fileName) {
+        return ts.visitEachChild(node, child => visit(child), context)
+      }
+
+      const classType = typeChecker.getTypeAtLocation(node.parent)
+
+      return ts.createDecorator(
+        ts.createCall(
+          ts.createPropertyAccess(
+            ts.createCall(ts.createIdentifier('require'), undefined, [
+              ts.createLiteral('@cogitatio/rtti'),
+            ]),
+            'ClassRtti',
+          ),
+          undefined,
+          [
             ts.createCall(
-              ts.createPropertyAccess(
-                ts.createCall(ts.createIdentifier('require'), undefined, [
-                  ts.createLiteral('@cogitatio/rtti'),
-                ]),
-                'ClassRtti',
-              ),
+              ts.createPropertyAccess(ts.createIdentifier('JSON'), 'parse'),
               undefined,
               [
-                ts.createCall(
-                  ts.createPropertyAccess(ts.createIdentifier('JSON'), 'parse'),
-                  undefined,
-                  [
-                    ts.createLiteral(
-                      JSON.stringify(resolveType(typeChecker, classType)),
-                    ),
-                  ],
+                ts.createLiteral(
+                  JSON.stringify(resolveType(typeChecker, classType)),
                 ),
               ],
             ),
-          )
-        }
-      }
-
-      return ts.visitEachChild(node, child => visit(child), context)
+          ],
+        ),
+      )
     }
 
     return node => ts.visitNode(node, visit)

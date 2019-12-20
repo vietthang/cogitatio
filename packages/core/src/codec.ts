@@ -11,3 +11,16 @@ export interface Decoder<I extends unknown> {
 export interface Codec<I extends unknown, O extends unknown>
   extends Encoder<O>,
     Decoder<I> {}
+
+export function composeDecoder<I>(
+  baseDecoder: Decoder<I>,
+  ...others: Array<Decoder<unknown>>
+): Decoder<I> {
+  return {
+    decode: <S extends SchemaLike>(schema: S, value: I): Resolve<S> => {
+      return others.reduce((prev, decoder) => {
+        return decoder.decode(schema, prev)
+      }, baseDecoder.decode(schema, value))
+    },
+  }
+}

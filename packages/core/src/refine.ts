@@ -1,36 +1,36 @@
 import { BaseSchema, SchemaType } from './common'
 import { Resolve, resolveSchema, Schema, SchemaLike } from './schema'
 
-export interface RefineSchema<
-  T extends unknown = unknown,
-  B extends unknown = unknown
-> extends BaseSchema<T & B> {
+export interface RefineSchema<I = any, O = any> extends BaseSchema<I> {
   readonly type: SchemaType.Refinement
-  readonly childSchema: Schema
-  readonly refineFunction: (value: T) => T
+  readonly baseSchema: Schema
+  encode: (value: I) => O
+  decode: (value: O) => I
 }
 
-export interface RefineConstructor<T = any, B = any> {
-  (value: T): T & B
-  schema: RefineSchema<T, B>
+export interface RefineConstructor<I = any, O = any> {
+  (value: O): I
+  schema: RefineSchema<I, O>
 }
 
-export function Refine<B extends unknown>() {
-  return <S extends SchemaLike>(
-    childSchema: S,
-    refineFunction: (value: Resolve<S>) => Resolve<S>,
-  ): RefineConstructor<Resolve<S>, B> => {
-    return Object.assign(
-      (value: Resolve<S>) => {
-        return value
-      },
-      {
-        schema: {
-          type: SchemaType.Refinement,
-          childSchema: resolveSchema(childSchema),
-          refineFunction,
-        } as RefineSchema<Resolve<S>, B>,
-      },
-    )
-  }
+export function Refine<I, S extends SchemaLike>(
+  baseSchema: S,
+  encode: (value: I) => Resolve<S>,
+  decode: (value: Resolve<S>) => I,
+): RefineConstructor<I, Resolve<S>> {
+  type O = Resolve<S>
+
+  return Object.assign(
+    (value: O) => {
+      return decode(value)
+    },
+    {
+      schema: {
+        type: SchemaType.Refinement,
+        baseSchema: resolveSchema(baseSchema),
+        encode,
+        decode,
+      } as RefineSchema<I, O>,
+    },
+  )
 }

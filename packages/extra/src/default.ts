@@ -1,13 +1,23 @@
-import { Refine, RefineConstructor, Resolve, SchemaLike } from '@cogitatio/core'
+import {
+  Optional,
+  Refine,
+  RefineConstructor,
+  Resolve,
+  SchemaLike,
+} from '@cogitatio/core'
 
 export function Default<S extends SchemaLike>(
-  value: Resolve<S>,
+  defaultValue: Resolve<S>,
   schema: S,
-): RefineConstructor<Resolve<S>, unknown> {
-  return Refine<unknown>()(schema, v => {
-    if (v === undefined) {
-      return value
-    }
-    return v
-  })
+): RefineConstructor<Resolve<S>, Resolve<S> | undefined> {
+  return Refine<Resolve<S>, any>(
+    Optional(schema),
+    v => v,
+    v => {
+      if (v === undefined) {
+        return defaultValue
+      }
+      return v
+    },
+  )
 }

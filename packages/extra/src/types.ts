@@ -17,6 +17,10 @@ import {
 } from '@cogitatio/core'
 import * as Joi from '@hapi/joi'
 
+function identity<T>(value: T) {
+  return value
+}
+
 function joiSchemaToValidator(schema: Joi.Schema): (input: any) => any {
   return input => {
     const { error, value } = schema.validate(input)
@@ -32,9 +36,9 @@ function joiSchemaToValidator(schema: Joi.Schema): (input: any) => any {
 // @internal
 export const refineEmail = joiSchemaToValidator(Joi.string().email())
 
-export const Email = Refine<{ email: true }>()(String, refineEmail)
+export type Email = string & { email: true }
 
-export type Email = Resolve<typeof Email>
+export const Email = Refine<Email, typeof String>(String, identity, refineEmail)
 
 // Port
 
@@ -46,33 +50,41 @@ export const refinePort = (value: bigint) => {
   return value
 }
 
-export const Port = Refine<{ port: true }>()(BigInt, refinePort)
+export type Port = bigint & { port: true }
 
-export type Port = Resolve<typeof Port>
+export const Port = Refine<Port, typeof BigInt>(
+  BigInt,
+  identity,
+  refinePort as any,
+)
 
 // Ip
 
 // @internal
 export const refineIp = joiSchemaToValidator(Joi.string().ip())
 
-export const Ip = Refine<{ ip: true }>()(String, refineIp)
+export type Ip = string & { ip: true }
 
-export type Ip = Resolve<typeof Ip>
+export const Ip = Refine<Ip, typeof String>(String, identity, refineIp)
 
 // Hostname
 
 // @internal
 export const refineHostname = joiSchemaToValidator(Joi.string().hostname())
 
-export const Hostname = Refine<{ hostname: true }>()(String, refineHostname)
+export type Hostname = string & { hostname: true }
 
-export type Hostname = Resolve<typeof Hostname>
+export const Hostname = Refine<Hostname, typeof String>(
+  String,
+  identity,
+  refineHostname,
+)
 
 // Uuid
 
 // @internal
 export const refineUuid = joiSchemaToValidator(Joi.string().uuid())
 
-export const Uuid = Refine<{ uuid: true }>()(String, refineUuid)
+export type Uuid = string & { uuid: true }
 
-export type Uuid = Resolve<typeof Uuid>
+export const Uuid = Refine<Uuid, typeof String>(String, identity, refineUuid)

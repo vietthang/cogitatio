@@ -116,9 +116,7 @@ export class JoiDecoder implements Decoder<unknown> {
           return this.resolveObjectSchema(schema.fields)
 
         case SchemaType.Refinement:
-          return this.resolveJoiSchema(schema.childSchema).custom(
-            schema.refineFunction,
-          )
+          return this.resolveJoiSchema(schema.baseSchema).custom(schema.decode)
 
         case SchemaType.TaggedUnion:
           return this.resolveTaggedUnionSchema(schema)

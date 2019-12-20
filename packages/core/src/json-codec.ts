@@ -78,7 +78,7 @@ export class JsonCodec implements Codec<JsonValue, JsonValue> {
         )
 
       case SchemaType.Refinement:
-        return this.encode(schema.childSchema, value)
+        return schema.encode(this.encode(schema.baseSchema, value))
 
       case SchemaType.TaggedUnion:
         return {
@@ -137,6 +137,9 @@ export class JsonCodec implements Codec<JsonValue, JsonValue> {
         if (!value) {
           throw new Error('invalid value for Dictionary')
         }
+        if (Array.isArray(value)) {
+          throw new Error('invalid value for Dictionary')
+        }
         return mapIndexed(value, element =>
           this.decode(schema.childSchema, element),
         )
@@ -170,9 +173,7 @@ export class JsonCodec implements Codec<JsonValue, JsonValue> {
         )
 
       case SchemaType.Refinement:
-        return schema.refineFunction(
-          this.decode(schema.childSchema, value),
-        ) as any
+        return schema.decode(this.decode(schema.baseSchema, value))
 
       case SchemaType.TaggedUnion: {
         switch (typeof value) {
@@ -271,8 +272,13 @@ export class JsonCodec implements Codec<JsonValue, JsonValue> {
         switch (typeof value) {
           case 'boolean':
           case 'bigint':
-          case 'string':
-            return Number(value)
+          case 'string': {
+            const numberValue = Number(value)
+            if (isNaN(numberValue)) {
+              throw new Error('invalid value for number')
+            }
+            return numberValue
+          }
           case 'number':
             return value
         }
@@ -304,12 +310,13 @@ export class JsonCodec implements Codec<JsonValue, JsonValue> {
         switch (typeof value) {
           case 'number':
           case 'bigint':
-          case 'string':
-            return new Date(value)
-        }
-
-        if (value instanceof Date) {
-          return value
+          case 'string': {
+            const dateValue = new Date(value)
+            if (isNaN(dateValue.getTime())) {
+              throw new Error('invalid value for Date')
+            }
+            return dateValue
+          }
         }
 
         throw new Error('invalid value for Date')

@@ -1,26 +1,13 @@
-import {
-  Constructor,
-  DictionarySchema,
-  EnumSchema,
-  ListSchema,
-  NullableSchema,
-  ObjectSchema,
-  OptionalSchema,
-  PrimitiveConstructor,
-  PrimitiveSchema,
-  Refine,
-  RefineSchema,
-  Resolve,
-  SchemaLike,
-  TaggedUnionSchema,
-  TupleSchema,
-} from '@cogitatio/core'
+import { Refine } from '@cogitatio/core'
 
-export const PhoneNumber = Refine<{ phoneNumber: true }>()(String, input => {
-  const libphonenumber: typeof import('google-libphonenumber') = require('google-libphonenumber')
-  const pnUtil = libphonenumber.PhoneNumberUtil.getInstance()
-  const phoneNumber = pnUtil.parseAndKeepRawInput(input)
-  return phoneNumber.getRawInput()!
-})
+export type PhoneNumber = import('google-libphonenumber').PhoneNumber
 
-export type PhoneNumber = Resolve<typeof PhoneNumber>
+export const PhoneNumber = Refine<PhoneNumber, typeof String>(
+  String,
+  value => value.getRawInputOrDefault(),
+  input => {
+    const libphonenumber: typeof import('google-libphonenumber') = require('google-libphonenumber')
+    const pnUtil = libphonenumber.PhoneNumberUtil.getInstance()
+    return pnUtil.parseAndKeepRawInput(input)
+  },
+)

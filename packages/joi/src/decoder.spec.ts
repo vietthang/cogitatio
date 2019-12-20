@@ -23,7 +23,6 @@ import {
   Uuid,
 } from '@cogitatio/extra'
 import Joi from '@hapi/joi'
-import { refineId64 } from '../../extra/src/id64'
 import { JoiDecoder, refineBigInt } from '../src'
 
 describe('resolveJoiSchema', () => {
@@ -172,11 +171,6 @@ describe('resolveJoiSchema', () => {
         return Enum(Gender)
       },
       expected: Joi.valid('Male', 'Female'),
-    },
-    {
-      name: 'id',
-      resolve: () => Id64,
-      expected: Joi.string().custom(refineId64),
     },
   ]
 

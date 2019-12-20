@@ -12,86 +12,6 @@ import {
   UnsupportedType,
 } from './types'
 
-function getPropertyType(
-  typeChecker: ts.TypeChecker,
-  type: ts.ObjectType,
-  name: string,
-): ts.Type | undefined {
-  const propertySymbol = type.getProperty(name)
-  if (!propertySymbol) {
-    return undefined
-  }
-  const declarations = propertySymbol.getDeclarations()
-  if (!declarations) {
-    return undefined
-  }
-
-  const propertyDeclaration = declarations.find(c =>
-    ts.isPropertyDeclaration(c),
-  ) as ts.PropertyDeclaration | undefined
-  if (propertyDeclaration) {
-    if (!propertyDeclaration.type) {
-      throw new Error('missing type in property declaration')
-    }
-    return typeChecker.getTypeFromTypeNode(propertyDeclaration.type)
-  }
-
-  const methodDeclaration = declarations.find(c =>
-    ts.isMethodDeclaration(c),
-  ) as ts.MethodDeclaration | undefined
-  if (methodDeclaration) {
-    if (!methodDeclaration.type) {
-      throw new Error('missing type in property declaration')
-    }
-    return typeChecker.getTypeFromTypeNode(methodDeclaration.type)
-  }
-
-  throw new Error(`can not resolve type for property "${name}"`)
-}
-
-function isArrayLikeType(
-  typeChecker: ts.TypeChecker,
-  type: ts.InterfaceType,
-): boolean {
-  const typeParameters = type.typeParameters
-  if (!typeParameters || typeParameters.length !== 1) {
-    return false
-  }
-
-  const elementType = typeParameters[0]
-  if (type.getNumberIndexType() !== elementType) {
-    return false
-  }
-
-  const lengthType = getPropertyType(typeChecker, type, 'length')
-  if (!lengthType) {
-    return false
-  }
-
-  return (type.getFlags() & ts.TypeFlags.Number) !== 0
-}
-
-function isPromiseLikeType(
-  typeChecker: ts.TypeChecker,
-  type: ts.InterfaceType,
-): boolean {
-  const typeParameters = type.typeParameters
-  if (!typeParameters || typeParameters.length !== 1) {
-    return false
-  }
-
-  const resolveType = typeParameters[0]
-
-  const thenType = getPropertyType(typeChecker, type, 'then')
-  if (!thenType) {
-    return false
-  }
-
-  const signatures = thenType.getCallSignatures()
-
-  return signatures.some(signature => signature.getReturnType() === resolveType)
-}
-
 // borrow from ts-morph
 function isEnum(type: ts.Type): boolean {
   const flags = type.getFlags()
@@ -118,6 +38,60 @@ function isEnum(type: ts.Type): boolean {
   return !!declarations.find(d => ts.isEnumDeclaration(d))
 }
 
+// TODO
+// there should be better approach, currently we check if the symbol is in default lib of @types/node only
+function checkAndGetGlobalName(
+  program: ts.Program,
+  type: ts.Type,
+): string | false {
+  const typeSymbol = type.getSymbol()
+  if (!typeSymbol) {
+    return false
+  }
+  const fqn = typeSymbol
+    ? program.getTypeChecker().getFullyQualifiedName(typeSymbol)
+    : undefined
+  if (!fqn) {
+    return false
+  }
+  const declarations = typeSymbol.getDeclarations()
+  if (!declarations) {
+    return false
+  }
+
+  const isDefaultLibOrNodeJsLibrary = (sourceFile: ts.SourceFile): boolean => {
+    if (program.isSourceFileDefaultLibrary(sourceFile)) {
+      return true
+    }
+    if (!program.isSourceFileFromExternalLibrary(sourceFile)) {
+      return false
+    }
+    return sourceFile.fileName.includes('@types/node')
+  }
+
+  const interfaceOrClassDeclarations = declarations.filter(declaration => {
+    const sourceFile = declaration.getSourceFile()
+    if (!isDefaultLibOrNodeJsLibrary(sourceFile)) {
+      return false
+    }
+
+    return (
+      ts.isInterfaceDeclaration(declaration) ||
+      ts.isClassDeclaration(declaration) ||
+      ts.isTypeAliasDeclaration(declaration)
+    )
+  }) as Array<
+    ts.InterfaceDeclaration | ts.ClassDeclaration | ts.TypeAliasDeclaration
+  >
+
+  if (!interfaceOrClassDeclarations.some(d => d.name)) {
+    return false
+  }
+
+  const declaration = interfaceOrClassDeclarations.find(d => d.name)!
+  return declaration.name!.getText()
+}
+
 function isTuple(
   type: ts.InterfaceType & { target?: ts.TypeReference },
 ): type is ts.TupleType {
@@ -128,10 +102,7 @@ function isTuple(
   return (targetType.objectFlags & ts.ObjectFlags.Tuple) !== 0
 }
 
-function resolveEnumValues(
-  typeChecker: ts.TypeChecker,
-  type: ts.Type,
-): EnumValue[] {
+function resolveEnumValues(program: ts.Program, type: ts.Type): EnumValue[] {
   const typeSymbol = type.getSymbol()
   if (!typeSymbol) {
     return []
@@ -152,50 +123,36 @@ function resolveEnumValues(
   return enumDeclaration.members.map(member => {
     return {
       name: member.name.getText(),
-      value: typeChecker.getConstantValue(member),
+      value: program.getTypeChecker().getConstantValue(member),
     }
   })
 }
 
 function resolveSignature(
-  typeChecker: ts.TypeChecker,
+  program: ts.Program,
   signature: ts.Signature,
 ): Signature {
   return {
     params: signature.getParameters().map(param => {
       const declarations = param.getDeclarations()
-      if (!declarations) {
+      if (!declarations || !declarations.length) {
         throw new Error(`missing declarations for param ${param.getName()}`)
-      }
-
-      const parameterDeclaration = declarations.find(d => ts.isParameter(d)) as
-        | ts.ParameterDeclaration
-        | undefined
-      if (!parameterDeclaration) {
-        throw new Error(
-          `missing parameter declaration for param ${param.getName()}`,
-        )
-      }
-
-      const parameterType = parameterDeclaration.type
-      if (!parameterType) {
-        throw new Error(
-          `missing type for parameter declaration for param ${param.getName()}`,
-        )
       }
 
       return {
         name: param.getName(),
         type: resolveType(
-          typeChecker,
-          typeChecker.getTypeFromTypeNode(parameterType),
+          program,
+          program
+            .getTypeChecker()
+            .getTypeOfSymbolAtLocation(param, declarations[0]),
         ),
       }
     }),
     typeParameters: signature
       .getTypeParameters()
-      ?.map(param => resolveType(typeChecker, param)),
-    returnType: resolveType(typeChecker, signature.getReturnType()),
+      ?.map(param => resolveType(program, param)),
+    returnType: resolveType(program, signature.getReturnType()),
   }
 }
 
@@ -218,11 +175,11 @@ function resolveModifierFlagsToScope(
 }
 
 function resolveProperty(
-  typeChecker: ts.TypeChecker,
+  program: ts.Program,
   propertySymbol: ts.Symbol,
 ): ObjectProperty {
   const declarations = propertySymbol.getDeclarations()
-  if (!declarations) {
+  if (!declarations || !declarations.length) {
     throw new Error(
       `missing declarations for param ${propertySymbol.getName()}`,
     )
@@ -243,33 +200,36 @@ function resolveProperty(
       (propertySymbol.flags & ts.SymbolFlags.Optional) !== ts.SymbolFlags.None,
     scope: resolveModifierFlagsToScope(modifierFlags),
     type: resolveType(
-      typeChecker,
-      typeChecker.getTypeOfSymbolAtLocation(propertySymbol, declarations[0]),
+      program,
+      program
+        .getTypeChecker()
+        .getTypeOfSymbolAtLocation(propertySymbol, declarations[0]),
     ),
   }
 }
 
 function resolveTypeArguments(
-  typeChecker: ts.TypeChecker,
+  program: ts.Program,
   type: ts.Type,
 ): RuntimeType[] {
-  return typeChecker
+  return program
+    .getTypeChecker()
     .getTypeArguments(type as ts.TypeReference)
-    .map(t => resolveType(typeChecker, t))
+    .map(t => resolveType(program, t))
 }
 
 function resolveTypeParameters(
-  typeChecker: ts.TypeChecker,
+  program: ts.Program,
   type: ts.Type & { typeParameters?: ts.Type[] },
 ): RuntimeType[] {
   if (!type.typeParameters) {
     return []
   }
-  return type.typeParameters.map(t => resolveType(typeChecker, t))
+  return type.typeParameters.map(t => resolveType(program, t))
 }
 
 function resolveObjectType(
-  typeChecker: ts.TypeChecker,
+  program: ts.Program,
   type: ts.InterfaceType,
   fqn?: string,
 ): ObjectType | UnsupportedType {
@@ -281,131 +241,43 @@ function resolveObjectType(
     fqn,
     callSignatures: type
       .getCallSignatures()
-      .map(signature => resolveSignature(typeChecker, signature)),
+      .map(signature => resolveSignature(program, signature)),
     constructSignatures: type
       .getConstructSignatures()
-      .map(signature => resolveSignature(typeChecker, signature)),
+      .map(signature => resolveSignature(program, signature)),
     properties: type
       .getProperties()
-      .map(propertySymbol => resolveProperty(typeChecker, propertySymbol)),
+      .map(propertySymbol => resolveProperty(program, propertySymbol)),
     numberIndexType:
-      tsNumberIndexType && resolveType(typeChecker, tsNumberIndexType),
+      tsNumberIndexType && resolveType(program, tsNumberIndexType),
     stringIndexType:
-      tsStringIndexType && resolveType(typeChecker, tsStringIndexType),
-    typeParameters: resolveTypeParameters(typeChecker, type),
-    typeArguments: resolveTypeParameters(typeChecker, type),
+      tsStringIndexType && resolveType(program, tsStringIndexType),
+    typeParameters: resolveTypeParameters(program, type),
+    typeArguments: resolveTypeParameters(program, type),
   }
 }
 
-function resolveType(typeChecker: ts.TypeChecker, type: ts.Type): RuntimeType {
+function resolveType(program: ts.Program, type: ts.Type): RuntimeType {
+  const typeChecker = program.getTypeChecker()
   const typeSymbol = type.getSymbol()
   const fqn = typeSymbol
     ? typeChecker.getFullyQualifiedName(typeSymbol)
     : undefined
 
-  switch (fqn) {
-    case 'Date':
-    case 'Buffer':
-    case 'URL':
-    case 'RegExp':
-    case 'ArrayBuffer':
-    case 'Int8Array':
-    case 'Uint8Array':
-    case 'Uint8ClampedArray':
-    case 'Int16Array':
-    case 'Uint16Array':
-    case 'Int32Array':
-    case 'Uint32Array':
-    case 'Float32Array':
-    case 'Float64Array':
-    case 'BigInt64Array':
-    case 'BigUint64Array':
-      return { kind: Kind.Wellknown, fqn }
-
-    case 'Array':
-    case 'ReadonlyArray': {
-      const typeArguments = typeChecker.getTypeArguments(
-        type as ts.TypeReference,
-      )
-      return {
-        kind: Kind.Array,
-        fqn,
-        elementType: resolveType(typeChecker, typeArguments[0]),
-      }
-    }
-
-    case 'Map':
-    case 'ReadonlyMap': {
-      return {
-        kind: Kind.Wellknown,
-        fqn: 'Map',
-        typeArguments: resolveTypeArguments(typeChecker, type),
-        typeParameters: resolveTypeParameters(typeChecker, type),
-      }
-    }
-
-    case 'Set':
-    case 'ReadonlySet': {
-      return {
-        kind: Kind.Wellknown,
-        fqn: 'Set',
-        typeArguments: resolveTypeArguments(typeChecker, type),
-        typeParameters: resolveTypeParameters(typeChecker, type),
-      }
-    }
-
-    case 'WeakMap':
-    case 'ReadonlyWeakMap': {
-      return {
-        kind: Kind.Wellknown,
-        fqn: 'WeakMap',
-        typeArguments: resolveTypeArguments(typeChecker, type),
-        typeParameters: resolveTypeParameters(typeChecker, type),
-      }
-    }
-
-    case 'WeakSet':
-    case 'ReadonlyWeakSet': {
-      return {
-        kind: Kind.Wellknown,
-        fqn: 'WeakSet',
-        typeArguments: resolveTypeArguments(typeChecker, type),
-        typeParameters: resolveTypeParameters(typeChecker, type),
-      }
-    }
-
-    case 'Promise': {
-      return {
-        kind: Kind.Wellknown,
-        fqn: 'Promise',
-        typeArguments: resolveTypeArguments(typeChecker, type),
-        typeParameters: resolveTypeParameters(typeChecker, type),
-      }
-    }
-
-    case 'Iterator': {
-      return {
-        kind: Kind.Wellknown,
-        fqn: 'Iterator',
-        typeArguments: resolveTypeArguments(typeChecker, type),
-        typeParameters: resolveTypeParameters(typeChecker, type),
-      }
-    }
-
-    case 'AsyncIterator': {
-      return {
-        kind: Kind.Wellknown,
-        fqn: 'AsyncIterator',
-        typeArguments: resolveTypeArguments(typeChecker, type),
-        typeParameters: resolveTypeParameters(typeChecker, type),
-      }
+  const globalName = checkAndGetGlobalName(program, type)
+  if (globalName) {
+    return {
+      kind: Kind.Wellknown,
+      fqn: globalName,
+      typeArguments: resolveTypeArguments(program, type),
+      typeParameters: resolveTypeParameters(program, type),
     }
   }
 
   if (isEnum(type)) {
     return {
       kind: Kind.Enum,
-      values: resolveEnumValues(typeChecker, type),
+      values: resolveEnumValues(program, type),
       fqn,
     }
   }
@@ -539,7 +411,7 @@ function resolveType(typeChecker: ts.TypeChecker, type: ts.Type): RuntimeType {
   if (type.isUnion()) {
     return {
       kind: Kind.Union,
-      elementTypes: type.types.map(t => resolveType(typeChecker, t)),
+      elementTypes: type.types.map(t => resolveType(program, t)),
       fqn,
     }
   }
@@ -547,7 +419,7 @@ function resolveType(typeChecker: ts.TypeChecker, type: ts.Type): RuntimeType {
   if (type.isIntersection()) {
     return {
       kind: Kind.Intersection,
-      elementTypes: type.types.map(t => resolveType(typeChecker, t)),
+      elementTypes: type.types.map(t => resolveType(program, t)),
       fqn,
     }
   }
@@ -562,13 +434,13 @@ function resolveType(typeChecker: ts.TypeChecker, type: ts.Type): RuntimeType {
       return {
         kind: Kind.Tuple,
         elementTypes: typeArguments.map(typeParameter =>
-          resolveType(typeChecker, typeParameter),
+          resolveType(program, typeParameter),
         ),
         fqn,
       }
     }
 
-    return resolveObjectType(typeChecker, objectType)
+    return resolveObjectType(program, objectType)
   }
 
   return {
@@ -644,7 +516,7 @@ export default function transformer<T extends ts.Node>(
               undefined,
               [
                 ts.createLiteral(
-                  JSON.stringify(resolveType(typeChecker, classType)),
+                  JSON.stringify(resolveType(program, classType)),
                 ),
               ],
             ),

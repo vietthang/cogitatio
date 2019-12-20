@@ -240,11 +240,14 @@ describe('Test Transformer', () => {
           readonly: false,
           scope: 'public',
           type: {
-            kind: 'Array',
+            kind: 'Wellknown',
             fqn: 'Array',
-            elementType: {
-              kind: 'String',
-            },
+            typeArguments: [
+              {
+                kind: 'String',
+              },
+            ],
+            typeParameters: [],
           },
         },
         {
@@ -253,11 +256,14 @@ describe('Test Transformer', () => {
           readonly: false,
           scope: 'public',
           type: {
-            kind: 'Array',
+            kind: 'Wellknown',
             fqn: 'Array',
-            elementType: {
-              kind: 'String',
-            },
+            typeArguments: [
+              {
+                kind: 'String',
+              },
+            ],
+            typeParameters: [],
           },
         },
         {
@@ -266,11 +272,14 @@ describe('Test Transformer', () => {
           readonly: false,
           scope: 'public',
           type: {
-            kind: 'Array',
+            kind: 'Wellknown',
             fqn: 'ReadonlyArray',
-            elementType: {
-              kind: 'String',
-            },
+            typeArguments: [
+              {
+                kind: 'String',
+              },
+            ],
+            typeParameters: [],
           },
         },
       ],
@@ -529,6 +538,8 @@ describe('Test Transformer', () => {
           scope: 'public',
           type: {
             kind: 'Wellknown',
+            typeParameters: [],
+            typeArguments: [],
             fqn: 'Date',
           },
         },
@@ -539,6 +550,8 @@ describe('Test Transformer', () => {
           scope: 'public',
           type: {
             kind: 'Wellknown',
+            typeParameters: [],
+            typeArguments: [],
             fqn: 'ArrayBuffer',
           },
         },
@@ -549,6 +562,8 @@ describe('Test Transformer', () => {
           scope: 'public',
           type: {
             kind: 'Wellknown',
+            typeParameters: [],
+            typeArguments: [],
             fqn: 'Int8Array',
           },
         },
@@ -559,6 +574,8 @@ describe('Test Transformer', () => {
           scope: 'public',
           type: {
             kind: 'Wellknown',
+            typeParameters: [],
+            typeArguments: [],
             fqn: 'Uint8Array',
           },
         },
@@ -569,6 +586,8 @@ describe('Test Transformer', () => {
           scope: 'public',
           type: {
             kind: 'Wellknown',
+            typeParameters: [],
+            typeArguments: [],
             fqn: 'Uint8ClampedArray',
           },
         },
@@ -579,6 +598,8 @@ describe('Test Transformer', () => {
           scope: 'public',
           type: {
             kind: 'Wellknown',
+            typeParameters: [],
+            typeArguments: [],
             fqn: 'Int16Array',
           },
         },
@@ -589,6 +610,8 @@ describe('Test Transformer', () => {
           scope: 'public',
           type: {
             kind: 'Wellknown',
+            typeParameters: [],
+            typeArguments: [],
             fqn: 'Uint16Array',
           },
         },
@@ -599,6 +622,8 @@ describe('Test Transformer', () => {
           scope: 'public',
           type: {
             kind: 'Wellknown',
+            typeParameters: [],
+            typeArguments: [],
             fqn: 'Int32Array',
           },
         },
@@ -609,6 +634,8 @@ describe('Test Transformer', () => {
           scope: 'public',
           type: {
             kind: 'Wellknown',
+            typeParameters: [],
+            typeArguments: [],
             fqn: 'Uint32Array',
           },
         },
@@ -619,6 +646,8 @@ describe('Test Transformer', () => {
           scope: 'public',
           type: {
             kind: 'Wellknown',
+            typeParameters: [],
+            typeArguments: [],
             fqn: 'Float32Array',
           },
         },
@@ -629,6 +658,8 @@ describe('Test Transformer', () => {
           scope: 'public',
           type: {
             kind: 'Wellknown',
+            typeParameters: [],
+            typeArguments: [],
             fqn: 'Float64Array',
           },
         },
@@ -639,6 +670,8 @@ describe('Test Transformer', () => {
           scope: 'public',
           type: {
             kind: 'Wellknown',
+            typeParameters: [],
+            typeArguments: [],
             fqn: 'BigInt64Array',
           },
         },
@@ -649,6 +682,8 @@ describe('Test Transformer', () => {
           scope: 'public',
           type: {
             kind: 'Wellknown',
+            typeParameters: [],
+            typeArguments: [],
             fqn: 'BigUint64Array',
           },
         },
@@ -659,6 +694,8 @@ describe('Test Transformer', () => {
           scope: 'public',
           type: {
             kind: 'Wellknown',
+            typeParameters: [],
+            typeArguments: [],
             fqn: 'Buffer',
           },
         },
@@ -669,6 +706,8 @@ describe('Test Transformer', () => {
           scope: 'public',
           type: {
             kind: 'Wellknown',
+            typeParameters: [],
+            typeArguments: [],
             fqn: 'RegExp',
           },
         },
@@ -679,6 +718,8 @@ describe('Test Transformer', () => {
           scope: 'public',
           type: {
             kind: 'Wellknown',
+            typeParameters: [],
+            typeArguments: [],
             fqn: 'URL',
           },
         },

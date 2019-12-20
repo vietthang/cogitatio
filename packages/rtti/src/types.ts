@@ -12,7 +12,6 @@ export enum Kind {
   String = 'String',
   BigInt = 'BigInt',
   Object = 'Object',
-  Array = 'Array',
   Tuple = 'Tuple',
   Union = 'Union',
   Intersection = 'Intersection',
@@ -110,11 +109,6 @@ export interface ObjectType extends BaseType {
   typeArguments?: RuntimeType[]
 }
 
-export interface ArrayType extends BaseType {
-  kind: Kind.Array
-  elementType: BaseType
-}
-
 export interface TupleType extends BaseType {
   kind: Kind.Tuple
   elementTypes: BaseType[]
@@ -161,7 +155,6 @@ export type RuntimeType =
   | StringType
   | BigIntType
   | ObjectType
-  | ArrayType
   | TupleType
   | UnionType
   | IntersectionType

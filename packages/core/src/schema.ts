@@ -1,5 +1,5 @@
 import { AnySchema } from './any'
-import { SchemaType } from './common'
+import { BaseSchema, SchemaType } from './common'
 import { DictionarySchema } from './dictionary'
 import { EnumSchema } from './enum'
 import { ListSchema } from './list'
@@ -59,8 +59,8 @@ function isRefineConstructor(fn: any): fn is RefineConstructor<any, any> {
   return fn.schema !== undefined
 }
 
-export const resolveSchema: Transformer<[SchemaLike], Schema> = memoized(
-  (schema: SchemaLike) => {
+export const resolveSchema: Transformer<[any], Schema> = memoized(
+  schema => {
     if (isPrimitiveConstructor(schema)) {
       return { type: SchemaType.Primitive, native: schema } as PrimitiveSchema
     }

@@ -9,6 +9,7 @@ import { memoized } from './utils'
 export interface Id64<S extends SchemaLike> {
   readonly idValue: bigint
   readonly schema: S
+  toString(): string
 }
 
 class Id64Impl<S extends SchemaLike> implements Id64<S> {

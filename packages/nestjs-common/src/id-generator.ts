@@ -31,9 +31,9 @@ export class IdGenerator {
   }
 
   public nextId<S extends SchemaLike>(
-    _schema: S, // only use for static type inference
+    schema: S, // only use for static type inference
     options: NextIdOptions = {},
-  ): Id64<Resolve<S>> {
+  ): Id64<S> {
     const ioTimestamp = options.ioTimestamp ?? IdGenerator.defaultIoTimestamp
 
     const timestamp = ioTimestamp()
@@ -76,6 +76,6 @@ export class IdGenerator {
       BigInt(this.id) * BigInt(2) ** BigInt(12) +
       time * BigInt(2) ** BigInt(22)
 
-    return result.toString(10) as Id64<Resolve<S>>
+    return Id64(schema)(result.toString(10))
   }
 }

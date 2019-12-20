@@ -14,31 +14,37 @@ describe('test getIdGenerator', () => {
     for (let i = 0; i <= 0xfff; i++) {
       const expected = (baseId + BigInt(i)).toString()
       expect(
-        idGenerator.nextId(String, {
-          ioTimestamp: () =>
-            Temporal.Absolute.fromEpochMilliseconds(
-              Date.UTC(2020, 0, 0, 0, 0, 0, 0),
-            ),
-        }),
+        idGenerator
+          .nextId(String, {
+            ioTimestamp: () =>
+              Temporal.Absolute.fromEpochMilliseconds(
+                Date.UTC(2020, 0, 0, 0, 0, 0, 0),
+              ),
+          })
+          .toString(),
       ).toEqual(expected)
     }
     expect(() => idGenerator.nextId(String)).toThrowError()
 
     expect(
-      idGenerator.nextId(String, {
-        ioTimestamp: () =>
-          Temporal.Absolute.fromEpochMilliseconds(
-            Date.UTC(2020, 0, 0, 0, 0, 0, 1),
-          ),
-      }),
+      idGenerator
+        .nextId(String, {
+          ioTimestamp: () =>
+            Temporal.Absolute.fromEpochMilliseconds(
+              Date.UTC(2020, 0, 0, 0, 0, 0, 1),
+            ),
+        })
+        .toString(),
     ).toEqual('2646880970346594304')
     expect(
-      idGenerator.nextId(String, {
-        ioTimestamp: () =>
-          Temporal.Absolute.fromEpochMilliseconds(
-            Date.UTC(2020, 0, 0, 0, 0, 0, 1),
-          ),
-      }),
+      idGenerator
+        .nextId(String, {
+          ioTimestamp: () =>
+            Temporal.Absolute.fromEpochMilliseconds(
+              Date.UTC(2020, 0, 0, 0, 0, 0, 1),
+            ),
+        })
+        .toString(),
     ).toEqual('2646880970346594305')
   })
 })

@@ -76,6 +76,6 @@ export class IdGenerator {
       BigInt(this.id) * BigInt(2) ** BigInt(12) +
       time * BigInt(2) ** BigInt(22)
 
-    return Id64(schema)(result.toString(10))
+    return Id64(schema)(result)
   }
 }

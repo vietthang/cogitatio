@@ -3,6 +3,7 @@ import {
   RefineConstructor,
   resolveSchema,
   SchemaLike,
+  success,
 } from '@cogitatio/core'
 import { memoized } from './utils'
 
@@ -30,9 +31,9 @@ export type CursorConstructor = <S extends SchemaLike>(
 export const Cursor = memoized(<S extends SchemaLike>(schemaLike: S) => {
   return Refine<Cursor<S>, typeof String>(
     String,
-    cursor => cursor.cursorValue,
-    value => {
-      return new CursorImpl(value, schemaLike)
+    (_, cursor) => cursor.cursorValue,
+    (_, value) => {
+      return success(new CursorImpl(value, schemaLike))
     },
   )
 }, resolveSchema) as CursorConstructor

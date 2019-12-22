@@ -6,9 +6,12 @@ import {
   Property,
   Resolve,
   SchemaLike,
+  ValidationError,
 } from '@cogitatio/core'
+import { unauthorized } from '@cogitatio/errors'
 import { Default } from '@cogitatio/extra'
 import { Temporal } from '@cogitatio/tc39-temporal'
+import { either } from 'fp-ts'
 import jwt from 'jsonwebtoken'
 import { JwtAlgorithm } from './common'
 import { durationToSeconds } from './utils'
@@ -50,19 +53,28 @@ export class JwtVerifier<S extends SchemaLike> {
   ) {}
 
   public verify(token: string, date: Date = new Date()): Resolve<S> {
-    const decoded = jwt.verify(token, this.config.key, {
-      algorithms: this.config.algorithms,
-      audience: this.config.audience,
-      clockTolerance:
-        this.config.clockTolerance &&
-        durationToSeconds(this.config.clockTolerance),
-      issuer: this.config.issuer,
-      ignoreExpiration: this.config.ignoreExpiration,
-      ignoreNotBefore: this.config.ignoreNotBefore,
-      jwtid: this.config.jwtid,
-      subject: this.config.subject,
-      clockTimestamp: Math.floor(date.getTime() / 1000),
-    })
-    return this.decoder.decode(this.schema, decoded)
+    let decoded: unknown
+    try {
+      decoded = jwt.verify(token, this.config.key, {
+        algorithms: this.config.algorithms,
+        audience: this.config.audience,
+        clockTolerance:
+          this.config.clockTolerance &&
+          durationToSeconds(this.config.clockTolerance),
+        issuer: this.config.issuer,
+        ignoreExpiration: this.config.ignoreExpiration,
+        ignoreNotBefore: this.config.ignoreNotBefore,
+        jwtid: this.config.jwtid,
+        subject: this.config.subject,
+        clockTimestamp: Math.floor(date.getTime() / 1000),
+      })
+    } catch (error) {
+      throw unauthorized({ code: 'INVALID_JWT', origin: error })
+    }
+
+    const validation = this.decoder.decode(this.schema, decoded)
+    return either.getOrElse<ValidationError[], Resolve<S>>(errors => {
+      throw unauthorized({ code: 'INVALID_PAYLOAD', extra: errors })
+    })(validation)
   }
 }

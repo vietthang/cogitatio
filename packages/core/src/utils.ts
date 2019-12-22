@@ -1,3 +1,21 @@
+export function mapIndexed(
+  value: object,
+  mapFunction: (element: any, index: number | string) => any,
+): any {
+  if (value === null) {
+    throw new Error('dont support null value')
+  }
+  if (Array.isArray(value)) {
+    return value.map(mapFunction)
+  }
+  return Object.fromEntries(
+    Object.entries(value).map(([key, element]) => [
+      key,
+      mapFunction(element, key),
+    ]),
+  )
+}
+
 export type Transformer<Ins extends any[], Out> = (...input: Ins) => Out
 
 export function memoized<Ins extends any[], Out>(

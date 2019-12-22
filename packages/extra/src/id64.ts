@@ -3,6 +3,7 @@ import {
   RefineConstructor,
   resolveSchema,
   SchemaLike,
+  success,
 } from '@cogitatio/core'
 import { memoized } from './utils'
 
@@ -28,18 +29,21 @@ const MAX_INTEGER_64 = BigInt(2) ** BigInt(64) - BigInt(1)
 
 export type Id64Constructor = <S extends SchemaLike>(
   schemaLike: S,
-) => RefineConstructor<Id64<S>, string>
+) => RefineConstructor<Id64<S>, bigint>
 
 export const Id64 = memoized(<S extends SchemaLike>(schema: S) => {
-  return Refine<Id64<S>, typeof String>(
-    String,
-    id => id.idValue.toString(10),
-    value => {
-      const bigintValue = BigInt(value)
-      if (bigintValue > BigInt(0) && bigintValue < MAX_INTEGER_64) {
-        return new Id64Impl(bigintValue, schema)
+  return Refine<Id64<S>, typeof BigInt>(
+    BigInt,
+    (_, id) => id.idValue,
+    (context, value) => {
+      if (value > BigInt(0) && value < MAX_INTEGER_64) {
+        return success(new Id64Impl(value, schema))
       }
-      throw new Error('id64 is out of int64 range')
+      return context.failure({
+        message: 'id64 is out of int64 range',
+        value,
+        rule: 'int64',
+      })
     },
   )
 }, resolveSchema) as Id64Constructor

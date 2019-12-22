@@ -4,6 +4,7 @@ import {
   RefineConstructor,
   resolveSchema,
   SchemaLike,
+  success,
 } from '@cogitatio/core'
 import { Cursor } from './cursor'
 import { Edge } from './edge'
@@ -32,7 +33,7 @@ export type ConnectionConstructor = <S extends SchemaLike, Q>(
 export const Connection = memoized(<S extends SchemaLike, Q>(_: S) => {
   return Refine<Connection<S, Q>, any>(
     Any,
-    value => value,
-    value => value,
+    (_, value) => value,
+    (_, value) => success(value),
   )
 }, resolveSchema) as ConnectionConstructor

@@ -1,6 +1,8 @@
-import { Decoder, Resolve, SchemaLike } from '@cogitatio/core'
+import { Decoder, Resolve, SchemaLike, ValidationError } from '@cogitatio/core'
+import { internal } from '@cogitatio/errors'
 import { DECODER_SYMBOL } from '@cogitatio/nestjs-validation'
 import { DynamicModule, Global } from '@nestjs/common'
+import { either } from 'fp-ts'
 import rc from 'rc'
 import {
   CONFIG_DECODER_SYMBOL,
@@ -41,8 +43,11 @@ export class CoreModule {
           provide: CONFIG_SYMBOL,
           useFactory(decoder: Decoder<unknown>) {
             const raw = rc(name, defaultConfig)
+            const validation = decoder.decode(schema, raw)
 
-            return decoder.decode(schema, raw)
+            return either.getOrElse<ValidationError[], Resolve<S>>(errors => {
+              throw internal({ message: 'validation error', extra: errors })
+            })(validation)
           },
           inject: [CONFIG_DECODER_SYMBOL],
         },

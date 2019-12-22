@@ -173,7 +173,6 @@ describe('Test Transformer', () => {
           scope: 'public',
           type: {
             kind: 'Literal',
-            fqn: 'number',
             value: 10,
           },
         },

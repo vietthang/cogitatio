@@ -1,10 +1,17 @@
-import { Decoder, resolveSchema, SchemaLike } from '@cogitatio/core'
+import {
+  Decoder,
+  resolveSchema,
+  SchemaLike,
+  ValidationError,
+} from '@cogitatio/core'
+import { badRequest } from '@cogitatio/errors'
 import { Inject, Injectable } from '@nestjs/common'
 import {
   ArgumentMetadata,
   ClassProvider,
   PipeTransform,
 } from '@nestjs/common/interfaces'
+import { either } from 'fp-ts'
 import { generateNamedClass } from './utils'
 
 export const DECODER_SYMBOL = '___nestjs_utils_Decoder'
@@ -28,7 +35,11 @@ export function registerProvider<S extends SchemaLike>(
         throw new Error('can not find schema')
       }
 
-      return this.decoder.decode(schema, value)
+      const validation = this.decoder.decode(schema, value)
+
+      return either.getOrElse<ValidationError[], unknown>(errors => {
+        throw badRequest({ extra: errors })
+      })(validation)
     }
   }
 

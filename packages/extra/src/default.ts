@@ -4,6 +4,7 @@ import {
   RefineConstructor,
   Resolve,
   SchemaLike,
+  success,
 } from '@cogitatio/core'
 
 export function Default<S extends SchemaLike>(
@@ -12,12 +13,12 @@ export function Default<S extends SchemaLike>(
 ): RefineConstructor<Resolve<S>, Resolve<S> | undefined> {
   return Refine<Resolve<S>, any>(
     Optional(schema),
-    v => v,
-    v => {
+    (_, v) => v,
+    (_, v) => {
       if (v === undefined) {
-        return defaultValue
+        return success(defaultValue)
       }
-      return v
+      return success(v)
     },
   )
 }

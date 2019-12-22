@@ -1,10 +1,10 @@
-import { AppError, AppErrorOptions } from './error'
+import { AppError, AppErrorInit } from './error'
 
-export function error(options: AppErrorOptions): AppError {
+export function error(options: AppErrorInit): AppError {
   return new AppError(options)
 }
 
-export type QuickAppErrorOptions = Omit<AppErrorOptions, 'status'>
+export type QuickAppErrorOptions = Omit<AppErrorInit, 'status'>
 
 export function badRequest(options: QuickAppErrorOptions = {}): AppError {
   return error({
@@ -143,17 +143,17 @@ export function gatewayTimeut(options: QuickAppErrorOptions = {}): AppError {
   })
 }
 
-export type ErrorTransformer = (origin: Error) => AppErrorOptions
+export type ErrorTransformer = (origin: Error) => AppErrorInit
 
 const defaultErrorTransformer: ErrorTransformer = origin => ({ origin })
 
-export async function wrapAsync<T>(
-  promise: Promise<T>,
+export async function wrapContext<T>(
+  wrappable: Promise<T> | (() => T) | (() => Promise<T>),
   errorTransform: ErrorTransformer = defaultErrorTransformer,
 ): Promise<T> {
   const base = internal()
   try {
-    return await promise
+    return typeof wrappable === 'function' ? await wrappable() : await wrappable
   } catch (origin) {
     const error = base.extend(errorTransform(origin))
     error.stack = base.stack

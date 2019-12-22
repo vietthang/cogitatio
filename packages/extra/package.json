@@ -25,6 +25,7 @@
   },
   "devDependencies": {
     "@types/google-libphonenumber": "^7.4.17",
+    "@types/hapi__joi": "^16.0.4",
     "google-libphonenumber": "^3.2.6"
   },
   "gitHead": "43351e734f3e5dac4ef7a3d717e0b8280e6ff1c3"

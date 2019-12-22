@@ -1,11 +1,14 @@
+import { either } from 'fp-ts'
+import { Context, Validation, ValidationError } from './codec'
 import { BaseSchema, SchemaType } from './common'
+import { ContextImpl } from './json/context-impl'
 import { Resolve, resolveSchema, Schema, SchemaLike } from './schema'
 
 export interface RefineSchema<I = any, O = any> extends BaseSchema<I> {
   readonly type: SchemaType.Refinement
   readonly baseSchema: Schema
-  encode: (value: I) => O
-  decode: (value: O) => I
+  encode: (context: Context, value: I) => O
+  decode: (context: Context, value: O) => Validation<I>
 }
 
 export interface RefineConstructor<I = any, O = any> {
@@ -15,14 +18,17 @@ export interface RefineConstructor<I = any, O = any> {
 
 export function Refine<I, S extends SchemaLike>(
   baseSchema: S,
-  encode: (value: I) => Resolve<S>,
-  decode: (value: Resolve<S>) => I,
+  encode: (context: Context, value: I) => Resolve<S>,
+  decode: (context: Context, value: Resolve<S>) => Validation<I>,
 ): RefineConstructor<I, Resolve<S>> {
   type O = Resolve<S>
 
   return Object.assign(
     (value: O) => {
-      return decode(value)
+      const context = new ContextImpl()
+      return either.getOrElse<ValidationError[], I>(e => {
+        throw e
+      })(decode(context, value))
     },
     {
       schema: {

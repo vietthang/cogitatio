@@ -1,7 +1,7 @@
+import { error } from '@cogitatio/errors'
 import {
   ClientIdContextKey,
   Context,
-  error,
   RequestIdContextKey,
   RequestTimeContextKey,
   TypedKey,
@@ -110,7 +110,7 @@ export class WinstonLogger implements Logger {
       requestTime,
       meta: other,
       labels,
-      exception: exception ? error(exception) : undefined,
+      exception: exception ? error({ origin: exception }) : undefined,
     }
   }
 }

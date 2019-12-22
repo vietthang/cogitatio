@@ -1,5 +1,6 @@
 import {
   Decoder,
+  Encoder,
   Enum,
   List,
   Optional,
@@ -10,6 +11,7 @@ import {
 import { Default } from '@cogitatio/extra'
 import { Temporal } from '@cogitatio/tc39-temporal'
 import jwt from 'jsonwebtoken'
+import { JsonObject, JsonValue } from '../../core/src/json/common'
 import { JwtAlgorithm } from './common'
 
 export class JwtSignConfig {
@@ -50,7 +52,7 @@ export class JwtSignConfig {
 export class JwtSigner<S extends SchemaLike> {
   constructor(
     private readonly schema: S,
-    private readonly decoder: Decoder<unknown>,
+    private readonly encoder: Encoder<JsonObject>,
     private readonly config: JwtSignConfig,
   ) {}
 
@@ -58,7 +60,7 @@ export class JwtSigner<S extends SchemaLike> {
     return jwt.sign(
       {
         iat: Math.floor(date.getTime() / 1000),
-        ...this.decoder.decode(this.schema, payload),
+        ...this.encoder.encode(this.schema, payload),
       },
       this.config.key,
       {

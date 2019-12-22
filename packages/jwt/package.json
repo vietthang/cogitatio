@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@cogitatio/core": "^0.0.12-alpha.2",
+    "@cogitatio/errors": "^0.0.12-alpha.2",
     "@cogitatio/extra": "^0.0.12-alpha.2",
     "jsonwebtoken": "^8.5.1"
   },

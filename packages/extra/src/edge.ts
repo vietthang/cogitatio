@@ -5,6 +5,7 @@ import {
   Resolve,
   resolveSchema,
   SchemaLike,
+  success,
 } from '@cogitatio/core'
 import { Cursor } from './cursor'
 import { memoized } from './utils'
@@ -28,7 +29,7 @@ export const Edge = memoized(<S extends SchemaLike>(schema: S) => {
 
   return Refine<Edge<S>, typeof EdgeLocal>(
     EdgeLocal,
-    v => v,
-    v => v,
+    (_, v) => v,
+    (_, v) => success(v),
   )
 }, resolveSchema) as EdgeConstructor

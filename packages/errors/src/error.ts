@@ -1,11 +1,3 @@
-export interface AppErrorOptions {
-  code?: string
-  status?: number
-  message?: string
-  origin?: unknown
-  extra?: unknown
-}
-
 export function formatErrorToJSON(error: unknown): unknown {
   if (error instanceof AppError) {
     return {
@@ -23,7 +15,7 @@ export function formatErrorToJSON(error: unknown): unknown {
       code: 'INTERNAL_ERROR',
       status: 500,
       message: error.message,
-      stack: error.message,
+      stack: error.stack,
     }
   }
 
@@ -32,6 +24,14 @@ export function formatErrorToJSON(error: unknown): unknown {
     status: 500,
     message: 'unknown error',
   }
+}
+
+export interface AppErrorInit {
+  code?: string
+  status?: number
+  message?: string
+  origin?: unknown
+  extra?: unknown
 }
 
 export class AppError extends Error {
@@ -49,7 +49,7 @@ export class AppError extends Error {
     message = code,
     origin,
     extra,
-  }: AppErrorOptions = {}) {
+  }: AppErrorInit = {}) {
     super(message)
 
     this.code = code
@@ -62,7 +62,7 @@ export class AppError extends Error {
     return formatErrorToJSON(this)
   }
 
-  public extend(options: AppErrorOptions): AppError {
+  public extend(options: AppErrorInit): AppError {
     return new AppError({
       ...this,
       ...options,

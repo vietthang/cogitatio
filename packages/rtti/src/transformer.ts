@@ -76,9 +76,10 @@ function checkAndGetGlobalName(
     }
 
     return (
-      ts.isInterfaceDeclaration(declaration) ||
-      ts.isClassDeclaration(declaration) ||
-      ts.isTypeAliasDeclaration(declaration)
+      sourceFile.statements.includes(declaration as ts.DeclarationStatement) &&
+      (ts.isInterfaceDeclaration(declaration) ||
+        ts.isClassDeclaration(declaration) ||
+        ts.isTypeAliasDeclaration(declaration))
     )
   }) as Array<
     ts.InterfaceDeclaration | ts.ClassDeclaration | ts.TypeAliasDeclaration
@@ -317,7 +318,7 @@ function resolveType(program: ts.Program, type: ts.Type): RuntimeType {
     return {
       kind: Kind.Literal,
       value: (type as ts.LiteralType).value,
-      fqn: 'number',
+      fqn,
     }
   }
 

@@ -1,4 +1,4 @@
-import { Decoder } from '@cogitatio/core'
+import { Decoder, JsonCodec } from '@cogitatio/core'
 import { DynamicModule, Global } from '@nestjs/common'
 import { DECODER_SYMBOL, registeredProviders } from './common'
 
@@ -7,10 +7,7 @@ export interface CoreModuleOptions {
 }
 
 async function makeDefaultDecoder(): Promise<Decoder<unknown>> {
-  // import dynamically to allow "@cogitatio/joi" stay in peerDependencies and not included if not required
-  const { JoiDecoder } = await import('@cogitatio/joi')
-
-  return new JoiDecoder()
+  return new JsonCodec()
 }
 
 @Global()

@@ -1,4 +1,5 @@
-import { Optional, Property, Resolve, SchemaLike } from '@cogitatio/core'
+import { Optional, Property, SchemaLike } from '@cogitatio/core'
+import { internal } from '@cogitatio/errors'
 import { Id64 } from '@cogitatio/extra'
 import { Temporal } from '@cogitatio/tc39-temporal'
 
@@ -31,7 +32,7 @@ export class IdGenerator {
   }
 
   public nextId<S extends SchemaLike>(
-    schema: S, // only use for static type inference
+    schema: S,
     options: NextIdOptions = {},
   ): Id64<S> {
     const ioTimestamp = options.ioTimestamp ?? IdGenerator.defaultIoTimestamp
@@ -43,15 +44,19 @@ export class IdGenerator {
     )
 
     if (time < this.lastTime) {
-      throw new Error('invalid timestamp function')
+      throw internal({
+        code: 'ID_GENERATOR_INVALID_TIMESTAMP_FUNCTION',
+        message: 'invalid timestamp function',
+      })
     }
 
     // Generates id in the same millisecond as the previous id
     if (time === this.lastTime) {
       if (this.outOfBound) {
-        throw new Error(
-          'out of bound, do you try to generate over 4096 ids in 1ms?',
-        )
+        throw internal({
+          code: 'ID_GENERATOR_OUT_OF_BOUND',
+          message: 'out of bound, do you try to generate over 4096 ids in 1ms?',
+        })
       }
       // Increase sequence counter
       // tslint:disable-next-line:no-bitwise
@@ -61,9 +66,10 @@ export class IdGenerator {
       // - set overflow flag and wait till next millisecond
       if (this.seq === 0) {
         this.outOfBound = true
-        throw new Error(
-          'out of bound, do you try to generate over 4096 ids in 1ms?',
-        )
+        throw internal({
+          code: 'ID_GENERATOR_OUT_OF_BOUND',
+          message: 'out of bound, do you try to generate over 4096 ids in 1ms?',
+        })
       }
     } else {
       this.seq = 0

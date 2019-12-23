@@ -1,3 +1,4 @@
+import { internal } from '@cogitatio/errors'
 import { either } from 'fp-ts'
 import { Context, Validation, ValidationError } from './codec'
 import { BaseSchema, SchemaType } from './common'
@@ -26,9 +27,11 @@ export function Refine<I, S extends SchemaLike>(
   return Object.assign(
     (value: O) => {
       const context = new ContextImpl()
-      return either.getOrElse<ValidationError[], I>(e => {
-        throw e
-      })(decode(context, value))
+      const validation = decode(context, value)
+
+      return either.getOrElse<ValidationError[], I>(errors => {
+        throw internal({ extra: errors })
+      })(validation)
     },
     {
       schema: {

@@ -75,7 +75,7 @@ describe('e2e', () => {
       module: 'TestService',
       labels: ['foo'],
       meta: { foo: 'bar' },
-      exception: { code: 'UNKNOWN_ERROR', status: 500, message: 'My Error' },
+      exception: { code: 'INTERNAL_ERROR', status: 500, message: 'My Error' },
     })
     expect(typeof logSpy.mock.calls[1][1]).toBe('function')
   })

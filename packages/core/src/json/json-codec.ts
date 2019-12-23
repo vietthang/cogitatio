@@ -314,7 +314,7 @@ export class JsonCodec implements Codec<JsonValue, JsonValue> {
       }
 
       default:
-        throw new Error(`unsupported type: ${schema}`)
+        throw new Error('unsupported type')
     }
   }
 

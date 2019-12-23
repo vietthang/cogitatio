@@ -1,4 +1,4 @@
-import { error } from '@cogitatio/errors'
+import { error, formatErrorToJSON } from '@cogitatio/errors'
 import {
   ClientIdContextKey,
   Context,
@@ -9,7 +9,7 @@ import {
 import winston from 'winston'
 
 export interface LogMeta {
-  exception?: Error
+  exception?: unknown
   labels?: string[]
   [key: string]: unknown
 }
@@ -110,7 +110,7 @@ export class WinstonLogger implements Logger {
       requestTime,
       meta: other,
       labels,
-      exception: exception ? error({ origin: exception }) : undefined,
+      exception: exception ? formatErrorToJSON(exception) : undefined,
     }
   }
 }

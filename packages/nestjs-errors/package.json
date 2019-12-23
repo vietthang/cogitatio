@@ -1,0 +1,36 @@
+{
+  "name": "@cogitatio/nestjs-errors",
+  "version": "0.0.12-alpha.2",
+  "main": "dist/index.js",
+  "types": "dist/packages/nestjs-errors/src/index.d.ts",
+  "scripts": {
+    "clean": "rimraf ./dist",
+    "prebuild": "yarn clean",
+    "build": "tsdx build --target node --tsconfig tsconfig.build.json --entry src/index.ts",
+    "prepublishOnly": "yarn build",
+    "test": "jest"
+  },
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "/src",
+    "/dist"
+  ],
+  "devDependencies": {
+    "@airbrake/node": "^1.0.6",
+    "@nestjs/graphql": "^6.5.3",
+    "@nestjs/platform-express": "^6.10.12",
+    "@sentry/node": "^5.10.2",
+    "@types/node-fetch": "^2.5.4",
+    "apollo-server-core": "^2.9.14",
+    "apollo-server-express": "^2.9.14",
+    "node-fetch": "^2.6.0"
+  },
+  "peerDependencies": {},
+  "dependencies": {
+    "@cogitatio/errors": "^0.0.12-alpha.2"
+  },
+  "gitHead": "43351e734f3e5dac4ef7a3d717e0b8280e6ff1c3"
+}

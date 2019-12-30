@@ -14,7 +14,7 @@ export interface RefineSchema<I = any, O = any> extends BaseSchema<I> {
 
 export interface RefineConstructor<I = any, O = any> {
   (value: O): I
-  schema: RefineSchema<I, O>
+  refineSchema: RefineSchema<I, O>
 }
 
 export function Refine<I, S extends SchemaLike>(
@@ -34,7 +34,7 @@ export function Refine<I, S extends SchemaLike>(
       })(validation)
     },
     {
-      schema: {
+      refineSchema: {
         type: SchemaType.Refinement,
         baseSchema: resolveSchema(baseSchema),
         encode,
@@ -42,4 +42,10 @@ export function Refine<I, S extends SchemaLike>(
       } as RefineSchema<I, O>,
     },
   )
+}
+
+export function isRefineConstructor(
+  fn: any,
+): fn is RefineConstructor<any, any> {
+  return fn.refineSchema !== undefined
 }

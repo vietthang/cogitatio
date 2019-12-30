@@ -1,5 +1,6 @@
 import {
   Decoder,
+  JsonValue,
   resolveSchema,
   SchemaLike,
   ValidationError,
@@ -14,7 +15,7 @@ import {
 import { either } from 'fp-ts'
 import { generateNamedClass } from './utils'
 
-export const DECODER_SYMBOL = '___nestjs_utils_Decoder'
+export const JSON_CODEC_SYMBOL = '___nestjs_utils_Decoder'
 
 export const registeredProviders: Array<ClassProvider<PipeTransform>> = []
 
@@ -22,13 +23,13 @@ export function registerProvider<S extends SchemaLike>(
   schemaLike?: S,
 ): ClassProvider<PipeTransform> {
   @Injectable()
-  class Pipe implements PipeTransform<unknown, unknown> {
+  class Pipe implements PipeTransform<JsonValue, unknown> {
     constructor(
-      @Inject(DECODER_SYMBOL)
-      private readonly decoder: Decoder<unknown>,
+      @Inject(JSON_CODEC_SYMBOL)
+      private readonly decoder: Decoder<JsonValue>,
     ) {}
 
-    public transform(value: unknown, metadata: ArgumentMetadata): unknown {
+    public transform(value: JsonValue, metadata: ArgumentMetadata): unknown {
       const schema = schemaLike ? resolveSchema(schemaLike) : metadata.metatype
 
       if (!schema || schema === Object) {

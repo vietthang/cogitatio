@@ -1,12 +1,12 @@
-import { Decoder, JsonCodec } from '@cogitatio/core'
+import { Decoder, JsonCodec, JsonValue } from '@cogitatio/core'
 import { DynamicModule, Global } from '@nestjs/common'
-import { DECODER_SYMBOL, registeredProviders } from './common'
+import { JSON_CODEC_SYMBOL, registeredProviders } from './common'
 
 export interface CoreModuleOptions {
-  decoder?: Decoder<unknown>
+  decoder?: Decoder<JsonValue>
 }
 
-async function makeDefaultDecoder(): Promise<Decoder<unknown>> {
+async function makeDefaultDecoder(): Promise<Decoder<JsonValue>> {
   return new JsonCodec()
 }
 
@@ -17,7 +17,7 @@ export class CoreModule {
       module: CoreModule,
       providers: [
         {
-          provide: DECODER_SYMBOL,
+          provide: JSON_CODEC_SYMBOL,
           useFactory() {
             return decoder || makeDefaultDecoder()
           },
@@ -25,7 +25,7 @@ export class CoreModule {
         ...registeredProviders,
       ],
       exports: [
-        DECODER_SYMBOL,
+        JSON_CODEC_SYMBOL,
         ...registeredProviders.map(provider => provider.provide),
       ],
     }

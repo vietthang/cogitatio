@@ -1,5 +1,5 @@
 import { AnySchema } from './any'
-import { BaseSchema, SchemaType } from './common'
+import { SchemaType } from './common'
 import { DictionarySchema } from './dictionary'
 import { EnumSchema } from './enum'
 import { ListSchema } from './list'
@@ -13,8 +13,12 @@ import {
   PrimitiveSchema,
   ResolvePrimitiveFromConstructor,
 } from './primitive'
-import { RefineConstructor, RefineSchema } from './refine'
-import { TaggedUnionSchema } from './tagged-union'
+import { isRefineConstructor, RefineConstructor, RefineSchema } from './refine'
+import {
+  isTaggedUnionConstructor,
+  TaggedUnionConstructor,
+  TaggedUnionSchema,
+} from './tagged-union'
 import { TupleSchema } from './tuple'
 import { memoized, Transformer } from './utils'
 
@@ -34,7 +38,11 @@ export type Schema =
 export type Thunk<T> = T | (() => T)
 
 export type SchemaLike = Thunk<
-  Schema | PrimitiveConstructor | RefineConstructor | Constructor
+  | Schema
+  | PrimitiveConstructor
+  | RefineConstructor
+  | TaggedUnionConstructor
+  | Constructor
 >
 
 export type Resolve<S> = S extends PrimitiveConstructor
@@ -42,7 +50,9 @@ export type Resolve<S> = S extends PrimitiveConstructor
   : S extends Constructor<infer T>
   ? T
   : S extends RefineConstructor
-  ? S['schema']['_']
+  ? S['refineSchema']['_']
+  : S extends TaggedUnionConstructor
+  ? S['taggedUnionSchema']['_']
   : S extends Schema
   ? S['_']
   : never
@@ -53,10 +63,6 @@ function isClass(fn: unknown): fn is Constructor {
   }
 
   return !!fn.prototype
-}
-
-function isRefineConstructor(fn: any): fn is RefineConstructor<any, any> {
-  return fn.schema !== undefined
 }
 
 export const resolveSchema: Transformer<[any], Schema> = memoized(
@@ -71,7 +77,11 @@ export const resolveSchema: Transformer<[any], Schema> = memoized(
       }
 
       if (isRefineConstructor(schema)) {
-        return schema.schema
+        return schema.refineSchema
+      }
+
+      if (isTaggedUnionConstructor(schema)) {
+        return schema.taggedUnionSchema
       }
 
       return resolveSchema(schema())
@@ -85,12 +95,16 @@ export const resolveSchema: Transformer<[any], Schema> = memoized(
     }
 
     if (typeof schema === 'function') {
-      if (isClass(schema)) {
+      if (isRefineConstructor(schema)) {
         return schema
       }
 
-      if (isRefineConstructor(schema)) {
-        return schema.schema
+      if (isTaggedUnionConstructor(schema)) {
+        return schema
+      }
+
+      if (isClass(schema)) {
+        return schema
       }
 
       return schema()

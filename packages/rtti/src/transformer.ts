@@ -1,4 +1,5 @@
 // tslint:disable:no-bitwise
+import * as crypto from 'crypto'
 import * as path from 'path'
 import * as ts from 'typescript'
 import {
@@ -7,10 +8,66 @@ import {
   ObjectProperty,
   ObjectPropertyScope,
   ObjectType,
+  RefType,
   RuntimeType,
   Signature,
   UnsupportedType,
 } from './types'
+import { memoized } from './utils'
+
+interface Context {
+  program: ts.Program
+  pendingTypes: { [ref: string]: ts.InterfaceType }
+  resolvedTypes: { [ref: string]: ObjectType }
+}
+
+// generate global ref for symbol, using file path and location
+// TODO: find a better way maybe, with this approach, the tests may be broken when typescript upgraded
+const getSymbolGlobalRef = memoized(
+  (symbol: ts.Symbol): string => {
+    const hash = crypto.createHash('md5')
+    const declarations = symbol.getDeclarations()!
+    const data = declarations
+      .map(declaration => {
+        return [
+          path.relative(__dirname, declaration.getSourceFile().fileName),
+          declaration.getStart(),
+          declaration.getEnd(),
+        ].join('\0')
+      })
+      .sort() // to make sure the result is deterministic
+      .join('\0')
+
+    return hash.update(data).digest('base64')
+  },
+  symbol => symbol,
+)
+
+const getGlobalThisType = memoized(
+  (program: ts.Program) => {
+    const staticHelperSourceFile = program.getSourceFile(
+      path.resolve(__dirname, 'static-helper.ts'),
+    )
+    if (!staticHelperSourceFile) {
+      throw new Error('missing "static-helper.ts" file')
+    }
+
+    const globalStatement = staticHelperSourceFile.statements.find(
+      statement => {
+        if (!ts.isTypeAliasDeclaration(statement)) {
+          return false
+        }
+        return statement.name.getText() === '_globalThis'
+      },
+    ) as ts.TypeAliasDeclaration | undefined
+    if (!globalStatement) {
+      throw new Error('missing _global statement')
+    }
+
+    return program.getTypeChecker().getTypeFromTypeNode(globalStatement.type)
+  },
+  program => program,
+)
 
 // borrow from ts-morph
 function isEnum(type: ts.Type): boolean {
@@ -38,12 +95,11 @@ function isEnum(type: ts.Type): boolean {
   return !!declarations.find(d => ts.isEnumDeclaration(d))
 }
 
-// TODO
-// there should be better approach, currently we check if the symbol is in default lib of @types/node only
-function checkAndGetGlobalName(
+function isTypeInGlobal(
   program: ts.Program,
+  globalType: ts.Type,
   type: ts.Type,
-): string | false {
+): boolean {
   const typeSymbol = type.getSymbol()
   if (!typeSymbol) {
     return false
@@ -54,43 +110,101 @@ function checkAndGetGlobalName(
   if (!fqn) {
     return false
   }
-  const declarations = typeSymbol.getDeclarations()
-  if (!declarations) {
+
+  const globalPropertySymbol = globalType
+    .getApparentProperties()
+    .find(s => s.getName() === fqn)
+  if (!globalPropertySymbol) {
     return false
   }
 
-  const isDefaultLibOrNodeJsLibrary = (sourceFile: ts.SourceFile): boolean => {
-    if (program.isSourceFileDefaultLibrary(sourceFile)) {
-      return true
-    }
-    if (!program.isSourceFileFromExternalLibrary(sourceFile)) {
-      return false
-    }
-    return sourceFile.fileName.includes('@types/node')
-  }
-
-  const interfaceOrClassDeclarations = declarations.filter(declaration => {
-    const sourceFile = declaration.getSourceFile()
-    if (!isDefaultLibOrNodeJsLibrary(sourceFile)) {
-      return false
-    }
-
-    return (
-      sourceFile.statements.includes(declaration as ts.DeclarationStatement) &&
-      (ts.isInterfaceDeclaration(declaration) ||
-        ts.isClassDeclaration(declaration) ||
-        ts.isTypeAliasDeclaration(declaration))
-    )
-  }) as Array<
-    ts.InterfaceDeclaration | ts.ClassDeclaration | ts.TypeAliasDeclaration
-  >
-
-  if (!interfaceOrClassDeclarations.some(d => d.name)) {
+  const globalProperyTypeSymbol = program
+    .getTypeChecker()
+    .getDeclaredTypeOfSymbol(globalPropertySymbol)
+    .getSymbol()
+  if (globalProperyTypeSymbol !== typeSymbol) {
     return false
   }
 
-  const declaration = interfaceOrClassDeclarations.find(d => d.name)!
-  return declaration.name!.getText()
+  return true
+}
+
+function isTypeInDefaultLib(program: ts.Program, type: ts.Type): boolean {
+  const typeSymbol = type.getSymbol()
+  if (!typeSymbol) {
+    return false
+  }
+  const fqn = typeSymbol
+    ? program.getTypeChecker().getFullyQualifiedName(typeSymbol)
+    : undefined
+  if (!fqn) {
+    return false
+  }
+
+  return !!typeSymbol
+    .getDeclarations()
+    ?.find(d => program.isSourceFileDefaultLibrary(d.getSourceFile()))
+}
+
+function isTypeInStaticHelper(program: ts.Program, type: ts.Type): boolean {
+  const staticHelperSourceFile = program.getSourceFile(
+    path.resolve(__dirname, 'static-helper.ts'),
+  )
+  if (!staticHelperSourceFile) {
+    throw new Error('missing "static-helper.ts" file')
+  }
+
+  return !!staticHelperSourceFile.statements.find(statement => {
+    if (!ts.isModuleDeclaration(statement)) {
+      return false
+    }
+    const typeChecker = program.getTypeChecker()
+    if (statement.name.getText() !== 'global') {
+      return false
+    }
+
+    if (!statement.body || !ts.isModuleBlock(statement.body)) {
+      return false
+    }
+
+    return !!statement.body.statements.find(statement => {
+      if (!ts.isInterfaceDeclaration(statement)) {
+        return false
+      }
+
+      const statementType = typeChecker.getTypeAtLocation(statement)
+      return statementType === type
+    })
+  })
+}
+
+function isTypeInGlobalNamespace(program: ts.Program, type: ts.Type): boolean {
+  const typeSymbol = type.getSymbol()
+  if (!typeSymbol) {
+    return false
+  }
+
+  const fqn = typeSymbol
+    ? program.getTypeChecker().getFullyQualifiedName(typeSymbol)
+    : undefined
+  if (!fqn) {
+    return false
+  }
+
+  const globalThisType = getGlobalThisType(program)
+  if (isTypeInGlobal(program, globalThisType, type)) {
+    return true
+  }
+
+  if (isTypeInDefaultLib(program, type)) {
+    return true
+  }
+
+  if (isTypeInStaticHelper(program, type)) {
+    return true
+  }
+
+  return false
 }
 
 function isTuple(
@@ -103,7 +217,7 @@ function isTuple(
   return (targetType.objectFlags & ts.ObjectFlags.Tuple) !== 0
 }
 
-function resolveEnumValues(program: ts.Program, type: ts.Type): EnumValue[] {
+function resolveEnumValues(ctx: Context, type: ts.Type): EnumValue[] {
   const typeSymbol = type.getSymbol()
   if (!typeSymbol) {
     return []
@@ -124,15 +238,12 @@ function resolveEnumValues(program: ts.Program, type: ts.Type): EnumValue[] {
   return enumDeclaration.members.map(member => {
     return {
       name: member.name.getText(),
-      value: program.getTypeChecker().getConstantValue(member),
+      value: ctx.program.getTypeChecker().getConstantValue(member),
     }
   })
 }
 
-function resolveSignature(
-  program: ts.Program,
-  signature: ts.Signature,
-): Signature {
+function resolveSignature(ctx: Context, signature: ts.Signature): Signature {
   return {
     params: signature.getParameters().map(param => {
       const declarations = param.getDeclarations()
@@ -143,8 +254,8 @@ function resolveSignature(
       return {
         name: param.getName(),
         type: resolveType(
-          program,
-          program
+          ctx,
+          ctx.program
             .getTypeChecker()
             .getTypeOfSymbolAtLocation(param, declarations[0]),
         ),
@@ -152,8 +263,8 @@ function resolveSignature(
     }),
     typeParameters: signature
       .getTypeParameters()
-      ?.map(param => resolveType(program, param)),
-    returnType: resolveType(program, signature.getReturnType()),
+      ?.map(param => resolveType(ctx, param)),
+    returnType: resolveType(ctx, signature.getReturnType()),
   }
 }
 
@@ -176,7 +287,7 @@ function resolveModifierFlagsToScope(
 }
 
 function resolveProperty(
-  program: ts.Program,
+  ctx: Context,
   propertySymbol: ts.Symbol,
 ): ObjectProperty {
   const declarations = propertySymbol.getDeclarations()
@@ -201,84 +312,91 @@ function resolveProperty(
       (propertySymbol.flags & ts.SymbolFlags.Optional) !== ts.SymbolFlags.None,
     scope: resolveModifierFlagsToScope(modifierFlags),
     type: resolveType(
-      program,
-      program
+      ctx,
+      ctx.program
         .getTypeChecker()
         .getTypeOfSymbolAtLocation(propertySymbol, declarations[0]),
     ),
   }
 }
 
-function resolveTypeArguments(
-  program: ts.Program,
-  type: ts.Type,
-): RuntimeType[] {
-  return program
+function resolveTypeArguments(ctx: Context, type: ts.Type): RuntimeType[] {
+  return ctx.program
     .getTypeChecker()
     .getTypeArguments(type as ts.TypeReference)
-    .map(t => resolveType(program, t))
+    .map(t => resolveType(ctx, t))
 }
 
 function resolveTypeParameters(
-  program: ts.Program,
+  ctx: Context,
   type: ts.Type & { typeParameters?: ts.Type[] },
 ): RuntimeType[] {
   if (!type.typeParameters) {
     return []
   }
-  return type.typeParameters.map(t => resolveType(program, t))
+  return type.typeParameters.map(t => resolveType(ctx, t))
 }
 
-function resolveObjectType(
-  program: ts.Program,
-  type: ts.InterfaceType,
-  fqn?: string,
-): ObjectType | UnsupportedType {
+function resolveObjectType(ctx: Context, type: ts.InterfaceType): ObjectType {
   const tsNumberIndexType = type.getNumberIndexType()
   const tsStringIndexType = type.getStringIndexType()
 
   return {
     kind: Kind.Object,
-    fqn,
     callSignatures: type
       .getCallSignatures()
-      .map(signature => resolveSignature(program, signature)),
+      .map(signature => resolveSignature(ctx, signature)),
     constructSignatures: type
       .getConstructSignatures()
-      .map(signature => resolveSignature(program, signature)),
+      .map(signature => resolveSignature(ctx, signature)),
     properties: type
       .getProperties()
-      .map(propertySymbol => resolveProperty(program, propertySymbol)),
-    numberIndexType:
-      tsNumberIndexType && resolveType(program, tsNumberIndexType),
-    stringIndexType:
-      tsStringIndexType && resolveType(program, tsStringIndexType),
-    typeParameters: resolveTypeParameters(program, type),
-    typeArguments: resolveTypeParameters(program, type),
+      .map(propertySymbol => resolveProperty(ctx, propertySymbol)),
+    numberIndexType: tsNumberIndexType && resolveType(ctx, tsNumberIndexType),
+    stringIndexType: tsStringIndexType && resolveType(ctx, tsStringIndexType),
+    typeParameters: resolveTypeParameters(ctx, type),
+    typeArguments: resolveTypeParameters(ctx, type),
   }
 }
 
-function resolveType(program: ts.Program, type: ts.Type): RuntimeType {
-  const typeChecker = program.getTypeChecker()
+function resolveRefType(
+  ctx: Context,
+  type: ts.InterfaceType,
+): RefType | UnsupportedType {
+  const typeChecker = ctx.program.getTypeChecker()
+  const typeSymbol = type.getSymbol()
+  if (!typeSymbol) {
+    return { kind: Kind.Unsupported }
+  }
+  return {
+    kind: Kind.Ref,
+    ref: getSymbolGlobalRef(typeSymbol),
+    fqn: typeChecker.getFullyQualifiedName(typeSymbol),
+    typeParameters: resolveTypeParameters(ctx, type),
+    typeArguments: resolveTypeParameters(ctx, type),
+  }
+}
+
+function resolveType(ctx: Context, type: ts.Type): RuntimeType {
+  const typeChecker = ctx.program.getTypeChecker()
   const typeSymbol = type.getSymbol()
   const fqn = typeSymbol
     ? typeChecker.getFullyQualifiedName(typeSymbol)
     : undefined
 
-  const globalName = checkAndGetGlobalName(program, type)
-  if (globalName) {
+  if (typeSymbol && fqn && isTypeInGlobalNamespace(ctx.program, type)) {
     return {
       kind: Kind.Wellknown,
-      fqn: globalName,
-      typeArguments: resolveTypeArguments(program, type),
-      typeParameters: resolveTypeParameters(program, type),
+      fqn,
+      typeArguments: resolveTypeArguments(ctx, type),
+      typeParameters: resolveTypeParameters(ctx, type),
     }
   }
 
   if (isEnum(type)) {
     return {
       kind: Kind.Enum,
-      values: resolveEnumValues(program, type),
+      values: resolveEnumValues(ctx, type),
       fqn,
     }
   }
@@ -412,7 +530,7 @@ function resolveType(program: ts.Program, type: ts.Type): RuntimeType {
   if (type.isUnion()) {
     return {
       kind: Kind.Union,
-      elementTypes: type.types.map(t => resolveType(program, t)),
+      elementTypes: type.types.map(t => resolveType(ctx, t)),
       fqn,
     }
   }
@@ -420,7 +538,7 @@ function resolveType(program: ts.Program, type: ts.Type): RuntimeType {
   if (type.isIntersection()) {
     return {
       kind: Kind.Intersection,
-      elementTypes: type.types.map(t => resolveType(program, t)),
+      elementTypes: type.types.map(t => resolveType(ctx, t)),
       fqn,
     }
   }
@@ -435,13 +553,29 @@ function resolveType(program: ts.Program, type: ts.Type): RuntimeType {
       return {
         kind: Kind.Tuple,
         elementTypes: typeArguments.map(typeParameter =>
-          resolveType(program, typeParameter),
+          resolveType(ctx, typeParameter),
         ),
         fqn,
       }
     }
 
-    return resolveObjectType(program, objectType)
+    if (!typeSymbol || !fqn) {
+      throw new Error('object type without symbol')
+    }
+
+    const ref = getSymbolGlobalRef(typeSymbol)
+    // not in pending or resolved list
+    if (!ctx.pendingTypes[ref] && !ctx.resolvedTypes[ref]) {
+      ctx.pendingTypes[ref] = type as ts.InterfaceType
+    }
+
+    return {
+      kind: Kind.Ref,
+      ref,
+      fqn,
+      typeParameters: resolveTypeParameters(ctx, type),
+      typeArguments: resolveTypeParameters(ctx, type),
+    }
   }
 
   return {
@@ -495,12 +629,32 @@ export default function transformer<T extends ts.Node>(
         return ts.visitEachChild(node, child => visit(child), context)
       }
 
-      const sourceFile = variableDeclaration.getSourceFile()
-      if (path.resolve(__dirname, './decorators.ts') !== sourceFile.fileName) {
-        return ts.visitEachChild(node, child => visit(child), context)
+      const classType = typeChecker.getTypeAtLocation(
+        node.parent,
+      ) as ts.InterfaceType
+
+      const mainRef = getSymbolGlobalRef(classType.getSymbol()!)
+
+      const ctx: Context = {
+        program,
+        resolvedTypes: {},
+        pendingTypes: {
+          [mainRef]: classType,
+        },
       }
 
-      const classType = typeChecker.getTypeAtLocation(node.parent)
+      while (Object.keys(ctx.pendingTypes).length > 0) {
+        Object.entries(ctx.pendingTypes).forEach(([key, pendingType]) => {
+          const runtimeType = resolveObjectType(ctx, pendingType)
+          ctx.resolvedTypes[key] = runtimeType
+          delete ctx.pendingTypes[key]
+        })
+      }
+
+      const options: import('./decorators').ClassRttiOptions = {
+        mainRef,
+        references: ctx.resolvedTypes,
+      }
 
       return ts.createDecorator(
         ts.createCall(
@@ -515,11 +669,7 @@ export default function transformer<T extends ts.Node>(
             ts.createCall(
               ts.createPropertyAccess(ts.createIdentifier('JSON'), 'parse'),
               undefined,
-              [
-                ts.createLiteral(
-                  JSON.stringify(resolveType(program, classType)),
-                ),
-              ],
+              [ts.createLiteral(JSON.stringify(options))],
             ),
           ],
         ),

@@ -17,6 +17,7 @@ export enum Kind {
   Intersection = 'Intersection',
   Enum = 'Enum',
   Wellknown = 'Wellknown',
+  Ref = 'Ref',
 }
 
 export interface BaseType {
@@ -111,17 +112,17 @@ export interface ObjectType extends BaseType {
 
 export interface TupleType extends BaseType {
   kind: Kind.Tuple
-  elementTypes: BaseType[]
+  elementTypes: RuntimeType[]
 }
 
 export interface UnionType extends BaseType {
   kind: Kind.Union
-  elementTypes: BaseType[]
+  elementTypes: RuntimeType[]
 }
 
 export interface IntersectionType extends BaseType {
   kind: Kind.Intersection
-  elementTypes: BaseType[]
+  elementTypes: RuntimeType[]
 }
 
 export interface EnumValue {
@@ -137,6 +138,14 @@ export interface EnumType extends BaseType {
 export interface WellknownType extends BaseType {
   kind: Kind.Wellknown
   fqn: string
+  typeParameters?: RuntimeType[]
+  typeArguments?: RuntimeType[]
+}
+
+export interface RefType extends BaseType {
+  kind: Kind.Ref
+  fqn: string
+  ref: string
   typeParameters?: RuntimeType[]
   typeArguments?: RuntimeType[]
 }
@@ -160,3 +169,4 @@ export type RuntimeType =
   | IntersectionType
   | EnumType
   | WellknownType
+  | RefType

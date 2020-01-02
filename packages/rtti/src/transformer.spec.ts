@@ -214,7 +214,7 @@ describe('Test Transformer', () => {
     })
   })
 
-  it('should work for array', () => {
+  it('should work with array', () => {
     @GenerateClassRtti
     class TestClass {
       public strings!: string[]
@@ -222,7 +222,7 @@ describe('Test Transformer', () => {
       // tslint:disable-next-line
       public stringArray!: Array<string>
 
-      public readonlyStringArray!: ReadonlyArray<string>
+      public readonlyStrings!: ReadonlyArray<string>
     }
 
     const rtti = getClassRtti(TestClass)
@@ -266,7 +266,7 @@ describe('Test Transformer', () => {
           },
         },
         {
-          name: 'readonlyStringArray',
+          name: 'readonlyStrings',
           optional: false,
           readonly: false,
           scope: 'public',
@@ -499,6 +499,7 @@ describe('Test Transformer', () => {
     @GenerateClassRtti
     class TestClass {
       public date!: Date
+      public buffer!: Buffer
       public arrayBuffer!: ArrayBuffer
       public int8Array!: Int8Array
       public uint8Array!: Uint8Array
@@ -511,15 +512,12 @@ describe('Test Transformer', () => {
       public float64Array!: Float64Array
       public bigInt64Array!: BigInt64Array
       public bigUint64Array!: BigUint64Array
-      public buffer!: Buffer
       public regex!: RegExp
       public url!: URL
       public map!: Map<string, number>
       public set!: Set<string>
       public weakMap!: WeakMap<any, number>
       public weakSet!: WeakSet<any>
-      public iterator!: Iterator<string, number, boolean>
-      public asyncIterator!: AsyncIterator<string, number, boolean>
     }
 
     const rtti = getClassRtti(TestClass)
@@ -540,6 +538,18 @@ describe('Test Transformer', () => {
             typeParameters: [],
             typeArguments: [],
             fqn: 'Date',
+          },
+        },
+        {
+          name: 'buffer',
+          optional: false,
+          readonly: false,
+          scope: 'public',
+          type: {
+            kind: 'Wellknown',
+            typeParameters: [],
+            typeArguments: [],
+            fqn: 'Buffer',
           },
         },
         {
@@ -687,18 +697,6 @@ describe('Test Transformer', () => {
           },
         },
         {
-          name: 'buffer',
-          optional: false,
-          readonly: false,
-          scope: 'public',
-          type: {
-            kind: 'Wellknown',
-            typeParameters: [],
-            typeArguments: [],
-            fqn: 'Buffer',
-          },
-        },
-        {
           name: 'regex',
           optional: false,
           readonly: false,
@@ -792,50 +790,6 @@ describe('Test Transformer', () => {
             typeParameters: [],
           },
         },
-        {
-          name: 'iterator',
-          optional: false,
-          readonly: false,
-          scope: 'public',
-          type: {
-            kind: 'Wellknown',
-            fqn: 'Iterator',
-            typeArguments: [
-              {
-                kind: 'String',
-              },
-              {
-                kind: 'Number',
-              },
-              {
-                kind: 'Boolean',
-              },
-            ],
-            typeParameters: [],
-          },
-        },
-        {
-          name: 'asyncIterator',
-          optional: false,
-          readonly: false,
-          scope: 'public',
-          type: {
-            kind: 'Wellknown',
-            fqn: 'AsyncIterator',
-            typeArguments: [
-              {
-                kind: 'String',
-              },
-              {
-                kind: 'Number',
-              },
-              {
-                kind: 'Boolean',
-              },
-            ],
-            typeParameters: [],
-          },
-        },
       ],
     })
   })
@@ -916,6 +870,52 @@ describe('Test Transformer', () => {
     @GenerateClassRtti
     class TestClass {
       public nested!: Nested
+    }
+
+    const rtti = getClassRtti(TestClass)
+    expect(rtti).toEqual({
+      kind: Kind.Object,
+      callSignatures: [],
+      constructSignatures: [],
+      typeArguments: [],
+      typeParameters: [],
+      properties: [
+        {
+          name: 'nested',
+          optional: false,
+          readonly: false,
+          scope: 'public',
+          type: {
+            kind: 'Object',
+            callSignatures: [],
+            constructSignatures: [],
+            typeArguments: [],
+            typeParameters: [],
+            properties: [
+              {
+                name: 'foo',
+                optional: false,
+                readonly: false,
+                scope: 'public',
+                type: {
+                  kind: 'String',
+                },
+              },
+            ],
+          },
+        },
+      ],
+    })
+  })
+
+  it('should work with nested object class', () => {
+    class NestedClass {
+      public foo!: string
+    }
+
+    @GenerateClassRtti
+    class TestClass {
+      public nested!: NestedClass
     }
 
     const rtti = getClassRtti(TestClass)
@@ -1130,5 +1130,34 @@ describe('Test Transformer', () => {
         },
       ],
     })
+  })
+
+  it('should work with recursive type', () => {
+    @GenerateClassRtti
+    class TestClass {
+      public sibling!: TestClass
+    }
+
+    const rtti = getClassRtti(TestClass)
+
+    const expected = {
+      kind: Kind.Object,
+      callSignatures: [],
+      constructSignatures: [],
+      typeArguments: [],
+      typeParameters: [],
+      properties: [
+        {
+          name: 'sibling',
+          optional: false,
+          readonly: false,
+          scope: 'public',
+          type: null as any,
+        },
+      ],
+    }
+    expected.properties[0].type = expected
+
+    expect(rtti).toEqual(expected)
   })
 })

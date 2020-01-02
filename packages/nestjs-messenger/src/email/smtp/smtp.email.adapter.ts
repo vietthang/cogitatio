@@ -1,5 +1,8 @@
 import { Optional, Property } from '@cogitatio/core'
+import { internal } from '@cogitatio/errors'
 import { Default, Port } from '@cogitatio/extra'
+import fetch from 'node-fetch'
+import { Readable } from 'stream'
 import { EmailAddress, SendEmailPayload } from '../dto'
 import { EmailAdapter } from '../email.adapter'
 
@@ -60,6 +63,37 @@ export class SmtpEmailAdapter extends EmailAdapter {
       subject: payload.subject,
       html: payload.html,
       text: payload.text,
+      attachments:
+        payload.attachments &&
+        (await Promise.all(
+          payload.attachments.map(async attachment => {
+            let content: string | Buffer | Readable
+            switch (attachment.body.type) {
+              case 'Text':
+                content = attachment.body.Text
+                break
+              case 'Binary':
+                content = Buffer.from(attachment.body.Binary)
+                break
+              case 'Url': {
+                const res = await fetch(attachment.body.Url)
+                if (!res.ok) {
+                  throw internal({
+                    message: `fetch attachment error`,
+                    extra: { status: res.status, body: await res.text() },
+                  })
+                }
+                content = res.body as any
+              }
+            }
+
+            return {
+              filename: attachment.filename,
+              contentType: attachment.contentType,
+              content,
+            }
+          }),
+        )),
     })
   }
 }

@@ -4,7 +4,7 @@ import { Email } from '@cogitatio/extra'
 export const AttachmentBody = TaggedUnion({
   Text: String,
   Binary: Uint8Array,
-  Ref: String,
+  Url: URL,
 })
 
 export type AttachmentBody = Resolve<typeof AttachmentBody>
@@ -16,8 +16,8 @@ export class Attachment {
   @Property(Optional(String))
   public readonly contentType?: string
 
-  @Property(Optional(AttachmentBody))
-  public readonly body?: AttachmentBody
+  @Property(AttachmentBody)
+  public readonly body!: AttachmentBody
 }
 
 export class EmailAddress {

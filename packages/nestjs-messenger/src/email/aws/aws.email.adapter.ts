@@ -1,54 +1,76 @@
+import { internal } from '@cogitatio/errors'
+import fetch from 'node-fetch'
+import { Readable } from 'stream'
 import { EmailAddress, SendEmailPayload } from '../dto'
 import { EmailAdapter } from '../email.adapter'
 
 export class AwsEmailAdapter extends EmailAdapter {
-  private static formatEmailAddress(address: EmailAddress): string {
+  private static convertEmailAddress(
+    address: EmailAddress,
+  ): string | import('nodemailer/lib/mailer').Address {
     if (address.name) {
-      return `${address.name} <${address.address}>`
+      return {
+        name: address.name,
+        address: address.address,
+      }
     }
     return address.address
   }
-  private readonly ses: import('aws-sdk').SES
+
+  private readonly transport: import('nodemailer/lib/mailer')
 
   constructor() {
     super()
     const { SES }: typeof import('aws-sdk') = require('aws-sdk')
-    this.ses = new SES()
+    const mailer: typeof import('nodemailer') = require('nodemailer')
+    this.transport = mailer.createTransport({
+      SES: new SES(),
+    })
   }
 
   public async sendMessage(payload: SendEmailPayload): Promise<void> {
-    const request: import('aws-sdk').SES.Types.SendEmailRequest = {
-      Source: AwsEmailAdapter.formatEmailAddress(payload.from),
-      Message: {
-        Subject: {
-          Data: payload.subject,
-          Charset: 'UTF-8',
-        },
-        Body: {
-          Html:
-            (payload.html && {
-              Data: payload.html,
-              Charset: 'UTF-8',
-            }) ||
-            undefined,
-          Text:
-            (payload.text && {
-              Data: payload.text,
-              Charset: 'UTF-8',
-            }) ||
-            undefined,
-        },
-      },
-      Destination: {
-        ToAddresses: payload.to?.map(AwsEmailAdapter.formatEmailAddress),
-        CcAddresses: payload.cc?.map(AwsEmailAdapter.formatEmailAddress),
-        BccAddresses: payload.bcc?.map(AwsEmailAdapter.formatEmailAddress),
-      },
-      ReplyToAddresses: payload.replyTo?.map(
-        AwsEmailAdapter.formatEmailAddress,
-      ),
-    }
+    await this.transport.sendMail({
+      from: payload.from && AwsEmailAdapter.convertEmailAddress(payload.from),
+      to: payload.to?.map(AwsEmailAdapter.convertEmailAddress),
+      cc: payload.cc?.map(AwsEmailAdapter.convertEmailAddress),
+      bcc: payload.bcc?.map(AwsEmailAdapter.convertEmailAddress),
+      replyTo: payload.replyTo
+        ?.map(AwsEmailAdapter.convertEmailAddress)
+        .join(', '),
+      subject: payload.subject,
+      html: payload.html,
+      text: payload.text,
+      attachments:
+        payload.attachments &&
+        (await Promise.all(
+          payload.attachments.map(async attachment => {
+            let content: string | Buffer | Readable
+            switch (attachment.body.type) {
+              case 'Text':
+                content = attachment.body.Text
+                break
+              case 'Binary':
+                content = Buffer.from(attachment.body.Binary)
+                break
+              case 'Url': {
+                const res = await fetch(attachment.body.Url)
+                if (!res.ok) {
+                  throw internal({
+                    message: `fetch attachment error`,
+                    extra: { status: res.status, body: await res.text() },
+                  })
+                }
+                content = res.body as any
+              }
+            }
 
-    await this.ses.sendEmail(request).promise()
+            return {
+              filename: attachment.filename,
+              contentType: attachment.contentType,
+              content,
+            }
+          }),
+        )),
+    })
   }
 }

@@ -1,8 +1,8 @@
 import { Temporal } from '@cogitatio/tc39-temporal'
 import { IdGenerator } from './id-generator'
 
-describe('test getIdGenerator', () => {
-  it('should generate fine', async () => {
+describe('test IdGenerator', () => {
+  it('should generate correctly', async () => {
     const epoch = Temporal.Absolute.fromEpochMilliseconds(Date.UTC(2000, 0))
 
     const idGenerator = new IdGenerator({
@@ -11,7 +11,7 @@ describe('test getIdGenerator', () => {
     })
 
     const baseId = BigInt('2646880970342400000')
-    for (let i = 0; i <= 0xfff; i++) {
+    for (let i = 0; i < 0x1000; i++) {
       const expected = (baseId + BigInt(i)).toString()
       expect(
         idGenerator
@@ -24,7 +24,14 @@ describe('test getIdGenerator', () => {
           .toString(),
       ).toEqual(expected)
     }
-    expect(() => idGenerator.nextId(String)).toThrowError()
+    expect(() =>
+      idGenerator.nextId(String, {
+        ioTimestamp: () =>
+          Temporal.Absolute.fromEpochMilliseconds(
+            Date.UTC(2020, 0, 0, 0, 0, 0, 0),
+          ),
+      }),
+    ).toThrowError()
 
     expect(
       idGenerator

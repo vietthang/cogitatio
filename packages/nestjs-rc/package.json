@@ -22,7 +22,7 @@
     "@cogitatio/core": "^0.0.12-alpha.2",
     "@cogitatio/errors": "^0.0.12-alpha.2",
     "@cogitatio/extra": "^0.0.12-alpha.2",
-    "@cogitatio/nestjs-validation": "^0.0.12-alpha.2",
+    "@cogitatio/nestjs-validation": "^0.0.12-alpha.1",
     "@nestjs/common": "^6.10.11",
     "@nestjs/core": "^6.10.11",
     "rc": "^1.2.8"

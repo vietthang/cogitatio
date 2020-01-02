@@ -1,6 +1,6 @@
 import { Decoder, Resolve, SchemaLike, ValidationError } from '@cogitatio/core'
 import { internal } from '@cogitatio/errors'
-import { DECODER_SYMBOL } from '@cogitatio/nestjs-validation'
+import { JSON_CODEC_SYMBOL } from '@cogitatio/nestjs-validation'
 import { DynamicModule, Global } from '@nestjs/common'
 import { either } from 'fp-ts'
 import rc from 'rc'
@@ -37,7 +37,7 @@ export class CoreModule {
             }
             return theDecoder
           },
-          inject: [DECODER_SYMBOL],
+          inject: [JSON_CODEC_SYMBOL],
         },
         {
           provide: CONFIG_SYMBOL,

@@ -17,17 +17,14 @@
     "/src",
     "/dist"
   ],
-  "peerDependencies": {
-    "@cogitatio/core": "^0.0.11",
-    "@cogitatio/errors": "^0.0.11",
-    "@cogitatio/extra": "^0.0.11",
-    "@cogitatio/joi": "^0.0.11",
+  "dependencies": {
+    "@cogitatio/core": "^0.0.12-alpha.2",
+    "@cogitatio/errors": "^0.0.12-alpha.2",
+    "@cogitatio/extra": "^0.0.12-alpha.2",
+    "@cogitatio/joi": "^0.0.12-alpha.2",
     "@nestjs/common": "^6.10.11",
     "@nestjs/core": "^6.10.11"
   },
-  "devDependencies": {
-    "@nestjs/common": "^6.10.11",
-    "@nestjs/core": "^6.10.11"
-  },
+  "devDependencies": {},
   "gitHead": "43351e734f3e5dac4ef7a3d717e0b8280e6ff1c3"
 }

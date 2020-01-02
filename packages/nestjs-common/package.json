@@ -19,7 +19,6 @@
     "/dist"
   ],
   "devDependencies": {
-    "@types/flake-idgen": "^0.1.30",
     "@types/request-ip": "^0.0.34",
     "@types/useragent": "^2.1.1",
     "@types/uuid": "^3.4.6",
@@ -35,8 +34,7 @@
   "dependencies": {
     "@cogitatio/core": "^0.0.12-alpha.2",
     "@cogitatio/extra": "^0.0.12-alpha.2",
-    "@cogitatio/tc39-temporal": "^0.0.12-alpha.2",
-    "flake-idgen": "^1.1.2"
+    "@cogitatio/tc39-temporal": "^0.0.12-alpha.2"
   },
   "gitHead": "43351e734f3e5dac4ef7a3d717e0b8280e6ff1c3"
 }

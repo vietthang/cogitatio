@@ -1,0 +1,40 @@
+{
+  "name": "@cogitatio/nestjs-messenger",
+  "version": "0.0.12-alpha.1",
+  "main": "dist/index.js",
+  "types": "dist/packages/nestjs-messenger/src/index.d.ts",
+  "scripts": {
+    "clean": "rimraf ./dist",
+    "prebuild": "yarn clean",
+    "build": "tsdx build --target node --tsconfig tsconfig.build.json --entry src/index.ts",
+    "prepublishOnly": "yarn build"
+  },
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "/src",
+    "/dist"
+  ],
+  "peerDependencies": {
+    "aws-sdk": "^2.595.0",
+    "nodemailer": "^6.4.2"
+  },
+  "dependencies": {
+    "@cogitatio/nestjs-validation": "^0.0.12-alpha.1",
+    "@cogitatio/core": "^0.0.12-alpha.1",
+    "@cogitatio/errors": "^0.0.12-alpha.1",
+    "@cogitatio/extra": "^0.0.12-alpha.1",
+    "@nestjs/common": "^6.10.11",
+    "@nestjs/core": "^6.10.11",
+    "node-fetch": "^2.6.0"
+  },
+  "devDependencies": {
+    "@types/node-fetch": "^2.5.4",
+    "@types/nodemailer": "^6.4.0",
+    "aws-sdk": "^2.595.0",
+    "nodemailer": "^6.4.2"
+  },
+  "gitHead": "43351e734f3e5dac4ef7a3d717e0b8280e6ff1c3"
+}

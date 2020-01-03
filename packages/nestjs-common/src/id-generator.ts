@@ -1,6 +1,6 @@
 import { Optional, Property, SchemaLike } from '@cogitatio/core'
 import { internal } from '@cogitatio/errors'
-import { Id64 } from '@cogitatio/extra'
+import { Id64, Uint64 } from '@cogitatio/extra'
 import { Temporal } from '@cogitatio/tc39-temporal'
 
 export class IdGeneratorOptions {
@@ -82,6 +82,6 @@ export class IdGenerator {
       BigInt(this.id) * BigInt(2) ** BigInt(12) +
       time * BigInt(2) ** BigInt(22)
 
-    return Id64(schema)(result)
+    return Id64(schema)(Uint64(result))
   }
 }

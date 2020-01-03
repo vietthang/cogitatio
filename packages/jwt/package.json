@@ -1,6 +1,6 @@
 {
   "name": "@cogitatio/jwt",
-  "version": "0.0.12-alpha.2",
+  "version": "0.0.12-alpha.3",
   "main": "dist/index.js",
   "types": "dist/packages/jwt/src/index.d.ts",
   "scripts": {
@@ -14,9 +14,9 @@
     "access": "public"
   },
   "dependencies": {
-    "@cogitatio/core": "^0.0.12-alpha.2",
-    "@cogitatio/errors": "^0.0.12-alpha.2",
-    "@cogitatio/extra": "^0.0.12-alpha.2",
+    "@cogitatio/core": "^0.0.12-alpha.3",
+    "@cogitatio/errors": "^0.0.12-alpha.3",
+    "@cogitatio/extra": "^0.0.12-alpha.3",
     "jsonwebtoken": "^8.5.1"
   },
   "files": [

@@ -1,6 +1,6 @@
 {
   "name": "@cogitatio/extra",
-  "version": "0.0.12-alpha.2",
+  "version": "0.0.12-alpha.3",
   "main": "dist/index.js",
   "types": "dist/packages/extra/src/index.d.ts",
   "scripts": {
@@ -18,7 +18,7 @@
     "/dist"
   ],
   "dependencies": {
-    "@cogitatio/core": "^0.0.12-alpha.2",
+    "@cogitatio/core": "^0.0.12-alpha.3",
     "@hapi/joi": "^16.1.8"
   },
   "peerDependencies": {

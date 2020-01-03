@@ -1,6 +1,6 @@
 {
   "name": "@cogitatio/rtti",
-  "version": "0.0.12-alpha.2",
+  "version": "0.0.12-alpha.3",
   "main": "dist/index.js",
   "types": "dist/packages/rtti/src/index.d.ts",
   "scripts": {

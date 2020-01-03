@@ -1,6 +1,6 @@
 {
   "name": "@cogitatio/nestjs-rc",
-  "version": "0.0.12-alpha.1",
+  "version": "0.0.12-alpha.3",
   "main": "dist/index.js",
   "types": "dist/packages/nestjs-rc/src/index.d.ts",
   "scripts": {
@@ -17,12 +17,11 @@
     "/src",
     "/dist"
   ],
-  "peerDependencies": {},
   "dependencies": {
-    "@cogitatio/core": "^0.0.12-alpha.2",
-    "@cogitatio/errors": "^0.0.12-alpha.2",
-    "@cogitatio/extra": "^0.0.12-alpha.2",
-    "@cogitatio/nestjs-validation": "^0.0.12-alpha.1",
+    "@cogitatio/core": "^0.0.12-alpha.3",
+    "@cogitatio/errors": "^0.0.12-alpha.3",
+    "@cogitatio/extra": "^0.0.12-alpha.3",
+    "@cogitatio/nestjs-validation": "^0.0.12-alpha.3",
     "@nestjs/common": "^6.10.11",
     "@nestjs/core": "^6.10.11",
     "rc": "^1.2.8"

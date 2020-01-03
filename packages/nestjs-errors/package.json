@@ -1,6 +1,6 @@
 {
   "name": "@cogitatio/nestjs-errors",
-  "version": "0.0.12-alpha.2",
+  "version": "0.0.12-alpha.3",
   "main": "dist/index.js",
   "types": "dist/packages/nestjs-errors/src/index.d.ts",
   "scripts": {
@@ -28,9 +28,8 @@
     "apollo-server-express": "^2.9.14",
     "node-fetch": "^2.6.0"
   },
-  "peerDependencies": {},
   "dependencies": {
-    "@cogitatio/errors": "^0.0.12-alpha.2"
+    "@cogitatio/errors": "^0.0.12-alpha.3"
   },
   "gitHead": "43351e734f3e5dac4ef7a3d717e0b8280e6ff1c3"
 }

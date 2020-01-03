@@ -1,6 +1,7 @@
 import {
   Decoder,
   Enum,
+  JsonValue,
   List,
   Optional,
   Property,
@@ -47,13 +48,16 @@ export class JwtVerifyConfig {
 
 export class JwtVerifier<S extends SchemaLike> {
   constructor(
-    private readonly decoder: Decoder<unknown>,
+    private readonly decoder: Decoder<JsonValue>,
     private readonly schema: S,
     private readonly config: JwtVerifyConfig,
   ) {}
 
-  public verify(token: string, date: Date = new Date()): Resolve<S> {
-    let decoded: unknown
+  public verify(
+    token: string,
+    timestamp: Temporal.Absolute = Temporal.now.absolute(),
+  ): Resolve<S> {
+    let decoded: any
     try {
       decoded = jwt.verify(token, this.config.key, {
         algorithms: this.config.algorithms,
@@ -66,7 +70,7 @@ export class JwtVerifier<S extends SchemaLike> {
         ignoreNotBefore: this.config.ignoreNotBefore,
         jwtid: this.config.jwtid,
         subject: this.config.subject,
-        clockTimestamp: Math.floor(date.getTime() / 1000),
+        clockTimestamp: Number(timestamp.getEpochSeconds()),
       })
     } catch (error) {
       throw unauthorized({ code: 'INVALID_JWT', origin: error })

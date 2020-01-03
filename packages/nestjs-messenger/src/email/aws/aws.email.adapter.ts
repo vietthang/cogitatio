@@ -1,7 +1,7 @@
 import { internal } from '@cogitatio/errors'
 import fetch from 'node-fetch'
 import { Readable } from 'stream'
-import { EmailAddress, SendEmailPayload } from '../dto'
+import { EmailAddress, SendEmailPayload, SendEmailResponse } from '../dto'
 import { EmailAdapter } from '../email.adapter'
 
 export class AwsEmailAdapter extends EmailAdapter {
@@ -28,8 +28,10 @@ export class AwsEmailAdapter extends EmailAdapter {
     })
   }
 
-  public async sendMessage(payload: SendEmailPayload): Promise<void> {
-    await this.transport.sendMail({
+  public async sendMessage(
+    payload: SendEmailPayload,
+  ): Promise<SendEmailResponse> {
+    const res = await this.transport.sendMail({
       from: payload.from && AwsEmailAdapter.convertEmailAddress(payload.from),
       to: payload.to?.map(AwsEmailAdapter.convertEmailAddress),
       cc: payload.cc?.map(AwsEmailAdapter.convertEmailAddress),
@@ -72,5 +74,7 @@ export class AwsEmailAdapter extends EmailAdapter {
           }),
         )),
     })
+
+    return { messageId: res.messageId }
   }
 }

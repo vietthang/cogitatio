@@ -56,3 +56,8 @@ export class SendEmailPayload {
   @Property(Optional(List(Attachment)))
   public readonly attachments?: Attachment[]
 }
+
+export class SendEmailResponse {
+  @Property(Optional(String))
+  public readonly messageId?: string
+}

@@ -1,8 +1,8 @@
-import { SendEmailPayload } from './dto'
+import { SendEmailPayload, SendEmailResponse } from './dto'
 import { EmailAdapter } from './email.adapter'
 
 export class NullEmailAdapter extends EmailAdapter {
-  public sendMessage(_: SendEmailPayload): Promise<void> {
+  public sendMessage(_: SendEmailPayload): Promise<SendEmailResponse> {
     throw new Error('Method not implemented.')
   }
 }

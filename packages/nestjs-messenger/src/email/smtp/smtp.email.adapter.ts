@@ -3,7 +3,7 @@ import { internal } from '@cogitatio/errors'
 import { Default, Port } from '@cogitatio/extra'
 import fetch from 'node-fetch'
 import { Readable } from 'stream'
-import { EmailAddress, SendEmailPayload } from '../dto'
+import { EmailAddress, SendEmailPayload, SendEmailResponse } from '../dto'
 import { EmailAdapter } from '../email.adapter'
 
 export class SmtpEmailAdapterOptions {
@@ -40,11 +40,14 @@ export class SmtpEmailAdapter extends EmailAdapter {
     super()
   }
 
-  public async sendMessage(payload: SendEmailPayload): Promise<void> {
+  public async sendMessage(
+    payload: SendEmailPayload,
+  ): Promise<SendEmailResponse> {
     const mailer = await import('nodemailer')
     const transport = mailer.createTransport({
       host: this.options.host,
       port: Number(this.options.port),
+      secure: this.options.secure,
       auth:
         (this.options.user && {
           user: this.options.user,
@@ -52,7 +55,8 @@ export class SmtpEmailAdapter extends EmailAdapter {
         }) ||
         undefined,
     })
-    await transport.sendMail({
+
+    const res = await transport.sendMail({
       from: payload.from && SmtpEmailAdapter.convertEmailAddress(payload.from),
       to: payload.to?.map(SmtpEmailAdapter.convertEmailAddress),
       cc: payload.cc?.map(SmtpEmailAdapter.convertEmailAddress),
@@ -95,5 +99,7 @@ export class SmtpEmailAdapter extends EmailAdapter {
           }),
         )),
     })
+
+    return { messageId: res.messageId }
   }
 }

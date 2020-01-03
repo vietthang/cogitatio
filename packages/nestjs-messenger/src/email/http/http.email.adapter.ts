@@ -1,7 +1,7 @@
 import { Encoder, JsonValue, Property } from '@cogitatio/core'
 import { error } from '@cogitatio/errors'
 import fetch from 'node-fetch'
-import { SendEmailPayload } from '../dto'
+import { SendEmailPayload, SendEmailResponse } from '../dto'
 import { EmailAdapter } from '../email.adapter'
 
 export class HttpEmailAdapterOptions {
@@ -17,7 +17,9 @@ export class HttpEmailAdapter extends EmailAdapter {
     super()
   }
 
-  public async sendMessage(payload: SendEmailPayload): Promise<void> {
+  public async sendMessage(
+    payload: SendEmailPayload,
+  ): Promise<SendEmailResponse> {
     const res = await fetch(this.options.url, {
       method: 'POST',
       headers: {
@@ -28,5 +30,7 @@ export class HttpEmailAdapter extends EmailAdapter {
     if (!res.ok) {
       throw error({ code: 'POST_FAILED', extra: await res.text() })
     }
+    const json = await res.json()
+    return { messageId: json.messageId }
   }
 }

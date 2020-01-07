@@ -105,8 +105,15 @@ export class JsonCodec implements Codec<JsonValue, JsonValue> {
         )
 
       case SchemaType.Object:
-        return mapIndexed(schema.fields, (resolve, key) =>
-          this.encodeInternal(context.child(key), resolve(), value[key]),
+        return Object.fromEntries(
+          schema.fields.map(({ key, externalKey, schema }) => [
+            externalKey,
+            this.encodeInternal(
+              context.child(key),
+              resolveSchema(schema),
+              value[key],
+            ),
+          ]),
         )
 
       case SchemaType.Refinement:
@@ -463,26 +470,32 @@ export class JsonCodec implements Codec<JsonValue, JsonValue> {
       })
     }
 
-    const entries = Object.entries(schema.fields).map(([k, schemaLike]) => {
-      const schema = resolveSchema(schemaLike)
+    const entries = schema.fields.map(({ key, externalKey, schema }) => {
       return [
-        k,
-        this.decodeInternal(context.child(k), schema, value[k]),
+        key,
+        this.decodeInternal(
+          context.child(key),
+          resolveSchema(schema),
+          value[externalKey],
+        ),
       ] as const
     })
 
     const hasFailure = entries.some(([_, v]) => either.isLeft(v))
     if (!hasFailure) {
       return success(
-        Object.fromEntries(
-          entries.map(
-            ([k, v]) =>
-              [
-                k,
-                either.getOrElse<ValidationError[], unknown>(() => {
-                  throw new Error('invalid case')
-                })(v),
-              ] as const,
+        Object.assign(
+          Object.create(schema.ctor.prototype),
+          Object.fromEntries(
+            entries.map(
+              ([k, v]) =>
+                [
+                  k,
+                  either.getOrElse<ValidationError[], unknown>(() => {
+                    throw new Error('invalid case')
+                  })(v),
+                ] as const,
+            ),
           ),
         ),
       )

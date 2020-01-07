@@ -1,6 +1,5 @@
 import { SchemaType } from './common'
-import { Constructor, ObjectSchema } from './object'
-import { Schema } from './schema'
+import { Constructor, ObjectSchema, ObjectSchemaField } from './object'
 
 const reflectMap = new WeakMap<Constructor, ObjectSchema<any>>()
 
@@ -12,22 +11,18 @@ export function reflectClass<T>(ctor: Constructor<T>): ObjectSchema<T> {
   return schema
 }
 
-export function decorateProperty<
-  T extends {} = {},
-  Key extends keyof T = keyof T
->(ctor: Constructor<T>, key: Key, resolveSchema: () => Schema) {
-  const schema =
-    reflectMap.get(ctor) ||
-    ({ type: SchemaType.Object, fields: {} } as ObjectSchema<any>)
+export function decorateProperty<T extends {} = {}>(
+  ctor: Constructor<T>,
+  field: ObjectSchemaField,
+) {
+  const objectSchema: ObjectSchema<any> = reflectMap.get(ctor) || {
+    _: undefined as any,
+    type: SchemaType.Object,
+    ctor,
+    fields: [],
+  }
   reflectMap.set(ctor, {
-    ...schema,
-    fields: {
-      ...schema.fields,
-      [key]: resolveSchema,
-    } as any,
+    ...objectSchema,
+    fields: objectSchema.fields.concat(field),
   })
-}
-
-export function decorateClass<T>(ctor: Constructor, schema: ObjectSchema<T>) {
-  reflectMap.set(ctor, schema)
 }

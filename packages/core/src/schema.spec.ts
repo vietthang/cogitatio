@@ -1,8 +1,7 @@
 import { SchemaType } from './common'
 import { List } from './list'
-import { ObjectSchema, Record } from './object'
+import { ObjectSchema } from './object'
 import { Property } from './property'
-import { Refine } from './refine'
 import { resolveSchema } from './schema'
 import { Tuple } from './tuple'
 
@@ -69,30 +68,18 @@ describe('test resolveSchema', () => {
     const schema = resolveSchema(A)
     expect(schema.type).toEqual(SchemaType.Object)
     const fields = (schema as ObjectSchema<any>).fields
-    expect(Object.keys(fields)).toEqual(['str', 'num'])
-    expect(resolveSchema(fields.str)).toEqual({
-      type: SchemaType.Primitive,
-      native: String,
-    })
-    expect(resolveSchema(fields.num)).toEqual({
-      type: SchemaType.Primitive,
-      native: Number,
-    })
-  })
-
-  it('should handle raw object dictionary fine', () => {
-    const schema = resolveSchema(Record({ num: Number, str: String }))
-    expect(schema.type).toStrictEqual(SchemaType.Object)
-    const fields = (schema as ObjectSchema<any>).fields
-    expect(Object.keys(fields)).toEqual(['num', 'str'])
-    expect(resolveSchema(fields.num)).toEqual({
-      type: SchemaType.Primitive,
-      native: Number,
-    })
-    expect(resolveSchema(fields.str)).toEqual({
-      type: SchemaType.Primitive,
-      native: String,
-    })
+    expect(fields).toEqual([
+      {
+        key: 'str',
+        externalKey: 'str',
+        schema: String,
+      },
+      {
+        key: 'num',
+        externalKey: 'num',
+        schema: Number,
+      },
+    ])
   })
 
   it('should handle schema fine', () => {

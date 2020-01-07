@@ -9,6 +9,7 @@ import {
   TaggedUnion,
   Tuple,
 } from '@cogitatio/core'
+import { either } from 'fp-ts'
 import { failure, success, ValidationError } from '../codec'
 import { JsonValue } from './common'
 import { JsonCodec } from './json-codec'
@@ -642,17 +643,52 @@ describe('decode', () => {
 
       @Property(B)
       public readonly nested!: B
+
+      @Property(String, 'alternate2')
+      public readonly alternate!: string
     }
 
     const validate = (i: JsonValue) => decoder.decode(A, i)
 
     it('valid values', () => {
-      expect(
-        validate({ foo: 'foo', bar: 10, nested: { foo: 'string' } }),
-      ).toEqual(success({ foo: 'foo', bar: 10, nested: { foo: 'string' } }))
+      const validation = validate({
+        foo: 'foo',
+        bar: 10,
+        nested: { foo: 'string' },
+        alternate2: 'foo',
+      })
 
-      expect(validate({ foo: 'foo', bar: 10, nested: { foo: 10 } })).toEqual(
-        success({ foo: 'foo', bar: 10, nested: { foo: '10' } }),
+      expect(validation).toEqual(
+        success({
+          foo: 'foo',
+          bar: 10,
+          nested: { foo: 'string' },
+          alternate: 'foo',
+        }),
+      )
+
+      const validatedValue = either.getOrElse<any, any>(() => {
+        throw new Error('guard')
+      })(validation)
+      expect(validatedValue).toBeInstanceOf(A)
+      expect(validatedValue.nested).toBeInstanceOf(B)
+    })
+
+    it('coerce values', () => {
+      expect(
+        validate({
+          foo: 'foo',
+          bar: 10,
+          nested: { foo: 10 },
+          alternate2: 'foo',
+        }),
+      ).toEqual(
+        success({
+          foo: 'foo',
+          bar: 10,
+          nested: { foo: '10' },
+          alternate: 'foo',
+        }),
       )
 
       expect(
@@ -660,9 +696,17 @@ describe('decode', () => {
           foo: 'foo',
           bar: 10,
           nested: { foo: 10 },
+          alternate2: 'foo',
           additional: 'foo',
         }),
-      ).toEqual(success({ foo: 'foo', bar: 10, nested: { foo: '10' } }))
+      ).toEqual(
+        success({
+          foo: 'foo',
+          bar: 10,
+          nested: { foo: '10' },
+          alternate: 'foo',
+        }),
+      )
     })
 
     it('invalid values', () => {
@@ -677,7 +721,14 @@ describe('decode', () => {
         ]),
       )
 
-      expect(validate({ foo: 'foo', bar: 10, nested: { foo: {} } })).toEqual(
+      expect(
+        validate({
+          foo: 'foo',
+          bar: 10,
+          nested: { foo: {} },
+          alternate2: 'foo',
+        }),
+      ).toEqual(
         failure([
           new ValidationError({
             message: 'invalid value for String',
@@ -798,5 +849,18 @@ describe('encode', () => {
   it('Nullable', () => {
     expect(encoder.encode(Nullable(String), 'foo')).toEqual('foo')
     expect(encoder.encode(Nullable(String), null)).toEqual(null)
+  })
+
+  it('Object', () => {
+    class A {
+      @Property(String)
+      public foo!: string
+
+      @Property(String, 'alternate')
+      public alternateName!: string
+    }
+    expect(
+      encoder.encode(A, { foo: 'foo', alternateName: 'alternate' }),
+    ).toEqual({ foo: 'foo', alternate: 'alternate' })
   })
 })

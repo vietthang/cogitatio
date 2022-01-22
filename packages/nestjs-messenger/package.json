@@ -28,7 +28,7 @@
     "@cogitatio/nestjs-validation": "^0.0.12-alpha.3",
     "@nestjs/common": "^6.10.11",
     "@nestjs/core": "^6.10.11",
-    "node-fetch": "^2.6.0"
+    "node-fetch": "^3.1.1"
   },
   "devDependencies": {
     "@types/node-fetch": "^2.5.4",

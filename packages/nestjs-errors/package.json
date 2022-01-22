@@ -26,7 +26,7 @@
     "@types/node-fetch": "^2.5.4",
     "apollo-server-core": "^2.9.14",
     "apollo-server-express": "^2.9.14",
-    "node-fetch": "^2.6.0"
+    "node-fetch": "^3.1.1"
   },
   "dependencies": {
     "@cogitatio/errors": "^0.0.12-alpha.3"

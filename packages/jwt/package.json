@@ -17,7 +17,7 @@
     "@cogitatio/core": "^0.0.12-alpha.3",
     "@cogitatio/errors": "^0.0.12-alpha.3",
     "@cogitatio/extra": "^0.0.12-alpha.3",
-    "jsonwebtoken": "^8.5.1"
+    "jsonwebtoken": "^9.0.0"
   },
   "files": [
     "/src",
